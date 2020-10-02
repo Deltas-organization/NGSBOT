@@ -47,8 +47,7 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
     }
     getfilteredGames(daysInFuture, daysInFutureClamp) {
         return __awaiter(this, void 0, void 0, function* () {
-            var todaysdate = new Date();
-            var todaysUTC = Date.UTC(todaysdate.getFullYear(), todaysdate.getMonth(), todaysdate.getDate());
+            var todaysUTC = new Date().getTime();
             let scheduledGames = yield this.NGSScheduleDataStore.GetSchedule();
             let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture + 1, daysInFutureClamp));
             filteredGames = filteredGames.sort((f1, f2) => {
@@ -77,7 +76,7 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
     }
     filterSchedule(todaysUTC, schedule, daysInFuture, daysInFutureClamp) {
         let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = Date.UTC(scheduledDate.getFullYear(), scheduledDate.getMonth(), scheduledDate.getDate());
+        let scheduledUTC = scheduledDate.getTime();
         var ms = scheduledUTC - todaysUTC;
         let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
         if (dayDifference >= 0 && dayDifference <= daysInFuture) {
@@ -97,16 +96,22 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
             let dayGroupMessages = [];
             for (var i = 0; i < scheduledMatches.length; i++) {
                 let m = scheduledMatches[i];
-                let scheduledDate = new Date(+m.scheduledTime.startTime);
-                let hours = scheduledDate.getHours();
-                let minutes = scheduledDate.getMinutes();
+                let scheduledDateUTC = new Date(+m.scheduledTime.startTime);
+                let hours = scheduledDateUTC.getUTCHours();
+                if (hours <= 5) {
+                    hours = 24 - 5 + hours;
+                }
+                let minutes = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
                     minutes = "00";
                 let newMessage = '';
                 if (currentDaysAhead != m.DaysAhead) {
                     dayGroupMessages.push(message);
+                    let date = scheduledDateUTC.getUTCDate();
+                    if (hours >= 19)
+                        date -= 1;
                     message = "";
-                    newMessage = `\n**__${scheduledDate.getMonth() + 1}/${scheduledDate.getDate()}__** \n`;
+                    newMessage = `\n**__${scheduledDateUTC.getMonth() + 1}/${date}__** \n`;
                     currentDaysAhead = m.DaysAhead;
                     currentTime = -1;
                 }
