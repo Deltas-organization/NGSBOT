@@ -1,0 +1,1 @@
+{"version":3,"file":"adminTranslatorBase.js","sourceRoot":"","sources":["../../../src/translators/bases/adminTranslatorBase.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAkD;AAKlD,MAAsB,mBAAoB,SAAQ,+BAAc;IAE/C,MAAM,CAAC,OAAgB;;YAEhC,IAAG,OAAO,CAAC,MAAM,CAAC,WAAW,CAAC,GAAG,CAAC,eAAe,CAAC;gBAC9C,OAAO,IAAI,CAAC;YAEhB,OAAO,KAAK,CAAC;QACjB,CAAC;KAAA;CACJ;AATD,kDASC"}
