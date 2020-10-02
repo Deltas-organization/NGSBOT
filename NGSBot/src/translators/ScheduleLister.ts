@@ -103,8 +103,7 @@ export class ScheduleLister extends TranslatorBase {
             let minutes: any = scheduledDate.getMinutes();
             if (minutes == 0)
                 minutes = "00";
-
-
+                
             let newMessage = ''
 
             if (currentDaysAhead != m.DaysAhead) {
