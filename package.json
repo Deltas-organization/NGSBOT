@@ -14,7 +14,6 @@
     "dotenv": "^8.2.0",
     "inversify": "^5.0.1",
     "node-fetch": "^2.6.0",
-    "node-ipc": "^9.1.1",
     "reflect-metadata": "^0.1.13",
     "typescript": "^3.9.3"
   },

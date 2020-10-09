@@ -29,6 +29,7 @@ const NGSDataStore_1 = require("./NGSDataStore");
 const NGSScheduleDataStore_1 = require("./NGSScheduleDataStore");
 const ScheduleLister_1 = require("./translators/ScheduleLister");
 const commandLister_1 = require("./translators/commandLister");
+const MessageSender_1 = require("./helpers/MessageSender");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -44,8 +45,9 @@ let Bot = /** @class */ (() => {
             // this.translators.push(new PendingChecker(client));
             // this.translators.push(new HistoryChecker(client, NGSDataStore));
             // this.translators.push(new DivisionLister(client, NGSDataStore));
-            this.translators.push(new ScheduleLister_1.ScheduleLister(client, NGSScheduleDataStore));
             // this.translators.push(new StandingsLister(client));
+            this.scheduleLister = new ScheduleLister_1.ScheduleLister(client, NGSScheduleDataStore);
+            this.translators.push(this.scheduleLister);
             this.translators.push(new commandLister_1.CommandLister(client, this.translators));
         }
         listen() {
@@ -62,6 +64,15 @@ let Bot = /** @class */ (() => {
                     translator.Translate(trimmedValue, message);
                 });
             }
+        }
+        sendSchedule() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.client.login(this.token);
+                let messages = yield this.scheduleLister.getGameMessagesForToday();
+                for (var index = 0; index < messages.length; index++) {
+                    yield MessageSender_1.MessageSender.SendMessageToChannel(this.client, messages[index], "761410049926889544");
+                }
+            });
         }
     };
     Bot = __decorate([

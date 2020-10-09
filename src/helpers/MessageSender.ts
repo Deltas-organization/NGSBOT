@@ -6,11 +6,8 @@ export class MessageSender {
         return this.originalMessage.channel;
     }
 
-    public get Mentions() {
-        return this.originalMessage.mentions;
-    }
-
     constructor(private client: Client, public readonly originalMessage: Message) {
+
     }
 
     public async SendMessage(message: string) {
@@ -34,6 +31,24 @@ export class MessageSender {
 
     public async SendMessageToChannel(message: string, channelID: string) {
         var myChannel = this.originalMessage.guild.channels.cache.find(channel => channel.id == channelID) as TextChannel;
-        await myChannel.send(message);        
+        await myChannel.send({
+            embed: {
+                color: 0,
+                description: message
+            }
+        });       
+    }
+    
+    public static async SendMessageToChannel(client: Client, message: string, channelID: string) {
+        client.channels.cache.forEach(server => {
+            console.log(server.id + " (id: " + server.id + ")");
+        });
+        var myChannel = client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
+        await myChannel.send({
+            embed: {
+                color: 0,
+                description: message
+            }
+        });        
     }
 }

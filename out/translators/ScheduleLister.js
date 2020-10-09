@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleLister = void 0;
-const translatorBase_1 = require("./bases/translatorBase");
-class ScheduleLister extends translatorBase_1.TranslatorBase {
+const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
+class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     constructor(client, NGSScheduleDataStore) {
         super(client);
         this.NGSScheduleDataStore = NGSScheduleDataStore;
@@ -42,7 +42,16 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                     endDays = -1;
             }
             let filteredGames = yield this.getfilteredGames(duration, endDays);
-            yield this.SendMessages(filteredGames, messageSender);
+            let messages = yield this.getMessages(filteredGames);
+            for (var index = 0; index < messages.length; index++) {
+                yield messageSender.SendMessage(messages[index]);
+            }
+        });
+    }
+    getGameMessagesForToday() {
+        return __awaiter(this, void 0, void 0, function* () {
+            var filteredGames = yield this.getfilteredGames(0, 0);
+            return yield this.getMessages(filteredGames);
         });
     }
     getfilteredGames(daysInFuture, daysInFutureClamp) {
@@ -55,11 +64,19 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                 if (result == 0) {
                     let f1Date = new Date(+f1.scheduledTime.startTime);
                     let f2Date = new Date(+f2.scheduledTime.startTime);
-                    let timeDiff = f1Date.getTime() - f2Date.getTime();
-                    if (timeDiff > 0)
+                    let result = f1Date.getHours() - f2Date.getHours();
+                    if (result > 0)
                         return 1;
-                    else
+                    else if (result < 0)
                         return -1;
+                    else {
+                        result = f1Date.getMinutes() - f2Date.getMinutes();
+                        if (result > 0)
+                            return 1;
+                        else if (result < 0)
+                            return -1;
+                        return 0;
+                    }
                 }
                 return result;
             });
@@ -80,8 +97,9 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
         }
         return false;
     }
-    SendMessages(scheduledMatches, messageSender) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getMessages(scheduledMatches) {
+        return new Promise((resolver, rejector) => {
+            let messagesToSend = [];
             let message = '';
             let currentDaysAhead = -1;
             let currentTime = -1;
@@ -92,9 +110,6 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                 let hours = scheduledDateUTC.getUTCHours();
                 if (hours <= 5) {
                     hours = 24 - 5 + hours;
-                }
-                else {
-                    hours -= 5;
                 }
                 let minutes = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
@@ -119,7 +134,7 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                         hours -= 12;
                         pmMessage = "pm";
                     }
-                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | ${hours}:${minutes}${pmMessage} C |  `;
+                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | `;
                     if (hours + 1 == 12) {
                         pmMessage = "am";
                     }
@@ -141,12 +156,13 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
             for (var i = 0; i < dayGroupMessages.length; i++) {
                 let groupMessage = dayGroupMessages[i];
                 if (groupMessage.length + message.length > 2048) {
-                    yield messageSender.SendMessage(message);
+                    messagesToSend.push(message);
                     message = "";
                 }
                 message += groupMessage;
             }
-            yield messageSender.SendMessage(message);
+            messagesToSend.push(message);
+            resolver(messagesToSend);
         });
     }
 }

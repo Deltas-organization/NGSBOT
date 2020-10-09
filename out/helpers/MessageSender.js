@@ -18,9 +18,6 @@ class MessageSender {
     get TextChannel() {
         return this.originalMessage.channel;
     }
-    get Mentions() {
-        return this.originalMessage.mentions;
-    }
     SendMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.TextChannel.send({
@@ -45,7 +42,26 @@ class MessageSender {
     SendMessageToChannel(message, channelID) {
         return __awaiter(this, void 0, void 0, function* () {
             var myChannel = this.originalMessage.guild.channels.cache.find(channel => channel.id == channelID);
-            yield myChannel.send(message);
+            yield myChannel.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
+        });
+    }
+    static SendMessageToChannel(client, message, channelID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            client.channels.cache.forEach(server => {
+                console.log(server.id + " (id: " + server.id + ")");
+            });
+            var myChannel = client.channels.cache.find(channel => channel.id == channelID);
+            yield myChannel.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
         });
     }
 }
