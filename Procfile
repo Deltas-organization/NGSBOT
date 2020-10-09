@@ -1,2 +1,2 @@
 worker: node out/index.js;
-sendschedule: node out/schdule-cron.js
+sendschedule: node out/schedule-cron.js
