@@ -1,0 +1,18 @@
+#! /app/bin/node
+
+var ipc = require('node-ipc');
+
+ipc.config.id = 'scheduleSender';
+ipc.config.retry = 1500;
+
+ipc.connectTo(
+    "NGSBotServer",
+    function () {
+        ipc.of.NGSBotServer.on(
+            'connect',
+            function () {
+                ipc.of.NGSBotServer.emit('message', 'reloadSchedule');
+                process.exit();
+            });
+    }
+);

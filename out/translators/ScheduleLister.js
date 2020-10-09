@@ -124,7 +124,7 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                         hours -= 12;
                         pmMessage = "pm";
                     }
-                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | `;
+                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | ${hours}:${minutes}${pmMessage} C |  `;
                     if (hours + 1 == 12) {
                         pmMessage = "am";
                     }
