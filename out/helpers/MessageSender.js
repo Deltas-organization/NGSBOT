@@ -52,16 +52,15 @@ class MessageSender {
     }
     static SendMessageToChannel(client, message, channelID) {
         return __awaiter(this, void 0, void 0, function* () {
-            client.channels.cache.forEach(server => {
-                console.log(server.id + " (id: " + server.id + ")");
-            });
             var myChannel = client.channels.cache.find(channel => channel.id == channelID);
-            yield myChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
+            if (myChannel != null) {
+                yield myChannel.send({
+                    embed: {
+                        color: 0,
+                        description: message
+                    }
+                });
+            }
         });
     }
 }

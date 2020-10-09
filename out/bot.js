@@ -69,8 +69,12 @@ let Bot = /** @class */ (() => {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
                 let messages = yield this.scheduleLister.getGameMessagesForToday();
-                for (var index = 0; index < messages.length; index++) {
-                    yield MessageSender_1.MessageSender.SendMessageToChannel(this.client, messages[index], "761410049926889544");
+                //My TEst Server and NGS HypeChannel
+                let channelsToReceiveMessage = ["761410049926889544", "522574547405242389"];
+                for (var channelIndex = 0; channelIndex < channelsToReceiveMessage.length; channelIndex++) {
+                    for (var index = 0; index < messages.length; index++) {
+                        yield MessageSender_1.MessageSender.SendMessageToChannel(this.client, messages[index], channelsToReceiveMessage[channelIndex]);
+                    }
                 }
             });
         }

@@ -19,7 +19,7 @@ export class MessageSender {
         });
     }
 
-    public async SendFields(description: string, fields: {name: string, value: string}[]) {
+    public async SendFields(description: string, fields: { name: string, value: string }[]) {
         await this.TextChannel.send({
             embed: {
                 color: 0,
@@ -36,19 +36,18 @@ export class MessageSender {
                 color: 0,
                 description: message
             }
-        });       
-    }
-    
-    public static async SendMessageToChannel(client: Client, message: string, channelID: string) {
-        client.channels.cache.forEach(server => {
-            console.log(server.id + " (id: " + server.id + ")");
         });
+    }
+
+    public static async SendMessageToChannel(client: Client, message: string, channelID: string) {
         var myChannel = client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
-        await myChannel.send({
-            embed: {
-                color: 0,
-                description: message
-            }
-        });        
+        if (myChannel != null) {
+            await myChannel.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
+        }
     }
 }
