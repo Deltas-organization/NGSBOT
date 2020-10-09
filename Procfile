@@ -1,2 +1,2 @@
 worker: node out/index.js;
-server: node out/start-server.js;
+server: node out/sub-pub/start-server.js;
