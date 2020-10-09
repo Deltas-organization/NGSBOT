@@ -1,11 +1,15 @@
 #! /app/bin/node
 
-require('dotenv').config(); // Recommended way of loading dotenv
-import container from "../src/inversify/inversify.config";
-import {TYPES} from "../src/inversify/types";
-import {Bot} from "../src/bot";
-let bot = container.get(TYPES.Bot);
-bot.sendSchedule().then(() =>
-{
-    process.exit();
-})
+// require('dotenv').config(); // Recommended way of loading dotenv
+// import container from "../src/inversify/inversify.config";
+// import {TYPES} from "../src/inversify/types";
+// import {Bot} from "../src/bot";
+// let bot = container.get(TYPES.Bot);
+// bot.sendSchedule().then(() =>
+// {
+//     process.exit();
+// })
+function sayHello() {
+    console.log('Hello JS World');
+  }
+ sayHello();
