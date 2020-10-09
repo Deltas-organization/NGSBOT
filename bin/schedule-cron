@@ -1,4 +1,4 @@
-#! /app/bin/node
+#! /app/bin
 
 // require('dotenv').config(); // Recommended way of loading dotenv
 // import container from "../src/inversify/inversify.config";
