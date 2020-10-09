@@ -55,19 +55,11 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                 if (result == 0) {
                     let f1Date = new Date(+f1.scheduledTime.startTime);
                     let f2Date = new Date(+f2.scheduledTime.startTime);
-                    let result = f1Date.getHours() - f2Date.getHours();
-                    if (result > 0)
+                    let timeDiff = f1Date.getTime() - f2Date.getTime();
+                    if (timeDiff > 0)
                         return 1;
-                    else if (result < 0)
+                    else
                         return -1;
-                    else {
-                        result = f1Date.getMinutes() - f2Date.getMinutes();
-                        if (result > 0)
-                            return 1;
-                        else if (result < 0)
-                            return -1;
-                        return 0;
-                    }
                 }
                 return result;
             });
@@ -100,6 +92,9 @@ class ScheduleLister extends translatorBase_1.TranslatorBase {
                 let hours = scheduledDateUTC.getUTCHours();
                 if (hours <= 5) {
                     hours = 24 - 5 + hours;
+                }
+                else {
+                    hours -= 5;
                 }
                 let minutes = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
