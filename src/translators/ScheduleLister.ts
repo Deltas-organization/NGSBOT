@@ -41,9 +41,8 @@ export class ScheduleLister extends AdminTranslatorBase {
 
         let filteredGames = await this.getfilteredGames(duration, endDays);
         let messages = await this.getMessages(filteredGames);
-        for(var index = 0; index < messages.length; index++)
-        {
-            await messageSender.SendMessage(messages[index]);        
+        for (var index = 0; index < messages.length; index++) {
+            await messageSender.SendMessage(messages[index]);
         }
     }
 
@@ -61,19 +60,13 @@ export class ScheduleLister extends AdminTranslatorBase {
             if (result == 0) {
                 let f1Date = new Date(+f1.scheduledTime.startTime);
                 let f2Date = new Date(+f2.scheduledTime.startTime);
-                let result = f1Date.getHours() - f2Date.getHours();
-                if (result > 0)
+                let timeDiff = f1Date.getTime() - f2Date.getTime();
+                if (timeDiff > 0)
                     return 1;
-                else if (result < 0)
+                else if (timeDiff < 0)
                     return -1;
-                else {
-                    result = f1Date.getMinutes() - f2Date.getMinutes();
-                    if (result > 0)
-                        return 1;
-                    else if (result < 0)
-                        return -1;
+                else 
                     return 0;
-                }
             }
 
             return result;
@@ -111,9 +104,11 @@ export class ScheduleLister extends AdminTranslatorBase {
                 let m = scheduledMatches[i];
                 let scheduledDateUTC = new Date(+m.scheduledTime.startTime);
                 let hours = scheduledDateUTC.getUTCHours();
-                if (hours <= 5) {
+                if (hours <= 5)
                     hours = 24 - 5 + hours;
-                }
+                else
+                    hours -= 5;
+
                 let minutes: any = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
                     minutes = "00";
@@ -142,7 +137,7 @@ export class ScheduleLister extends AdminTranslatorBase {
                         pmMessage = "pm";
                     }
 
-                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | `;
+                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | ${hours}:${minutes}${pmMessage} C | `;
                     if (hours + 1 == 12) {
                         pmMessage = "am";
                     }
