@@ -140,11 +140,8 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             });
             filteredGames = this.sortSchedule(filteredGames);
             let messages = yield this.getMessages(filteredGames);
-            console.log('this many');
-            console.log(messages.length);
             for (var index = 0; index < messages.length; index++) {
                 yield messageSender.SendMessage(messages[index]);
-                console.log('sending');
             }
         });
     }

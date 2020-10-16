@@ -148,11 +148,8 @@ export class ScheduleLister extends AdminTranslatorBase {
         });
         filteredGames = this.sortSchedule(filteredGames);
         let messages = await this.getMessages(filteredGames);
-        console.log('this many');
-        console.log(messages.length)
         for (var index = 0; index < messages.length; index++) {
             await messageSender.SendMessage(messages[index]);
-            console.log('sending');
         }
     }
 
