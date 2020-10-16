@@ -26,18 +26,17 @@ const discord_js_1 = require("discord.js");
 const inversify_1 = require("inversify");
 const types_1 = require("./inversify/types");
 const NGSDataStore_1 = require("./NGSDataStore");
-const NGSScheduleDataStore_1 = require("./NGSScheduleDataStore");
 const ScheduleLister_1 = require("./translators/ScheduleLister");
 const commandLister_1 = require("./translators/commandLister");
 const MessageSender_1 = require("./helpers/MessageSender");
+const LiveDataStore_1 = require("./LiveDataStore");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
-        constructor(client, token, NGSDataStore, NGSScheduleDataStore) {
+        constructor(client, token, NGSDataStore) {
             this.client = client;
             this.token = token;
             this.NGSDataStore = NGSDataStore;
-            this.NGSScheduleDataStore = NGSScheduleDataStore;
             this.translators = [];
             // this.translators.push(new NameChecker(client, NGSDataStore));
             // this.translators.push(new TeamNameChecker(client, NGSDataStore));
@@ -46,7 +45,8 @@ let Bot = /** @class */ (() => {
             // this.translators.push(new HistoryChecker(client, NGSDataStore));
             // this.translators.push(new DivisionLister(client, NGSDataStore));
             // this.translators.push(new StandingsLister(client));
-            this.scheduleLister = new ScheduleLister_1.ScheduleLister(client, NGSScheduleDataStore);
+            const liveDataStore = new LiveDataStore_1.LiveDataStore();
+            this.scheduleLister = new ScheduleLister_1.ScheduleLister(client, liveDataStore);
             this.translators.push(this.scheduleLister);
             this.translators.push(new commandLister_1.CommandLister(client, this.translators));
         }
@@ -84,9 +84,7 @@ let Bot = /** @class */ (() => {
         __param(0, inversify_1.inject(types_1.TYPES.Client)),
         __param(1, inversify_1.inject(types_1.TYPES.Token)),
         __param(2, inversify_1.inject(types_1.TYPES.NGSDataStore)),
-        __param(3, inversify_1.inject(types_1.TYPES.NGSScheduleDataStore)),
-        __metadata("design:paramtypes", [discord_js_1.Client, String, NGSDataStore_1.NGSDataStore,
-            NGSScheduleDataStore_1.NGSScheduleDataStore])
+        __metadata("design:paramtypes", [discord_js_1.Client, String, NGSDataStore_1.NGSDataStore])
     ], Bot);
     return Bot;
 })();

@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StandingsLister = void 0;
-const translatorBase_1 = require("./bases/translatorBase");
 const http = require("http");
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
-class StandingsLister extends translatorBase_1.TranslatorBase {
+const deltaTranslatorBase_1 = require("./bases/deltaTranslatorBase");
+class StandingsLister extends deltaTranslatorBase_1.DeltaTranslatorBase {
     constructor(client) {
         super(client);
     }
