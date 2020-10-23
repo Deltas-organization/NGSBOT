@@ -1,11 +1,12 @@
 
 import { Cacher } from './helpers/Cacher';
 import { QueryBuilder } from './helpers/QueryBuilder';
-import { INGSSchedule } from './interfaces/INGSSchedule';
+import { INGSSchedule, INGSUser } from './interfaces';
 
 export class LiveDataStore {
     private cachedDivisions = new Cacher<INGSDivision[]>(60 * 24);
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
+    private cachedUsers = new Cacher<INGSUser[]>(60);
 
     public async GetDivisions(): Promise<INGSDivision[]> {
         return this.cachedDivisions.TryGetFromCache(() => new QueryBuilder().GetResponse<INGSDivision[]>('/division/get/all'));
@@ -15,6 +16,36 @@ export class LiveDataStore {
         return this.cachedSchedule.TryGetFromCache(() => new QueryBuilder().GetResponse<INGSSchedule[]>('/schedule/get/matches/scheduled?season=10'));
     }
 
+    public async GetUsers(): Promise<INGSUser[]>
+    {
+        return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
+    }
+
+    private async GetFreshUsers(): Promise<INGSUser[]>
+    {
+        let allUsers = [];
+        const divisions = await this.GetDivisions();
+        for(let division of divisions)
+        {
+            for(let team of division.teams)
+            {
+                try
+                {
+                    console.log(`/team/get?team=${escape(team)}`);
+                    const teamResponse = await new QueryBuilder().GetResponse<INGSTeam>(`/team/get?team=${escape(team)}`);
+                    const encodedUsers = teamResponse.teamMembers.map(member => escape(member.displayName));
+                    const teamMembers = await new QueryBuilder().GetResponse<INGSUser[]>(`/user/get?users=${encodedUsers.join()}`);
+                    allUsers = allUsers.concat(teamMembers);
+                }
+                catch (e)
+                {
+                    console.log(`/team/get?team=${escape(team)}`);
+                }
+            }
+        }
+
+        return allUsers;
+    }
 
     public async FindTeams(searchTerm: string): Promise<INGSTeam[]> {
         const validTeams = await this.GetValidTeams(searchTerm);

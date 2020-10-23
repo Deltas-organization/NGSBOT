@@ -18,9 +18,14 @@ class QueryBuilder {
                     chunks += chunk;
                 });
                 result.on('end', () => {
-                    var parsedObject = JSON.parse(chunks);
-                    var response = parsedObject.returnObject;
-                    resolver(response);
+                    try {
+                        var parsedObject = JSON.parse(chunks);
+                        var response = parsedObject.returnObject;
+                        resolver(response);
+                    }
+                    catch (e) {
+                        rejector();
+                    }
                 });
             });
             req.on('error', (e) => {

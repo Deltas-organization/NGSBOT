@@ -16,6 +16,7 @@ class LiveDataStore {
     constructor() {
         this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
         this.cachedSchedule = new Cacher_1.Cacher(60);
+        this.cachedUsers = new Cacher_1.Cacher(60);
     }
     GetDivisions() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -24,6 +25,32 @@ class LiveDataStore {
     }
     GetSchedule() {
         return this.cachedSchedule.TryGetFromCache(() => new QueryBuilder_1.QueryBuilder().GetResponse('/schedule/get/matches/scheduled?season=10'));
+    }
+    GetUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
+        });
+    }
+    GetFreshUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let allUsers = [];
+            const divisions = yield this.GetDivisions();
+            for (let division of divisions) {
+                for (let team of division.teams) {
+                    try {
+                        console.log(`/team/get?team=${escape(team)}`);
+                        const teamResponse = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/team/get?team=${escape(team)}`);
+                        const encodedUsers = teamResponse.teamMembers.map(member => escape(member.displayName));
+                        const teamMembers = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
+                        allUsers = allUsers.concat(teamMembers);
+                    }
+                    catch (e) {
+                        console.log(`/team/get?team=${escape(team)}`);
+                    }
+                }
+            }
+            return allUsers;
+        });
     }
     FindTeams(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {

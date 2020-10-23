@@ -6,6 +6,11 @@ export class MessageSender {
         return this.originalMessage.channel;
     }
 
+    public get Requester()
+    {
+        return this.originalMessage.member.user;
+    }
+
     constructor(private client: Client, public readonly originalMessage: Message) {
 
     }
