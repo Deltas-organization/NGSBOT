@@ -1,9 +1,8 @@
-import { TranslatorBase } from "./bases/translatorBase";
 import { INGSSchedule } from "../interfaces/INGSSchedule";
-import { NGSScheduleDataStore } from "../NGSScheduleDataStore";
 import { MessageSender } from "../helpers/MessageSender";
 import { Client } from "discord.js";
-import { debug } from "console";
+import { LiveDataStore } from "../LiveDataStore";
+import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 
 export class ScheduleLister extends AdminTranslatorBase {
@@ -16,8 +15,13 @@ export class ScheduleLister extends AdminTranslatorBase {
         return "Displays the Schedule for Today or a future date if a number is also provided, detailed (-d) will return all days betwen now and the number provided, up to 10.";
     }
 
-    constructor(client: Client, private NGSScheduleDataStore: NGSScheduleDataStore) {
+    constructor(client: Client, private liveDataStore: LiveDataStore) {
         super(client);
+    }
+
+    public async getGameMessagesForToday() {
+        var filteredGames = await this.getfilteredGames(0, 0);
+        return await this.getMessages(filteredGames);
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
@@ -26,7 +30,7 @@ export class ScheduleLister extends AdminTranslatorBase {
         if (commands.length == 1) {
             let parsedNumber = parseInt(commands[0])
             if (isNaN(parsedNumber)) {
-                await messageSender.SendMessage(`the value provided is not a number: ${commands[0]}`)
+                await this.SearchByDivision(commands, messageSender);
                 return;
             }
             if (parsedNumber > 10) {
@@ -38,6 +42,11 @@ export class ScheduleLister extends AdminTranslatorBase {
             if (detailed)
                 endDays = -1;
         }
+        else if (commands.length == 2) {
+            await this.SearchByDivision(commands, messageSender);
+            return;
+        }
+
 
         let filteredGames = await this.getfilteredGames(duration, endDays);
         let messages = await this.getMessages(filteredGames);
@@ -46,14 +55,9 @@ export class ScheduleLister extends AdminTranslatorBase {
         }
     }
 
-    public async getGameMessagesForToday() {
-        var filteredGames = await this.getfilteredGames(0, 0);
-        return await this.getMessages(filteredGames);
-    }
-
     private async getfilteredGames(daysInFuture: number, daysInFutureClamp: number) {
         var todaysUTC = new Date().getTime();
-        let scheduledGames = await this.NGSScheduleDataStore.GetSchedule();
+        let scheduledGames = await this.liveDataStore.GetSchedule();
         let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture + 1, daysInFutureClamp));
         filteredGames = filteredGames.sort((f1, f2) => {
             let result = f1.DaysAhead - f2.DaysAhead
@@ -90,6 +94,63 @@ export class ScheduleLister extends AdminTranslatorBase {
         }
 
         return false;
+    }
+
+    private sortSchedule(filteredGames: INGSSchedule[]): INGSSchedule[] {
+        return filteredGames.sort((f1, f2) => {
+            let result = f1.DaysAhead - f2.DaysAhead
+            if (result == 0) {
+                let f1Date = new Date(+f1.scheduledTime.startTime);
+                let f2Date = new Date(+f2.scheduledTime.startTime);
+                let timeDiff = f1Date.getTime() - f2Date.getTime();
+                if (timeDiff > 0)
+                    return 1;
+                else if (timeDiff < 0)
+                    return -1;
+                else
+                    return 0;
+            }
+
+            return result;
+        });
+    }
+
+    public async SearchByDivision(commands: string[], messageSender: MessageSender) {
+        var division = commands[0];
+        if (commands.length == 2) {
+            var coast = commands[1];
+            if (coast.toLowerCase() == "ne")
+                division += "-northeast";
+            else if (coast.toLowerCase() == "se")
+                division += "-southeast";
+            else
+                division += `-${coast}`;
+        }
+
+        var todaysUTC = new Date().getTime();
+        let scheduledGames = await this.liveDataStore.GetSchedule();
+        let filteredGames = scheduledGames.filter(s => {
+            let scheduledDate = new Date(+s.scheduledTime.startTime);
+            let scheduledUTC = scheduledDate.getTime();
+
+            if (scheduledUTC < todaysUTC)
+                return false;
+
+            if (!s.divisionConcat.startsWith(division))
+                return false;
+
+            const ms = scheduledUTC - todaysUTC;
+            const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
+
+            s.DaysAhead = dayDifference;
+
+            return true;
+        });
+        filteredGames = this.sortSchedule(filteredGames);
+        let messages = await this.getMessages(filteredGames);
+        for (var index = 0; index < messages.length; index++) {
+            await messageSender.SendMessage(messages[index]);
+        }
     }
 
     private getMessages(scheduledMatches: INGSSchedule[]): Promise<string[]> {

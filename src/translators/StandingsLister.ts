@@ -5,8 +5,9 @@ import { MessageSender } from "../helpers/MessageSender";
 import * as http from 'http';
 import { INGSStanding } from "../interfaces/INGSStanding";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
+import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 
-export class StandingsLister extends TranslatorBase {
+export class StandingsLister extends DeltaTranslatorBase {
 
     constructor(client: Client) {
         super(client);

@@ -12,15 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
-    constructor(client, NGSScheduleDataStore) {
+    constructor(client, liveDataStore) {
         super(client);
-        this.NGSScheduleDataStore = NGSScheduleDataStore;
+        this.liveDataStore = liveDataStore;
     }
     get commandBangs() {
         return ["Schedule", "sch"];
     }
     get description() {
         return "Displays the Schedule for Today or a future date if a number is also provided, detailed (-d) will return all days betwen now and the number provided, up to 10.";
+    }
+    getGameMessagesForToday() {
+        return __awaiter(this, void 0, void 0, function* () {
+            var filteredGames = yield this.getfilteredGames(0, 0);
+            return yield this.getMessages(filteredGames);
+        });
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,7 +35,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             if (commands.length == 1) {
                 let parsedNumber = parseInt(commands[0]);
                 if (isNaN(parsedNumber)) {
-                    yield messageSender.SendMessage(`the value provided is not a number: ${commands[0]}`);
+                    yield this.SearchByDivision(commands, messageSender);
                     return;
                 }
                 if (parsedNumber > 10) {
@@ -41,6 +47,10 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 if (detailed)
                     endDays = -1;
             }
+            else if (commands.length == 2) {
+                yield this.SearchByDivision(commands, messageSender);
+                return;
+            }
             let filteredGames = yield this.getfilteredGames(duration, endDays);
             let messages = yield this.getMessages(filteredGames);
             for (var index = 0; index < messages.length; index++) {
@@ -48,16 +58,10 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             }
         });
     }
-    getGameMessagesForToday() {
-        return __awaiter(this, void 0, void 0, function* () {
-            var filteredGames = yield this.getfilteredGames(0, 0);
-            return yield this.getMessages(filteredGames);
-        });
-    }
     getfilteredGames(daysInFuture, daysInFutureClamp) {
         return __awaiter(this, void 0, void 0, function* () {
             var todaysUTC = new Date().getTime();
-            let scheduledGames = yield this.NGSScheduleDataStore.GetSchedule();
+            let scheduledGames = yield this.liveDataStore.GetSchedule();
             let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture + 1, daysInFutureClamp));
             filteredGames = filteredGames.sort((f1, f2) => {
                 let result = f1.DaysAhead - f2.DaysAhead;
@@ -90,6 +94,56 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             return true;
         }
         return false;
+    }
+    sortSchedule(filteredGames) {
+        return filteredGames.sort((f1, f2) => {
+            let result = f1.DaysAhead - f2.DaysAhead;
+            if (result == 0) {
+                let f1Date = new Date(+f1.scheduledTime.startTime);
+                let f2Date = new Date(+f2.scheduledTime.startTime);
+                let timeDiff = f1Date.getTime() - f2Date.getTime();
+                if (timeDiff > 0)
+                    return 1;
+                else if (timeDiff < 0)
+                    return -1;
+                else
+                    return 0;
+            }
+            return result;
+        });
+    }
+    SearchByDivision(commands, messageSender) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var division = commands[0];
+            if (commands.length == 2) {
+                var coast = commands[1];
+                if (coast.toLowerCase() == "ne")
+                    division += "-northeast";
+                else if (coast.toLowerCase() == "se")
+                    division += "-southeast";
+                else
+                    division += `-${coast}`;
+            }
+            var todaysUTC = new Date().getTime();
+            let scheduledGames = yield this.liveDataStore.GetSchedule();
+            let filteredGames = scheduledGames.filter(s => {
+                let scheduledDate = new Date(+s.scheduledTime.startTime);
+                let scheduledUTC = scheduledDate.getTime();
+                if (scheduledUTC < todaysUTC)
+                    return false;
+                if (!s.divisionConcat.startsWith(division))
+                    return false;
+                const ms = scheduledUTC - todaysUTC;
+                const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
+                s.DaysAhead = dayDifference;
+                return true;
+            });
+            filteredGames = this.sortSchedule(filteredGames);
+            let messages = yield this.getMessages(filteredGames);
+            for (var index = 0; index < messages.length; index++) {
+                yield messageSender.SendMessage(messages[index]);
+            }
+        });
     }
     getMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {

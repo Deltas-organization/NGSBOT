@@ -1,7 +1,6 @@
 import { ITranslate } from "../../interfaces/ITranslator";
 import { Client, TextChannel, Message } from "discord.js";
 import { MessageSender } from "../../helpers/MessageSender";
-import { IConfiguration } from "../../interfaces/IConfiguration";
 
 export abstract class TranslatorBase implements ITranslate {
 

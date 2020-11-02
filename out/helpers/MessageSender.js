@@ -18,6 +18,9 @@ class MessageSender {
     get TextChannel() {
         return this.originalMessage.channel;
     }
+    get Requester() {
+        return this.originalMessage.member.user;
+    }
     SendMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.TextChannel.send({
