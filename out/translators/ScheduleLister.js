@@ -156,10 +156,10 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 let m = scheduledMatches[i];
                 let scheduledDateUTC = new Date(+m.scheduledTime.startTime);
                 let hours = scheduledDateUTC.getUTCHours();
-                if (hours <= 5)
-                    hours = 24 - 4 + hours;
+                if (hours <= 6)
+                    hours = 24 - 6 + hours;
                 else
-                    hours -= 4;
+                    hours -= 6;
                 let minutes = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
                     minutes = "00";
