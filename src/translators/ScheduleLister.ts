@@ -105,9 +105,9 @@ export class ScheduleLister extends AdminTranslatorBase {
                 let scheduledDateUTC = new Date(+m.scheduledTime.startTime);
                 let hours = scheduledDateUTC.getUTCHours();
                 if (hours <= 5)
-                    hours = 24 - 5 + hours;
+                    hours = 24 - 4 + hours;
                 else
-                    hours -= 5;
+                    hours -= 4;
 
                 let minutes: any = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
