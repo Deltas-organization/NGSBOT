@@ -201,6 +201,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 }
                 message += newMessage;
             }
+            dayGroupMessages.push(message);
             message = "";
             for (var i = 0; i < dayGroupMessages.length; i++) {
                 let groupMessage = dayGroupMessages[i];
