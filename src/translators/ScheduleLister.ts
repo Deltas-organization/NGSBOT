@@ -58,7 +58,7 @@ export class ScheduleLister extends AdminTranslatorBase {
     private async getfilteredGames(daysInFuture: number, daysInFutureClamp: number) {
         var todaysUTC = new Date().getTime();
         let scheduledGames = await this.liveDataStore.GetSchedule();
-        let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture + 1, daysInFutureClamp));
+        let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
         filteredGames = filteredGames.sort((f1, f2) => {
             let result = f1.DaysAhead - f2.DaysAhead
             if (result == 0) {
