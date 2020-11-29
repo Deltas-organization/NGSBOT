@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslatorBase = void 0;
 const MessageSender_1 = require("../../helpers/MessageSender");
 class TranslatorBase {
-    constructor(client) {
-        this.client = client;
+    constructor(translatorDependencies) {
+        this.translatorDependencies = translatorDependencies;
         this.Init();
     }
     Init() {
@@ -37,7 +37,7 @@ class TranslatorBase {
             });
             if (foundBang) {
                 let commands = this.RetrieveCommands(command);
-                let messageSender = new MessageSender_1.MessageSender(this.client, message);
+                let messageSender = new MessageSender_1.MessageSender(this.translatorDependencies.client, message, this.translatorDependencies.messageStore);
                 this.Interpret(commands, detailed, messageSender);
             }
         });

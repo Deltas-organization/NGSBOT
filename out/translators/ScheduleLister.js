@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
+const globals_1 = require("../globals");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
-    constructor(client, liveDataStore) {
-        super(client);
+    constructor(translatorDependencies, liveDataStore) {
+        super(translatorDependencies);
         this.liveDataStore = liveDataStore;
     }
     get commandBangs() {
@@ -25,6 +26,10 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     getGameMessagesForToday() {
         return __awaiter(this, void 0, void 0, function* () {
             var filteredGames = yield this.getfilteredGames(0, 0);
+            if (filteredGames.length <= 0) {
+                globals_1.Globals.log("No games available for today.");
+                return;
+            }
             return yield this.getMessages(filteredGames);
         });
     }
@@ -56,6 +61,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             for (var index = 0; index < messages.length; index++) {
                 yield messageSender.SendMessage(messages[index]);
             }
+            yield messageSender.originalMessage.delete();
         });
     }
     getfilteredGames(daysInFuture, daysInFutureClamp) {

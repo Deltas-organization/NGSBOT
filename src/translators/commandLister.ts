@@ -3,6 +3,8 @@ import { Client } from "discord.js";
 import { execFile } from "child_process";
 import { ITranslate } from "../interfaces/ITranslator";
 import { TranslatorBase } from "./bases/translatorBase";
+import { MessageStore } from "../MessageStore";
+import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 
 export class CommandLister extends TranslatorBase {
 
@@ -14,8 +16,8 @@ export class CommandLister extends TranslatorBase {
         return "Lists the available commands";
     }
 
-    constructor(client: Client, private translators: ITranslate[]) {
-        super(client);
+    constructor(translatorDependencies: TranslatorDependencies, private translators: ITranslate[]) {
+        super(translatorDependencies);
     }
 
     protected Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {

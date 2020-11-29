@@ -14,8 +14,8 @@ const http = require("http");
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
 const deltaTranslatorBase_1 = require("./bases/deltaTranslatorBase");
 class StandingsLister extends deltaTranslatorBase_1.DeltaTranslatorBase {
-    constructor(client) {
-        super(client);
+    constructor(translatorDependencies) {
+        super(translatorDependencies);
     }
     get commandBangs() {
         return ["St", "Standing", "Standings"];

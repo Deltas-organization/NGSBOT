@@ -7,6 +7,11 @@ import { CommandLister } from "./translators/commandLister";
 import { MessageSender } from "./helpers/MessageSender";
 import { LiveDataStore } from "./LiveDataStore";
 import { SelfTeamChecker } from "./translators/SelfTeamChecker";
+import { MessageStore } from "./MessageStore";
+import { TranslatorDependencies } from "./helpers/TranslatorDependencies";
+import { DeleteMessage } from "./translators/DeleteMessage";
+import { CheckUsers } from "./translators/CheckUsers";
+import { ConfigSetter } from "./translators/ConfigSetter";
 
 var fs = require('fs');
 
@@ -14,17 +19,23 @@ var fs = require('fs');
 export class Bot {
     private translators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
+    private dependencies: TranslatorDependencies;
 
     constructor(
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
     ) {
         const liveDataStore = new LiveDataStore();
-        this.scheduleLister = new ScheduleLister(client, liveDataStore);
-        this.translators.push(this.scheduleLister);
-        this.translators.push(new SelfTeamChecker(client, liveDataStore));
+        this.dependencies = new TranslatorDependencies(client,  new MessageStore())
 
-        this.translators.push(new CommandLister(client, this.translators));
+        this.scheduleLister = new ScheduleLister(this.dependencies, liveDataStore);
+        this.translators.push(this.scheduleLister);
+        this.translators.push(new SelfTeamChecker(this.dependencies, liveDataStore));
+        this.translators.push(new CheckUsers(this.dependencies, liveDataStore));
+        this.translators.push(new DeleteMessage(this.dependencies));
+        this.translators.push(new ConfigSetter(this.dependencies))
+
+        this.translators.push(new CommandLister(this.dependencies, this.translators));
     }
 
     public listen(): Promise<string> {
@@ -46,13 +57,13 @@ export class Bot {
     }
 
     public async sendSchedule() {
-        await this.client.login(this.token);
+        await this.dependencies.client.login(this.token);
         let messages = await this.scheduleLister.getGameMessagesForToday();
-        //My TEst Server and NGS HypeChannel
+        //My Test Server and NGS HypeChannel
         let channelsToReceiveMessage = ["761410049926889544", "522574547405242389"];
         for (var channelIndex = 0; channelIndex < channelsToReceiveMessage.length; channelIndex++) {
             for (var index = 0; index < messages.length; index++) {
-                await MessageSender.SendMessageToChannel(this.client, messages[index], channelsToReceiveMessage[channelIndex])
+                await MessageSender.SendMessageToChannel(this.dependencies, messages[index], channelsToReceiveMessage[channelIndex])
             }
         }
     }

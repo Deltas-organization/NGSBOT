@@ -4,6 +4,9 @@ import { Client } from "discord.js";
 import { LiveDataStore } from "../LiveDataStore";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
+import { MessageStore } from "../MessageStore";
+import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { Globals } from "../globals";
 
 export class ScheduleLister extends AdminTranslatorBase {
 
@@ -15,12 +18,17 @@ export class ScheduleLister extends AdminTranslatorBase {
         return "Displays the Schedule for Today or a future date if a number is also provided, detailed (-d) will return all days betwen now and the number provided, up to 10.";
     }
 
-    constructor(client: Client, private liveDataStore: LiveDataStore) {
-        super(client);
+    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
+        super(translatorDependencies);
     }
 
     public async getGameMessagesForToday() {
         var filteredGames = await this.getfilteredGames(0, 0);
+        if(filteredGames.length <= 0)
+        {
+            Globals.log("No games available for today.");
+            return;
+        }
         return await this.getMessages(filteredGames);
     }
 
@@ -53,6 +61,7 @@ export class ScheduleLister extends AdminTranslatorBase {
         for (var index = 0; index < messages.length; index++) {
             await messageSender.SendMessage(messages[index]);
         }
+        await messageSender.originalMessage.delete();
     }
 
     private async getfilteredGames(daysInFuture: number, daysInFutureClamp: number) {
@@ -115,7 +124,7 @@ export class ScheduleLister extends AdminTranslatorBase {
         });
     }
 
-    public async SearchByDivision(commands: string[], messageSender: MessageSender) {
+    private async SearchByDivision(commands: string[], messageSender: MessageSender) {
         var division = commands[0];
         if (commands.length == 2) {
             var coast = commands[1];

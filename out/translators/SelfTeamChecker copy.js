@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SelfTeamChecker = void 0;
 const translatorBase_1 = require("./bases/translatorBase");
-const globals_1 = require("../globals");
 var fs = require('fs');
 class SelfTeamChecker extends translatorBase_1.TranslatorBase {
     constructor(translatorDependencies, liveDataStore) {
@@ -42,7 +41,7 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
         });
     }
     findUserInGuid(guild, name) {
-        globals_1.Globals.log(guild.members.cache.map((mem, _, __) => mem.user.username));
+        console.log(guild.members.cache.map((mem, _, __) => mem.user.username));
         let filteredMembers = guild.members.cache.filter((member, _, __) => member.user.username.toLowerCase() == name.toLowerCase());
         if (filteredMembers.size == 1) {
             return filteredMembers.map((member, _, __) => {
@@ -57,7 +56,7 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
             let discordName = `${guildMember.username}#${guildMember.discriminator}`;
             for (var user of users) {
                 let ngsDiscordId = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
-                globals_1.Globals.log(ngsDiscordId);
+                console.log(ngsDiscordId);
                 if (ngsDiscordId == discordName.toLowerCase()) {
                     yield this.askUserTheirTeam(message, guildMember, user);
                     return true;
@@ -70,7 +69,7 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
     askUserTheirTeam(message, guildMember, user) {
         return __awaiter(this, void 0, void 0, function* () {
             let role = message.originalMessage.guild.roles.cache.find(r => r.name.toLowerCase() === user.teamName.toLowerCase());
-            globals_1.Globals.log(role);
+            console.log(role);
             let sentMessage = yield message.SendMessage(`${user.displayName.split("#")[0]} are you on team: ${user.teamName}?`);
             yield sentMessage.react('✅');
             yield sentMessage.react('❌');
@@ -89,8 +88,9 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
             catch (_a) {
                 sentMessage.reactions.removeAll();
             }
+            //await message.SendMessage(`Looks like ${guildMember.username} is on team: ${user.teamName}`);
         });
     }
 }
 exports.SelfTeamChecker = SelfTeamChecker;
-//# sourceMappingURL=SelfTeamChecker.js.map
+//# sourceMappingURL=SelfTeamChecker copy.js.map

@@ -1,13 +1,15 @@
 import { ITranslate } from "../../interfaces/ITranslator";
-import { Client, TextChannel, Message } from "discord.js";
+import { Client, TextChannel, Message, MessageMentions } from "discord.js";
 import { MessageSender } from "../../helpers/MessageSender";
+import { MessageStore } from "../../MessageStore";
+import { TranslatorDependencies } from "../../helpers/TranslatorDependencies";
 
 export abstract class TranslatorBase implements ITranslate {
 
     public abstract get commandBangs(): string[];
     public abstract get description(): string;
 
-    constructor(public client: Client) {
+    constructor(public translatorDependencies: TranslatorDependencies) {
         this.Init();
     }
 
@@ -35,7 +37,7 @@ export abstract class TranslatorBase implements ITranslate {
 
         if (foundBang) {
             let commands = this.RetrieveCommands(command);
-            let messageSender = new MessageSender(this.client, message);
+            let messageSender = new MessageSender(this.translatorDependencies.client, message, this.translatorDependencies.messageStore);
             this.Interpret(commands, detailed, messageSender);
         }
     }

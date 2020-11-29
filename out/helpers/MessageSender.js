@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageSender = void 0;
 class MessageSender {
-    constructor(client, originalMessage) {
+    constructor(client, originalMessage, messageStore) {
         this.client = client;
         this.originalMessage = originalMessage;
+        this.messageStore = messageStore;
     }
     get TextChannel() {
         return this.originalMessage.channel;
@@ -21,48 +22,44 @@ class MessageSender {
     get Requester() {
         return this.originalMessage.member.user;
     }
-    SendMessage(message) {
+    SendMessage(message, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.TextChannel.send({
+            var sentMessage = yield this.TextChannel.send({
                 embed: {
                     color: 0,
                     description: message
                 }
             });
+            if (storeMessage)
+                this.messageStore.AddMessage(sentMessage);
+            return sentMessage;
         });
     }
     SendFields(description, fields) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.TextChannel.send({
+            var sentMessage = yield this.TextChannel.send({
                 embed: {
                     color: 0,
                     description: description,
                     fields: fields
                 }
             });
+            this.messageStore.AddMessage(sentMessage);
+            return sentMessage;
         });
     }
-    SendMessageToChannel(message, channelID) {
+    static SendMessageToChannel(dependencies, message, channelID) {
         return __awaiter(this, void 0, void 0, function* () {
-            var myChannel = this.originalMessage.guild.channels.cache.find(channel => channel.id == channelID);
-            yield myChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
-        });
-    }
-    static SendMessageToChannel(client, message, channelID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var myChannel = client.channels.cache.find(channel => channel.id == channelID);
+            var myChannel = dependencies.client.channels.cache.find(channel => channel.id == channelID);
             if (myChannel != null) {
-                yield myChannel.send({
+                var sentMessage = yield myChannel.send({
                     embed: {
                         color: 0,
                         description: message
                     }
                 });
+                dependencies.messageStore.AddMessage(sentMessage);
+                return sentMessage;
             }
         });
     }

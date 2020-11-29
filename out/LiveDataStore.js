@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LiveDataStore = void 0;
+const globals_1 = require("./globals");
 const Cacher_1 = require("./helpers/Cacher");
 const QueryBuilder_1 = require("./helpers/QueryBuilder");
 class LiveDataStore {
@@ -17,6 +18,7 @@ class LiveDataStore {
         this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
         this.cachedSchedule = new Cacher_1.Cacher(60);
         this.cachedUsers = new Cacher_1.Cacher(60);
+        this.cachedTeams = new Cacher_1.Cacher(60 * 24);
     }
     GetDivisions() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,51 +33,45 @@ class LiveDataStore {
             return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
         });
     }
+    GetTeams() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.cachedTeams.TryGetFromCache(() => this.GetFreshTeams());
+        });
+    }
     GetFreshUsers() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             let allUsers = [];
-            const divisions = yield this.GetDivisions();
-            for (let division of divisions) {
-                for (let team of division.teams) {
-                    try {
-                        console.log(`/team/get?team=${escape(team)}`);
-                        const teamResponse = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/team/get?team=${escape(team)}`);
-                        const encodedUsers = teamResponse.teamMembers.map(member => escape(member.displayName));
-                        const teamMembers = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
-                        allUsers = allUsers.concat(teamMembers);
-                    }
-                    catch (e) {
-                        console.log(`/team/get?team=${escape(team)}`);
-                    }
+            const teams = yield this.GetTeams();
+            for (let team of teams) {
+                try {
+                    var encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
+                    const teamMembers = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
+                    allUsers = allUsers.concat(teamMembers);
+                }
+                catch (e) {
+                    globals_1.Globals.log(`Problem Retrieving division ${team.divisionDisplayName} team: ${team.teamName}  users: ${(_a = team.teamMembers) === null || _a === void 0 ? void 0 : _a.map(member => member.displayName)}}`);
                 }
             }
             return allUsers;
         });
     }
-    FindTeams(searchTerm) {
+    GetFreshTeams() {
         return __awaiter(this, void 0, void 0, function* () {
-            const validTeams = yield this.GetValidTeams(searchTerm);
-            const response = [];
-            for (var index = 0; index < validTeams.length; index++) {
-                let encodedName = escape(validTeams[index]);
-                let teamRespose = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/team/get?team=${encodedName}`);
-                response.push(teamRespose);
-            }
-            return response;
-        });
-    }
-    GetValidTeams(searchTerm) {
-        return __awaiter(this, void 0, void 0, function* () {
+            let allTeams = [];
             const divisions = yield this.GetDivisions();
-            const allTeamNames = [].concat(...divisions.map(d => d.teams));
-            const searchRegex = new RegExp(searchTerm, 'i');
-            const validTeams = [];
-            for (var index = 0; index < allTeamNames.length; index++) {
-                const teamName = allTeamNames[index];
-                if (searchRegex.test(teamName))
-                    validTeams.push(teamName);
+            for (let division of divisions) {
+                for (let team of division.teams) {
+                    try {
+                        const teamResponse = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/team/get?team=${encodeURIComponent(team)}`);
+                        allTeams.push(teamResponse);
+                    }
+                    catch (e) {
+                        globals_1.Globals.log(`/team/get?team=${encodeURIComponent(team)}`);
+                    }
+                }
             }
-            return validTeams;
+            return allTeams;
         });
     }
 }

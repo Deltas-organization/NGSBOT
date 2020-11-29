@@ -9,63 +9,73 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SelfTeamChecker = void 0;
-const translatorBase_1 = require("./bases/translatorBase");
+exports.CheckUsers = void 0;
+const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const globals_1 = require("../globals");
 var fs = require('fs');
-class SelfTeamChecker extends translatorBase_1.TranslatorBase {
+class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
     constructor(translatorDependencies, liveDataStore) {
         super(translatorDependencies);
         this.liveDataStore = liveDataStore;
     }
     get commandBangs() {
-        return ["self"];
+        return ["check"];
     }
     get description() {
-        return "Will Return the team name that the player requesting is on.";
+        return "Will Check all users for discord tags and relevant team roles.";
     }
     Interpret(commands, detailed, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (commands.length > 0) {
-                for (var command of commands) {
-                    let guildMember = this.findUserInGuid(message.originalMessage.guild, command);
-                    if (guildMember) {
-                        yield this.findUserInNGS(message, guildMember);
-                    }
-                    else
-                        yield message.SendMessage(`Unable to find user: ${command}`);
-                }
-            }
-            else {
-                yield this.findUserInNGS(message, message.Requester);
+            let members = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
+            let availableRoles = message.originalMessage.guild.roles.cache.map((role, _, __) => role.name);
+            globals_1.Globals.log(`available Roles: ${availableRoles}`);
+            for (var member of members) {
+                yield this.findUserInNGS(message, member, availableRoles);
             }
         });
     }
-    findUserInGuid(guild, name) {
-        globals_1.Globals.log(guild.members.cache.map((mem, _, __) => mem.user.username));
-        let filteredMembers = guild.members.cache.filter((member, _, __) => member.user.username.toLowerCase() == name.toLowerCase());
-        if (filteredMembers.size == 1) {
-            return filteredMembers.map((member, _, __) => {
-                return member.user;
-            })[0];
-        }
-    }
-    findUserInNGS(message, guildMember) {
+    findUserInNGS(message, guildMember, serverRoles) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            const guildUser = guildMember.user;
             let users = yield this.liveDataStore.GetUsers();
-            let discordName = `${guildMember.username}#${guildMember.discriminator}`;
+            let discordName = `${guildUser.username}#${guildUser.discriminator}`;
+            let messageContainer = [];
             for (var user of users) {
                 let ngsDiscordId = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
-                globals_1.Globals.log(ngsDiscordId);
                 if (ngsDiscordId == discordName.toLowerCase()) {
-                    yield this.askUserTheirTeam(message, guildMember, user);
+                    var roles = guildMember.roles.cache.map((role, _, __) => role.name);
+                    const hasRole = this.lookForRole(roles, user.teamName);
+                    if (hasRole)
+                        continue;
+                    const roleOnServer = this.lookForRole(serverRoles, user.teamName);
+                    globals_1.Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${roles}. Found Existing role: ${roleOnServer}`);
+                    //await this.askUserTheirTeam(message, guildMember, user);
                     return true;
                 }
             }
-            yield message.SendMessage('unable to find user, no matching discord id registered.');
+            // await message.SendMessage('unable to find user, no matching discord id registered.');
             return false;
         });
+    }
+    lookForRole(userRoles, teamName) {
+        let team = teamName.trim();
+        const indexOfWidthdrawn = team.indexOf('(Withdrawn');
+        if (indexOfWidthdrawn > -1) {
+            team = team.slice(0, indexOfWidthdrawn).trim();
+        }
+        team = team.toLowerCase();
+        const teamWithoutSpaces = team.replace(' ', '');
+        for (const role of userRoles) {
+            const lowerCaseRole = role.toLowerCase().trim();
+            if (lowerCaseRole === team)
+                return role;
+            let roleWithoutSpaces = lowerCaseRole.replace(' ', '');
+            if (roleWithoutSpaces === teamWithoutSpaces) {
+                return role;
+            }
+        }
+        return null;
     }
     askUserTheirTeam(message, guildMember, user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -92,5 +102,5 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
         });
     }
 }
-exports.SelfTeamChecker = SelfTeamChecker;
-//# sourceMappingURL=SelfTeamChecker.js.map
+exports.CheckUsers = CheckUsers;
+//# sourceMappingURL=CheckUsers.js.map

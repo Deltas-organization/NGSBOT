@@ -6,11 +6,13 @@ import * as http from 'http';
 import { INGSStanding } from "../interfaces/INGSStanding";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
+import { MessageStore } from "../MessageStore";
+import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 
 export class StandingsLister extends DeltaTranslatorBase {
 
-    constructor(client: Client) {
-        super(client);
+    constructor(translatorDependencies: TranslatorDependencies) {
+        super(translatorDependencies);
     }
 
     public get commandBangs(): string[] {

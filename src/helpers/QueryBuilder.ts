@@ -1,7 +1,9 @@
 import * as http from 'http';
+import { Globals } from '../globals';
 
 export class QueryBuilder {
     public GetResponse<T>(path: string): Promise<T> {
+        Globals.logAdvanced(`retrieving: ${path}`);
         return new Promise<T>((resolver, rejector) => {
             const options = {
                 hostname: 'nexusgamingseries.org',
@@ -19,7 +21,8 @@ export class QueryBuilder {
                 result.on('end', () => {
                     try {
                         var parsedObject = JSON.parse(chunks);
-                        var response: T = parsedObject.returnObject;
+                        var response: T = parsedObject.returnObject;                        
+                        Globals.logAdvanced(`retrieved: ${path}`);
                         resolver(response);
                     }
                     catch (e) {
