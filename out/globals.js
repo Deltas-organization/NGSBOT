@@ -25,4 +25,4 @@ let Globals = /** @class */ (() => {
     return Globals;
 })();
 exports.Globals = Globals;
-//# sourceMappingURL=globals.js.map
+//# sourceMappingURL=Globals.js.map
