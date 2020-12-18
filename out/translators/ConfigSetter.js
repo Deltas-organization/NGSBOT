@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConfigSetter = void 0;
 const deltaTranslatorBase_1 = require("./bases/deltaTranslatorBase");
-const globals_1 = require("../globals");
+const Globals_1 = require("../Globals");
 class ConfigSetter extends deltaTranslatorBase_1.DeltaTranslatorBase {
     get commandBangs() {
         return ["config", "con"];
@@ -29,14 +29,14 @@ class ConfigSetter extends deltaTranslatorBase_1.DeltaTranslatorBase {
                 const lowerCaseCommand = command.toLowerCase();
                 switch (lowerCaseCommand) {
                     case 'log':
-                        globals_1.Globals.EnableLogging = !globals_1.Globals.EnableLogging;
+                        Globals_1.Globals.EnableLogging = !Globals_1.Globals.EnableLogging;
                         this.InformLogState(messageSender);
                         break;
                     case 'info':
                         informAllState = true;
                         break;
                     case 'advanced':
-                        globals_1.Globals.EnableAdvancedLogging = !globals_1.Globals.EnableAdvancedLogging;
+                        Globals_1.Globals.EnableAdvancedLogging = !Globals_1.Globals.EnableAdvancedLogging;
                         this.InformAdvancedLogState(messageSender);
                 }
             }
@@ -47,10 +47,10 @@ class ConfigSetter extends deltaTranslatorBase_1.DeltaTranslatorBase {
         });
     }
     InformLogState(messageSender) {
-        messageSender.SendMessage(`Logging is: ${globals_1.Globals.EnableLogging}`);
+        messageSender.SendMessage(`Logging is: ${Globals_1.Globals.EnableLogging}`);
     }
     InformAdvancedLogState(messageSender) {
-        messageSender.SendMessage(`Advanced Logging is: ${globals_1.Globals.EnableAdvancedLogging}`);
+        messageSender.SendMessage(`Advanced Logging is: ${Globals_1.Globals.EnableAdvancedLogging}`);
     }
 }
 exports.ConfigSetter = ConfigSetter;

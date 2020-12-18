@@ -8,7 +8,7 @@ import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
-import { Globals } from "../globals";
+import { Globals } from "../Globals";
 import { globalAgent } from "http";
 
 export class ConfigSetter extends DeltaTranslatorBase {

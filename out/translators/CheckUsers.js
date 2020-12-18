@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckUsers = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
-const globals_1 = require("../globals");
+const Globals_1 = require("../Globals");
 var fs = require('fs');
 class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
     constructor(translatorDependencies, liveDataStore) {
@@ -35,7 +35,7 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     ReloadServerRoles(message) {
         this._serverRoles = message.originalMessage.guild.roles.cache.map((role, _, __) => role);
-        globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
+        Globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
     EnsureUserRoles(message, guildMember, promptEvenIfAlreadyAssignedRole) {
         var _a;
@@ -45,7 +45,7 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
                 var users = yield this.liveDataStore.GetUsers();
             }
             catch (_b) {
-                globals_1.Globals.log("Problem with retrieving users");
+                Globals_1.Globals.log("Problem with retrieving users");
                 return;
             }
             let discordName = `${guildUser.username}#${guildUser.discriminator}`;
@@ -66,7 +66,7 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
                     }
                     const hasRole = this.lookForRole(rolesOfUser, user.teamName);
                     if (!hasRole || promptEvenIfAlreadyAssignedRole) {
-                        globals_1.Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${rolesOfUser.map(role => role.name)}. Found Existing role: ${roleOnServer.name}`);
+                        Globals_1.Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${rolesOfUser.map(role => role.name)}. Found Existing role: ${roleOnServer.name}`);
                         var added = yield this.AskIfYouWantToAddUserToRole(message, guildMember, roleOnServer, promptEvenIfAlreadyAssignedRole);
                         if (added) {
                             yield message.SendMessage(`${guildMember.displayName} has been added to role: ${roleOnServer.name}`);
@@ -78,7 +78,7 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
                     return true;
                 }
             }
-            globals_1.Globals.logAdvanced(`unable to find user: ${user.displayName}, no matching discord id registered.`);
+            Globals_1.Globals.logAdvanced(`unable to find user: ${user.displayName}, no matching discord id registered.`);
             return false;
         });
     }

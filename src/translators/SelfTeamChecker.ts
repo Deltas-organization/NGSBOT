@@ -5,7 +5,7 @@ import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { INGSUser } from "../interfaces";
-import { Globals } from "../globals";
+import { Globals } from "../Globals";
 
 var fs = require('fs');
 

@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { Globals } from '../globals';
+import { Globals } from '../Globals';
 
 export class QueryBuilder {
     public GetResponse<T>(path: string): Promise<T> {

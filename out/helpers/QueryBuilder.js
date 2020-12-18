@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryBuilder = void 0;
 const http = require("http");
-const globals_1 = require("../globals");
+const Globals_1 = require("../Globals");
 class QueryBuilder {
     GetResponse(path) {
-        globals_1.Globals.logAdvanced(`retrieving: ${path}`);
+        Globals_1.Globals.logAdvanced(`retrieving: ${path}`);
         return new Promise((resolver, rejector) => {
             const options = {
                 hostname: 'nexusgamingseries.org',
@@ -23,7 +23,7 @@ class QueryBuilder {
                     try {
                         var parsedObject = JSON.parse(chunks);
                         var response = parsedObject.returnObject;
-                        globals_1.Globals.logAdvanced(`retrieved: ${path}`);
+                        Globals_1.Globals.logAdvanced(`retrieved: ${path}`);
                         resolver(response);
                     }
                     catch (e) {

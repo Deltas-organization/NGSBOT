@@ -6,7 +6,7 @@ import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
-import { Globals } from "../globals";
+import { Globals } from "../Globals";
 
 export class ScheduleLister extends AdminTranslatorBase {
 
