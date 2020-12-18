@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LiveDataStore = void 0;
-const globals_1 = require("./globals");
+const Globals_1 = require("./Globals");
 const Cacher_1 = require("./helpers/Cacher");
 const QueryBuilder_1 = require("./helpers/QueryBuilder");
 class LiveDataStore {
@@ -50,7 +50,7 @@ class LiveDataStore {
                     allUsers = allUsers.concat(teamMembers);
                 }
                 catch (e) {
-                    globals_1.Globals.log(`Problem Retrieving division ${team.divisionDisplayName} team: ${team.teamName}  users: ${(_a = team.teamMembers) === null || _a === void 0 ? void 0 : _a.map(member => member.displayName)}}`);
+                    Globals_1.Globals.log(`Problem Retrieving division ${team.divisionDisplayName} team: ${team.teamName}  users: ${(_a = team.teamMembers) === null || _a === void 0 ? void 0 : _a.map(member => member.displayName)}}`);
                 }
             }
             return allUsers;
@@ -67,7 +67,7 @@ class LiveDataStore {
                         allTeams.push(teamResponse);
                     }
                     catch (e) {
-                        globals_1.Globals.log(`/team/get?team=${encodeURIComponent(team)}`);
+                        Globals_1.Globals.log(`/team/get?team=${encodeURIComponent(team)}`);
                     }
                 }
             }

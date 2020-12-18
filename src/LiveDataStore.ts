@@ -1,5 +1,5 @@
 
-import { Globals } from './globals';
+import { Globals } from './Globals';
 import { Cacher } from './helpers/Cacher';
 import { QueryBuilder } from './helpers/QueryBuilder';
 import { INGSSchedule, INGSUser } from './interfaces';
