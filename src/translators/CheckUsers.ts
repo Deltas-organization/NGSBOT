@@ -1,8 +1,6 @@
-import { Client, Guild, GuildMember, Message, User } from "discord.js";
-import { TranslatorBase } from "./bases/translatorBase";
+import { Client, Guild, GuildMember, Role, User } from "discord.js";
 import { MessageSender } from "../helpers/MessageSender";
 import { LiveDataStore } from "../LiveDataStore";
-import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { INGSUser } from "../interfaces";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
@@ -11,6 +9,8 @@ import { Globals } from "../globals";
 var fs = require('fs');
 
 export class CheckUsers extends AdminTranslatorBase {
+
+    private _serverRoles: Role[];
 
     public get commandBangs(): string[] {
         return ["check"];
@@ -26,41 +26,67 @@ export class CheckUsers extends AdminTranslatorBase {
 
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
         let members = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
-        let availableRoles = message.originalMessage.guild.roles.cache.map((role, _, __) => role.name);
-        Globals.log(`available Roles: ${availableRoles}`);
+        this.ReloadServerRoles(message);
         for (var member of members) {
-            await this.findUserInNGS(message, member, availableRoles);
+            await this.EnsureUserRoles(message, member, detailed);
         }
     }
 
-    private async findUserInNGS(message: MessageSender, guildMember: GuildMember, serverRoles: string[]) {
+    private ReloadServerRoles(message: MessageSender) {
+        this._serverRoles = message.originalMessage.guild.roles.cache.map((role, _, __) => role);
+        Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
+    }
+
+    private async EnsureUserRoles(message: MessageSender, guildMember: GuildMember, promptEvenIfAlreadyAssignedRole: boolean) {
         const guildUser = guildMember.user;
-        let users = await this.liveDataStore.GetUsers();
+        try {
+            var users = await this.liveDataStore.GetUsers();
+        }
+        catch {
+            Globals.log("Problem with retrieving users");
+            return;
+        }
+
         let discordName = `${guildUser.username}#${guildUser.discriminator}`;
-        let messageContainer = [];
         for (var user of users) {
             let ngsDiscordId = user.discordTag?.replace(' ', '').toLowerCase();
             if (ngsDiscordId == discordName.toLowerCase()) {
 
-                var roles = guildMember.roles.cache.map((role, _, __) => role.name);
+                var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
 
-                const hasRole = this.lookForRole(roles, user.teamName);
-                if (hasRole)
-                    continue;
+                let roleOnServer = this.lookForRole(this._serverRoles, user.teamName);
+                if (!roleOnServer) {
+                    let role = await this.AskIfYouWantToAddRoleToServer(message, user);
+                    if (role) {
+                        this._serverRoles.push(role);
+                        roleOnServer = role;
+                    }
+                    else {
+                        continue;
+                    }
+                }
 
-                const roleOnServer = this.lookForRole(serverRoles, user.teamName);
+                const hasRole = this.lookForRole(rolesOfUser, user.teamName);
+                if (!hasRole || promptEvenIfAlreadyAssignedRole) {
+                    Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${rolesOfUser.map(role => role.name)}. Found Existing role: ${roleOnServer.name}`);
 
-                Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${roles}. Found Existing role: ${roleOnServer}`);
-
-                //await this.askUserTheirTeam(message, guildMember, user);
+                    var added = await this.AskIfYouWantToAddUserToRole(message, guildMember, roleOnServer, promptEvenIfAlreadyAssignedRole);
+                    if (added) {
+                        await message.SendMessage(`${guildMember.displayName} has been added to role: ${roleOnServer.name}`);
+                    }
+                    else if (added == false) {
+                        await message.SendMessage(`${guildMember.displayName} has been removed from role: ${roleOnServer.name}`);
+                    }
+                }
                 return true;
             }
         }
-        // await message.SendMessage('unable to find user, no matching discord id registered.');
+
+        Globals.logAdvanced(`unable to find user: ${user.displayName}, no matching discord id registered.`);
         return false;
     }
 
-    private lookForRole(userRoles: string[], teamName: string): string {
+    private lookForRole(userRoles: Role[], teamName: string): Role {
         let team = teamName.trim();
         const indexOfWidthdrawn = team.indexOf('(Withdrawn');
         if (indexOfWidthdrawn > -1) {
@@ -70,7 +96,7 @@ export class CheckUsers extends AdminTranslatorBase {
         team = team.toLowerCase();
         const teamWithoutSpaces = team.replace(' ', '');
         for (const role of userRoles) {
-            const lowerCaseRole = role.toLowerCase().trim();
+            const lowerCaseRole = role.name.toLowerCase().trim();
             if (lowerCaseRole === team)
                 return role;
 
@@ -83,28 +109,33 @@ export class CheckUsers extends AdminTranslatorBase {
         return null;
     }
 
-    private async askUserTheirTeam(message: MessageSender, guildMember: User, user: INGSUser) {
-        let role = message.originalMessage.guild.roles.cache.find(r => r.name.toLowerCase() === user.teamName.toLowerCase());
-        Globals.log(role)
+    private async AskIfYouWantToAddRoleToServer(messageSender: MessageSender, user: INGSUser) {
+        let role: Role;
+        let reactionResponse = await messageSender.SendReactionMessage(`It looks like the user: ${user.displayName} is on team: ${user.teamName}, but there is not currently a role for that team. Would you like me to create this role?`,
+            (member) => this.IsAuthenticated(member),
+            async () => {
+                role = await messageSender.originalMessage.guild.roles.create({
+                    data: {
+                        name: user.teamName,
+                    },
+                    reason: 'needed a new team role added'
+                });
+            });
 
-        let sentMessage = await message.SendMessage(`${user.displayName.split("#")[0]} are you on team: ${user.teamName}?`);
-        await sentMessage.react('✅');
-        await sentMessage.react('❌');
-        const filter = (reaction, user) => {
-            return ['✅', '❌'].includes(reaction.emoji.name) && user.id === guildMember.id;
-        };
+        reactionResponse.message.delete();
+        return role;
+    }
 
-        try {
-            var collectedReactions = await sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-            if (collectedReactions.first().emoji.name === '✅') {
-                message.originalMessage.member.roles.add(role);
-            }
-            if (collectedReactions.first().emoji.name === '❌') {
-                message.originalMessage.member.roles.remove(role);
-            }
-        }
-        catch {
-            sentMessage.reactions.removeAll();
-        }
+    private async AskIfYouWantToAddUserToRole(messageSender: MessageSender, memberToAskAbout: GuildMember, roleToManipulate: Role, andRemove: boolean): Promise<boolean> {
+        let reactionResponse = await messageSender.SendReactionMessage(`From what I can see, ${memberToAskAbout.displayName} belongs to team: ${roleToManipulate.name}, but they don't have the role at the moment.  Would you like to add${(andRemove && '/remove') || ''} them to the role?`,
+            (member) => this.IsAuthenticated(member),
+            () => memberToAskAbout.roles.add(roleToManipulate),
+            () => {
+                if (andRemove)
+                    memberToAskAbout.roles.remove(roleToManipulate);
+            });
+
+        reactionResponse.message.delete();
+        return reactionResponse.response;
     }
 }

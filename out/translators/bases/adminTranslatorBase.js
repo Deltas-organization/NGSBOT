@@ -19,6 +19,11 @@ class AdminTranslatorBase extends translatorBase_1.TranslatorBase {
             return false;
         });
     }
+    IsAuthenticated(memberToCheck) {
+        if (memberToCheck.user.id == "163779571060178955" || memberToCheck.permissions.has('ADMINISTRATOR'))
+            return true;
+        return false;
+    }
 }
 exports.AdminTranslatorBase = AdminTranslatorBase;
 //# sourceMappingURL=adminTranslatorBase.js.map

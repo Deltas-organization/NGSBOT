@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageSender = void 0;
+const Globals_1 = require("../Globals");
 class MessageSender {
     constructor(client, originalMessage, messageStore) {
         this.client = client;
@@ -61,6 +62,45 @@ class MessageSender {
                 dependencies.messageStore.AddMessage(sentMessage);
                 return sentMessage;
             }
+        });
+    }
+    SendReactionMessage(message, authentication, yesReaction, noReaction = () => { }, storeMessage = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var sentMessage = yield this.TextChannel.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
+            if (storeMessage)
+                this.messageStore.AddMessage(sentMessage);
+            yield sentMessage.react('✅');
+            yield sentMessage.react('❌');
+            yield sentMessage.react('🛑');
+            const members = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
+            const filter = (reaction, user) => {
+                let member = members.find(mem => mem.id == user.id);
+                return ['✅', '❌', '🛑'].includes(reaction.emoji.name) && authentication(member);
+            };
+            let response = null;
+            try {
+                var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
+                if (collectedReactions.first().emoji.name === '✅') {
+                    yield yesReaction();
+                    response = true;
+                }
+                if (collectedReactions.first().emoji.name === '❌') {
+                    yield noReaction();
+                    response = false;
+                }
+                if (collectedReactions.first().emoji.name === '🛑') {
+                    response = null;
+                }
+            }
+            catch (err) {
+                Globals_1.Globals.log(`There was a problem with reaction message: ${message}. Error: ${err}`);
+            }
+            return { message: sentMessage, response: response };
         });
     }
 }

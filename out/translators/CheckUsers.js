@@ -27,34 +27,58 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
     Interpret(commands, detailed, message) {
         return __awaiter(this, void 0, void 0, function* () {
             let members = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
-            let availableRoles = message.originalMessage.guild.roles.cache.map((role, _, __) => role.name);
-            globals_1.Globals.log(`available Roles: ${availableRoles}`);
+            this.ReloadServerRoles(message);
             for (var member of members) {
-                yield this.findUserInNGS(message, member, availableRoles);
+                yield this.EnsureUserRoles(message, member, detailed);
             }
         });
     }
-    findUserInNGS(message, guildMember, serverRoles) {
+    ReloadServerRoles(message) {
+        this._serverRoles = message.originalMessage.guild.roles.cache.map((role, _, __) => role);
+        globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
+    }
+    EnsureUserRoles(message, guildMember, promptEvenIfAlreadyAssignedRole) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const guildUser = guildMember.user;
-            let users = yield this.liveDataStore.GetUsers();
+            try {
+                var users = yield this.liveDataStore.GetUsers();
+            }
+            catch (_b) {
+                globals_1.Globals.log("Problem with retrieving users");
+                return;
+            }
             let discordName = `${guildUser.username}#${guildUser.discriminator}`;
-            let messageContainer = [];
             for (var user of users) {
                 let ngsDiscordId = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
                 if (ngsDiscordId == discordName.toLowerCase()) {
-                    var roles = guildMember.roles.cache.map((role, _, __) => role.name);
-                    const hasRole = this.lookForRole(roles, user.teamName);
-                    if (hasRole)
-                        continue;
-                    const roleOnServer = this.lookForRole(serverRoles, user.teamName);
-                    globals_1.Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${roles}. Found Existing role: ${roleOnServer}`);
-                    //await this.askUserTheirTeam(message, guildMember, user);
+                    var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
+                    let roleOnServer = this.lookForRole(this._serverRoles, user.teamName);
+                    if (!roleOnServer) {
+                        let role = yield this.AskIfYouWantToAddRoleToServer(message, user);
+                        if (role) {
+                            this._serverRoles.push(role);
+                            roleOnServer = role;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    const hasRole = this.lookForRole(rolesOfUser, user.teamName);
+                    if (!hasRole || promptEvenIfAlreadyAssignedRole) {
+                        globals_1.Globals.log(`User: ${guildUser.username} on Team: ${user.teamName}. Doesn't have a matching role, current user Roles: ${rolesOfUser.map(role => role.name)}. Found Existing role: ${roleOnServer.name}`);
+                        var added = yield this.AskIfYouWantToAddUserToRole(message, guildMember, roleOnServer, promptEvenIfAlreadyAssignedRole);
+                        if (added) {
+                            yield message.SendMessage(`${guildMember.displayName} has been added to role: ${roleOnServer.name}`);
+                        }
+                        else if (added == false) {
+                            yield message.SendMessage(`${guildMember.displayName} has been removed from role: ${roleOnServer.name}`);
+                        }
+                    }
                     return true;
                 }
             }
-            // await message.SendMessage('unable to find user, no matching discord id registered.');
+            globals_1.Globals.logAdvanced(`unable to find user: ${user.displayName}, no matching discord id registered.`);
             return false;
         });
     }
@@ -67,7 +91,7 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
         team = team.toLowerCase();
         const teamWithoutSpaces = team.replace(' ', '');
         for (const role of userRoles) {
-            const lowerCaseRole = role.toLowerCase().trim();
+            const lowerCaseRole = role.name.toLowerCase().trim();
             if (lowerCaseRole === team)
                 return role;
             let roleWithoutSpaces = lowerCaseRole.replace(' ', '');
@@ -77,28 +101,29 @@ class CheckUsers extends adminTranslatorBase_1.AdminTranslatorBase {
         }
         return null;
     }
-    askUserTheirTeam(message, guildMember, user) {
+    AskIfYouWantToAddRoleToServer(messageSender, user) {
         return __awaiter(this, void 0, void 0, function* () {
-            let role = message.originalMessage.guild.roles.cache.find(r => r.name.toLowerCase() === user.teamName.toLowerCase());
-            globals_1.Globals.log(role);
-            let sentMessage = yield message.SendMessage(`${user.displayName.split("#")[0]} are you on team: ${user.teamName}?`);
-            yield sentMessage.react('✅');
-            yield sentMessage.react('❌');
-            const filter = (reaction, user) => {
-                return ['✅', '❌'].includes(reaction.emoji.name) && user.id === guildMember.id;
-            };
-            try {
-                var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-                if (collectedReactions.first().emoji.name === '✅') {
-                    message.originalMessage.member.roles.add(role);
-                }
-                if (collectedReactions.first().emoji.name === '❌') {
-                    message.originalMessage.member.roles.remove(role);
-                }
-            }
-            catch (_a) {
-                sentMessage.reactions.removeAll();
-            }
+            let role;
+            let reactionResponse = yield messageSender.SendReactionMessage(`It looks like the user: ${user.displayName} is on team: ${user.teamName}, but there is not currently a role for that team. Would you like me to create this role?`, (member) => this.IsAuthenticated(member), () => __awaiter(this, void 0, void 0, function* () {
+                role = yield messageSender.originalMessage.guild.roles.create({
+                    data: {
+                        name: user.teamName,
+                    },
+                    reason: 'needed a new team role added'
+                });
+            }));
+            reactionResponse.message.delete();
+            return role;
+        });
+    }
+    AskIfYouWantToAddUserToRole(messageSender, memberToAskAbout, roleToManipulate, andRemove) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let reactionResponse = yield messageSender.SendReactionMessage(`From what I can see, ${memberToAskAbout.displayName} belongs to team: ${roleToManipulate.name}, but they don't have the role at the moment.  Would you like to add${(andRemove && '/remove') || ''} them to the role?`, (member) => this.IsAuthenticated(member), () => memberToAskAbout.roles.add(roleToManipulate), () => {
+                if (andRemove)
+                    memberToAskAbout.roles.remove(roleToManipulate);
+            });
+            reactionResponse.message.delete();
+            return reactionResponse.response;
         });
     }
 }
