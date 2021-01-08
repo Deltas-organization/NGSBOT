@@ -15,4 +15,6 @@ __exportStar(require("./INGSSchedule"), exports);
 __exportStar(require("./INGSScheduleTeam"), exports);
 __exportStar(require("./INGSStanding"), exports);
 __exportStar(require("./INGSUser"), exports);
+__exportStar(require("./INGSTeam"), exports);
+__exportStar(require("./INGSRank"), exports);
 //# sourceMappingURL=index.js.map

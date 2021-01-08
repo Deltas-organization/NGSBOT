@@ -1,18 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NGSQueryBuilder = void 0;
-const http = require("http");
-const Globals_1 = require("../Globals");
-class NGSQueryBuilder {
-    GetResponse(path) {
-        Globals_1.Globals.logAdvanced(`retrieving: ${path}`);
-        return new Promise((resolver, rejector) => {
+import * as http from 'http';
+import { Globals } from '../Globals';
+
+export class NGSQueryBuilder {
+    public GetResponse<T>(path: string): Promise<T> {
+        Globals.logAdvanced(`retrieving: ${path}`);
+        return new Promise<T>((resolver, rejector) => {
             const options = {
                 hostname: 'nexusgamingseries.org',
                 port: 80,
-                path: `api/${path}`,
+                path: `/api${path}`,
                 method: 'GET'
             };
+
             const req = http.request(options, (result) => {
                 result.setEncoding('utf8');
                 var chunks = "";
@@ -22,8 +21,8 @@ class NGSQueryBuilder {
                 result.on('end', () => {
                     try {
                         var parsedObject = JSON.parse(chunks);
-                        var response = parsedObject.returnObject;
-                        Globals_1.Globals.logAdvanced(`retrieved: ${path}`);
+                        var response: T = parsedObject.returnObject;                        
+                        Globals.logAdvanced(`retrieved: ${path}`);
                         resolver(response);
                     }
                     catch (e) {
@@ -31,16 +30,21 @@ class NGSQueryBuilder {
                     }
                 });
             });
+
             req.on('error', (e) => {
                 console.error(`problem with request: ${e.message}`);
             });
+
             req.end();
         });
     }
-    PostResponse(path, objectToSerialize) {
-        Globals_1.Globals.logAdvanced(`Posting To: ${path}`);
+
+    public PostResponse<T>(path: string, objectToSerialize: any): Promise<T> {
+        Globals.logAdvanced(`Posting To: ${path}`);
+                
         const postData = JSON.stringify(objectToSerialize);
-        return new Promise((resolver, rejector) => {
+
+        return new Promise<T>((resolver, rejector) => {
             const options = {
                 hostname: 'nexusgamingseries.org',
                 port: 80,
@@ -51,6 +55,7 @@ class NGSQueryBuilder {
                     'Content-Length': postData.length
                 }
             };
+
             const req = http.request(options, (result) => {
                 result.setEncoding('utf8');
                 var chunks = "";
@@ -60,8 +65,8 @@ class NGSQueryBuilder {
                 result.on('end', () => {
                     try {
                         var parsedObject = JSON.parse(chunks);
-                        var response = parsedObject.returnObject;
-                        Globals_1.Globals.logAdvanced(`retrieved: ${path}`);
+                        var response: T = parsedObject.returnObject;                        
+                        Globals.logAdvanced(`retrieved: ${path}`);
                         resolver(response);
                     }
                     catch (e) {
@@ -69,13 +74,13 @@ class NGSQueryBuilder {
                     }
                 });
             });
+
             req.on('error', (e) => {
                 console.error(`problem with request: ${e.message}`);
             });
+
             req.write(postData);
             req.end();
         });
     }
 }
-exports.NGSQueryBuilder = NGSQueryBuilder;
-//# sourceMappingURL=QueryBuilder.js.map

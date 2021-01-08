@@ -8,6 +8,7 @@ import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { NGSQueryBuilder } from "../helpers/NGSQueryBuilder";
 
 export class StandingsLister extends DeltaTranslatorBase {
 
@@ -42,45 +43,15 @@ export class StandingsLister extends DeltaTranslatorBase {
 
         var divisionObject = {
             "division": div,
-            "season": 10
+            "season": 11
         };
 
-        const postData = JSON.stringify(divisionObject);
+        var standings = await new NGSQueryBuilder().PostResponse<INGSStanding[]>('/standings/fetch/division', divisionObject)
 
-        const options = {
-            hostname: 'nexusgamingseries.org',
-            port: 80,
-            path: '/standings/fetch/division',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length
-            }
-        };
-
-        const req = http.request(options, (result) => {
-            result.setEncoding('utf8');
-            var chunks = "";
-            result.on('data', (chunk) => {
-                chunks += chunk;
-            });
-            result.on('end', () => {
-                var parsedObject = JSON.parse(chunks);
-                var standings: INGSStanding[] = parsedObject.returnObject;
-                if (standings) {
-                    let message = this.CreateStandingsMessage(standings);
-                    messageSender.SendMessage(message);
-                }
-            });
-        });
-
-        req.on('error', (e) => {
-            console.error(`problem with request: ${e.message}`);
-        });
-
-        // Write data to request body
-        req.write(postData);
-        req.end();
+        if (standings) {
+            let message = this.CreateStandingsMessage(standings);
+            messageSender.SendMessage(message);
+        }
     }
 
     private CreateStandingsMessage(standings: INGSStanding[]): string {

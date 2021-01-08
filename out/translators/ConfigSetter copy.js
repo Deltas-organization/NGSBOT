@@ -54,4 +54,4 @@ class ConfigSetter extends deltaTranslatorBase_1.DeltaTranslatorBase {
     }
 }
 exports.ConfigSetter = ConfigSetter;
-//# sourceMappingURL=ConfigSetter.js.map
+//# sourceMappingURL=ConfigSetter copy.js.map

@@ -10,7 +10,7 @@ class NGSQueryBuilder {
             const options = {
                 hostname: 'nexusgamingseries.org',
                 port: 80,
-                path: `api/${path}`,
+                path: `/api${path}`,
                 method: 'GET'
             };
             const req = http.request(options, (result) => {
@@ -78,4 +78,4 @@ class NGSQueryBuilder {
     }
 }
 exports.NGSQueryBuilder = NGSQueryBuilder;
-//# sourceMappingURL=QueryBuilder.js.map
+//# sourceMappingURL=NGSQueryBuilder.js.map

@@ -12,21 +12,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LiveDataStore = void 0;
 const Globals_1 = require("./Globals");
 const Cacher_1 = require("./helpers/Cacher");
-const QueryBuilder_1 = require("./helpers/QueryBuilder");
+const NGSQueryBuilder_1 = require("./helpers/NGSQueryBuilder");
 class LiveDataStore {
     constructor() {
         this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
         this.cachedSchedule = new Cacher_1.Cacher(60);
         this.cachedUsers = new Cacher_1.Cacher(60);
         this.cachedTeams = new Cacher_1.Cacher(60 * 24);
+        this.cachedRegisteredTeams = new Cacher_1.Cacher(60 * 24);
     }
     GetDivisions() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.cachedDivisions.TryGetFromCache(() => new QueryBuilder_1.QueryBuilder().GetResponse('/division/get/all'));
+            return this.cachedDivisions.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/division/get/all'));
         });
     }
     GetSchedule() {
-        return this.cachedSchedule.TryGetFromCache(() => new QueryBuilder_1.QueryBuilder().GetResponse('/schedule/get/matches/scheduled?season=10'));
+        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/schedule/get/matches/scheduled?season=11'));
     }
     GetUsers() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,6 +39,11 @@ class LiveDataStore {
             return this.cachedTeams.TryGetFromCache(() => this.GetFreshTeams());
         });
     }
+    GetRegisteredTeams() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.cachedRegisteredTeams.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/team/get/registered'));
+        });
+    }
     GetFreshUsers() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
@@ -46,7 +52,7 @@ class LiveDataStore {
             for (let team of teams) {
                 try {
                     var encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
-                    const teamMembers = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
+                    const teamMembers = yield new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
                     allUsers = allUsers.concat(teamMembers);
                 }
                 catch (e) {
@@ -58,17 +64,32 @@ class LiveDataStore {
     }
     GetFreshTeams() {
         return __awaiter(this, void 0, void 0, function* () {
+            const registeredTeams = yield this.GetRegisteredTeams();
+            if (registeredTeams.length >= 0)
+                return registeredTeams;
+            else
+                return yield this.GetTeamsFromDivisionList();
+        });
+    }
+    GetTeamsFromDivisionList() {
+        return __awaiter(this, void 0, void 0, function* () {
             let allTeams = [];
             const divisions = yield this.GetDivisions();
-            for (let division of divisions) {
-                for (let team of division.teams) {
-                    try {
-                        const teamResponse = yield new QueryBuilder_1.QueryBuilder().GetResponse(`/team/get?team=${encodeURIComponent(team)}`);
-                        allTeams.push(teamResponse);
-                    }
-                    catch (e) {
-                        Globals_1.Globals.log(`/team/get?team=${encodeURIComponent(team)}`);
-                    }
+            let teamnames = [];
+            if (divisions.length <= 0) {
+                const teamsByDivions = divisions.map(d => d.teams);
+                teamnames = teamsByDivions.reduce((a, b) => a.concat(b), []);
+            }
+            else {
+                return yield this.GetRegisteredTeams();
+            }
+            for (let teamName of teamnames) {
+                try {
+                    const teamResponse = yield new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/team/get?team=${encodeURIComponent(teamName)}`);
+                    allTeams.push(teamResponse);
+                }
+                catch (e) {
+                    Globals_1.Globals.log(`/team/get?team=${encodeURIComponent(teamName)}`);
                 }
             }
             return allTeams;

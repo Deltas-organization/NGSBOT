@@ -12,6 +12,8 @@ import { TranslatorDependencies } from "./helpers/TranslatorDependencies";
 import { DeleteMessage } from "./translators/DeleteMessage";
 import { CheckUsers } from "./translators/CheckUsers";
 import { ConfigSetter } from "./translators/ConfigSetter";
+import { SearchPlayers } from "./translators/SearchPlayers";
+import { TeamNameChecker } from "./translators/TeamChecker";
 
 var fs = require('fs');
 
@@ -35,7 +37,9 @@ export class Bot
         this.translators.push(new SelfTeamChecker(this.dependencies, liveDataStore));
         this.translators.push(new CheckUsers(this.dependencies, liveDataStore));
         this.translators.push(new DeleteMessage(this.dependencies));
-        this.translators.push(new ConfigSetter(this.dependencies))
+        this.translators.push(new ConfigSetter(this.dependencies));
+        this.translators.push(new SearchPlayers(this.dependencies, liveDataStore));
+        this.translators.push(new TeamNameChecker(this.dependencies, liveDataStore));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }

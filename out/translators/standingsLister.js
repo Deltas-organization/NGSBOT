@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StandingsLister = void 0;
-const http = require("http");
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
 const deltaTranslatorBase_1 = require("./bases/deltaTranslatorBase");
+const NGSQueryBuilder_1 = require("../helpers/NGSQueryBuilder");
 class StandingsLister extends deltaTranslatorBase_1.DeltaTranslatorBase {
     constructor(translatorDependencies) {
         super(translatorDependencies);
@@ -41,40 +41,13 @@ class StandingsLister extends deltaTranslatorBase_1.DeltaTranslatorBase {
             }
             var divisionObject = {
                 "division": div,
-                "season": 10
+                "season": 11
             };
-            const postData = JSON.stringify(divisionObject);
-            const options = {
-                hostname: 'nexusgamingseries.org',
-                port: 80,
-                path: '/standings/fetch/division',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': postData.length
-                }
-            };
-            const req = http.request(options, (result) => {
-                result.setEncoding('utf8');
-                var chunks = "";
-                result.on('data', (chunk) => {
-                    chunks += chunk;
-                });
-                result.on('end', () => {
-                    var parsedObject = JSON.parse(chunks);
-                    var standings = parsedObject.returnObject;
-                    if (standings) {
-                        let message = this.CreateStandingsMessage(standings);
-                        messageSender.SendMessage(message);
-                    }
-                });
-            });
-            req.on('error', (e) => {
-                console.error(`problem with request: ${e.message}`);
-            });
-            // Write data to request body
-            req.write(postData);
-            req.end();
+            var standings = yield new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('/standings/fetch/division', divisionObject);
+            if (standings) {
+                let message = this.CreateStandingsMessage(standings);
+                messageSender.SendMessage(message);
+            }
         });
     }
     CreateStandingsMessage(standings) {
