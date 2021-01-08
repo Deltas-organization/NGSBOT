@@ -50,10 +50,10 @@ export class SearchPlayers extends TranslatorBase {
         let result = [];
         players.forEach(p => {
             let playerResult = '';
-            playerResult += `Name: ${p.displayName}, \nTeamName: ${p.teamName} \n`;
+            playerResult += `**Name**: ${p.displayName}, \n**TeamName**: ${p.teamName} \n`;
             for (var rank of p.verifiedRankHistory) {
                 if (rank.status == 'verified')
-                    playerResult += `${rank.year} Season: ${rank.season}. ${rank.hlRankMetal} ${rank.hlRankDivision} \n`;
+                    playerResult += `${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}** \n`;
             }
             result.push(playerResult);
         });
