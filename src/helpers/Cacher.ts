@@ -8,10 +8,10 @@ export class Cacher<T>
     private cache: T;
     private nextReloadTime = 0;
 
-    public async TryGetFromCache(setMethod: () => Promise<T>)
+    public async TryGetFromCache(setMethod: () => Promise<T>, reloadCache: boolean = false)
     {       
         let currentTime = new Date().getTime();
-        if (currentTime > this.nextReloadTime) {
+        if (reloadCache || currentTime > this.nextReloadTime) {
             this.nextReloadTime = currentTime + 1000 * 60 * this.refreshTimeInMinutes;
             this.cache = await setMethod();
         }

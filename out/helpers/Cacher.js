@@ -15,10 +15,10 @@ class Cacher {
         this.refreshTimeInMinutes = refreshTimeInMinutes;
         this.nextReloadTime = 0;
     }
-    TryGetFromCache(setMethod) {
+    TryGetFromCache(setMethod, reloadCache = false) {
         return __awaiter(this, void 0, void 0, function* () {
             let currentTime = new Date().getTime();
-            if (currentTime > this.nextReloadTime) {
+            if (reloadCache || currentTime > this.nextReloadTime) {
                 this.nextReloadTime = currentTime + 1000 * 60 * this.refreshTimeInMinutes;
                 this.cache = yield setMethod();
             }
