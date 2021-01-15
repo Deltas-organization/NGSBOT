@@ -10,6 +10,9 @@ import { TranslatorBase } from "./bases/translatorBase";
 export class SearchPlayers extends TranslatorBase {
 
     public async Verify(message: Message) {
+        if(message.member.user.id == "163779571060178955")
+            return true;
+            
         switch (message.guild.id) {
             case "674526786779873280":
                 return true;

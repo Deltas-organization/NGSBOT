@@ -14,6 +14,7 @@ import { CheckUsers } from "./translators/CheckUsers";
 import { ConfigSetter } from "./translators/ConfigSetter";
 import { SearchPlayers } from "./translators/SearchPlayers";
 import { TeamNameChecker } from "./translators/TeamChecker";
+import { Roles } from "./translators/Roles";
 
 var fs = require('fs');
 
@@ -40,6 +41,7 @@ export class Bot
         this.translators.push(new ConfigSetter(this.dependencies));
         this.translators.push(new SearchPlayers(this.dependencies, liveDataStore));
         this.translators.push(new TeamNameChecker(this.dependencies, liveDataStore));
+        this.translators.push(new Roles(this.dependencies, liveDataStore));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }
@@ -83,5 +85,10 @@ export class Bot
                 }
             }
         }
+    }
+
+    public async CheckRoles()
+    {
+
     }
 }

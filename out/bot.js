@@ -37,6 +37,7 @@ const CheckUsers_1 = require("./translators/CheckUsers");
 const ConfigSetter_1 = require("./translators/ConfigSetter");
 const SearchPlayers_1 = require("./translators/SearchPlayers");
 const TeamChecker_1 = require("./translators/TeamChecker");
+const Roles_1 = require("./translators/Roles");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -54,6 +55,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
             this.translators.push(new SearchPlayers_1.SearchPlayers(this.dependencies, liveDataStore));
             this.translators.push(new TeamChecker_1.TeamNameChecker(this.dependencies, liveDataStore));
+            this.translators.push(new Roles_1.Roles(this.dependencies, liveDataStore));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }
         listen() {
@@ -84,6 +86,10 @@ let Bot = /** @class */ (() => {
                         }
                     }
                 }
+            });
+        }
+        CheckRoles() {
+            return __awaiter(this, void 0, void 0, function* () {
             });
         }
     };
