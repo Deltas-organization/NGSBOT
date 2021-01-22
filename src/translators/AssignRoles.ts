@@ -9,7 +9,7 @@ import { debug } from "console";
 
 var fs = require('fs');
 
-export class Roles extends AdminTranslatorBase {
+export class AssignRoles extends AdminTranslatorBase {
 
     private _serverRoles: Role[];
     private _stopIteration = false;
@@ -44,15 +44,11 @@ export class Roles extends AdminTranslatorBase {
     private _myRole: Role;
 
     public get commandBangs(): string[] {
-        return ["roles"];
+        return ["assign"];
     }
 
     public get description(): string {
         return "Will Check all teams for users with discord tags and will assign roles.";
-    }
-
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
     }
 
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
@@ -135,25 +131,6 @@ export class Roles extends AdminTranslatorBase {
         return null;
     }
 
-    private async AskIfYouWantToAddRoleToServer(messageSender: MessageSender, teamName: string) {
-        let role: Role;
-        let reactionResponse = await messageSender.SendReactionMessage(`It looks like the team: ${teamName} has registered, but there is not currently a role for that team. Would you like me to create this role?`,
-            (member) => this.IsAuthenticated(member),
-            async () => {
-                role = await messageSender.originalMessage.guild.roles.create({
-                    data: {
-                        name: teamName,
-                    },
-                    reason: 'needed a new team role added'
-                });
-            });
-
-        reactionResponse.message.delete();
-        if (reactionResponse.response == null)
-            this._stopIteration = true;
-        return role;
-    }
-
     private FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): GuildMember {
         const ngsDiscordId = user.discordTag?.replace(' ', '').toLowerCase();
         for (let member of guildMembers) {
@@ -179,59 +156,25 @@ export class Roles extends AdminTranslatorBase {
                     //await guildMember.roles.add(teamRole);
                     message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${teamRole} \n`;
                 }
-                for (var role of rolesOfUser) {
-                    if (role == teamRole)
-                        continue;
-                    if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
-                        if(this._myRole.comparePositionTo(role) > 0)                        
-                        try {
-                            //await guildMember.roles.remove(role);
-                            message += `\u200B \u200B \u200B \u200B **Removed Role:** ${role} \n`
-                        }
-                        catch (e) {
+                // for (var role of rolesOfUser) {
+                //     if (role == teamRole)
+                //         continue;
+                //     if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
+                //         if(this._myRole.comparePositionTo(role) > 0)                        
+                //         try {
+                //             //await guildMember.roles.remove(role);
+                //             message += `\u200B \u200B \u200B \u200B **Removed Role:** ${role} \n`
+                //         }
+                //         catch (e) {
 
-                        }
-                    }
-                }
+                //         }
+                //     }
+                // }               
             }
             else {
                 message += `\u200B \u200B \u200B \u200B **Not Found** \n`;
             }
         }
         return message;
-    }
-
-    public async CheckUsers(channelID: string) {
-        var myChannel = this.translatorDependencies.client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
-        this._stopIteration = false;
-        const ngsUsers = await this.liveDataStore.GetUsers();
-        const guildMembers = myChannel.guild.members.cache.map((mem, _, __) => mem);
-        this.ReloadServerRoles(myChannel.guild);
-        let message = "";
-        for (var ngsUser of ngsUsers) {
-            const guildMember = this.FindGuildMember(ngsUser, guildMembers);
-            if (guildMember) {
-                const teamName = ngsUser.teamName;
-                let roleOnServer = this.lookForRole(this._serverRoles, teamName)
-                if (!roleOnServer) {
-                    message += `Added role for team: ${teamName} \n`;
-                    // roleOnServer = await myChannel.guild.roles.create({
-                    //     data: {
-                    //         name: teamName,
-                    //     },
-                    //     reason: 'needed a new team role added'
-                    // });
-                    this._serverRoles.push(roleOnServer);
-                }
-                message += `Assigned: ${ngsUser.displayName} to role: ${teamName}. \n`;
-                // guildMember.roles.add(roleOnServer);
-            }
-        }
-        await myChannel.send({
-            embed: {
-                color: 0,
-                description: message
-            }
-        });
     }
 }

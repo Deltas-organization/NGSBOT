@@ -20,10 +20,6 @@ export class CheckUsers extends AdminTranslatorBase {
         return "Will Check all users for discord tags and relevant team roles.";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
-    }
-
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
         let members = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
         this.ReloadServerRoles(message);

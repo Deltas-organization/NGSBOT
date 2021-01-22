@@ -12,10 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchPlayers = void 0;
 const translatorBase_1 = require("./bases/translatorBase");
 class SearchPlayers extends translatorBase_1.TranslatorBase {
-    constructor(translatorDependencies, liveDataStore) {
-        super(translatorDependencies);
-        this.liveDataStore = liveDataStore;
-    }
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
             if (message.member.user.id == "163779571060178955")

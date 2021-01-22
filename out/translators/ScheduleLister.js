@@ -13,10 +13,6 @@ exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
-    constructor(translatorDependencies, liveDataStore) {
-        super(translatorDependencies);
-        this.liveDataStore = liveDataStore;
-    }
     get commandBangs() {
         return ["Schedule", "sch"];
     }

@@ -40,7 +40,7 @@ export class DeleteMessage extends AdminTranslatorBase {
 
         var collectedReactions = await message.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
         if (collectedReactions.first().emoji.name === '✅') {
-            this.translatorDependencies.messageStore.DeleteMessage(amountToDelete);
+            this.messageStore.DeleteMessage(amountToDelete);
         }
         message.delete();
         messageSender.originalMessage.delete();

@@ -14,8 +14,9 @@ import { CheckUsers } from "./translators/CheckUsers";
 import { ConfigSetter } from "./translators/ConfigSetter";
 import { SearchPlayers } from "./translators/SearchPlayers";
 import { TeamNameChecker } from "./translators/TeamChecker";
-import { Roles } from "./translators/Roles";
+import { AssignRoles } from "./translators/AssignRoles";
 import { RegisteredCount } from "./translators/RegisteredCount";
+import { Purge } from "./translators/Purge";
 
 var fs = require('fs');
 
@@ -25,25 +26,26 @@ export class Bot
     private translators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
     private dependencies: TranslatorDependencies;
+    
 
     constructor(
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
     )
     {
-        const liveDataStore = new LiveDataStore();
-        this.dependencies = new TranslatorDependencies(client, new MessageStore())
+        this.dependencies = new TranslatorDependencies(client, new MessageStore(), new LiveDataStore())
 
-        this.scheduleLister = new ScheduleLister(this.dependencies, liveDataStore);
+        this.scheduleLister = new ScheduleLister(this.dependencies);
         this.translators.push(this.scheduleLister);
-        this.translators.push(new SelfTeamChecker(this.dependencies, liveDataStore));
-        this.translators.push(new CheckUsers(this.dependencies, liveDataStore));
+        this.translators.push(new SelfTeamChecker(this.dependencies));
+        this.translators.push(new CheckUsers(this.dependencies));
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
-        this.translators.push(new SearchPlayers(this.dependencies, liveDataStore));
-        this.translators.push(new TeamNameChecker(this.dependencies, liveDataStore));
-        this.translators.push(new Roles(this.dependencies, liveDataStore));
-        this.translators.push(new RegisteredCount(this.dependencies, liveDataStore));
+        this.translators.push(new SearchPlayers(this.dependencies));
+        this.translators.push(new TeamNameChecker(this.dependencies));
+        this.translators.push(new AssignRoles(this.dependencies));
+        this.translators.push(new RegisteredCount(this.dependencies));
+        this.translators.push(new Purge(this.dependencies))
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }

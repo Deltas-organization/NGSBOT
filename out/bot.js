@@ -37,8 +37,9 @@ const CheckUsers_1 = require("./translators/CheckUsers");
 const ConfigSetter_1 = require("./translators/ConfigSetter");
 const SearchPlayers_1 = require("./translators/SearchPlayers");
 const TeamChecker_1 = require("./translators/TeamChecker");
-const Roles_1 = require("./translators/Roles");
+const AssignRoles_1 = require("./translators/AssignRoles");
 const RegisteredCount_1 = require("./translators/RegisteredCount");
+const Purge_1 = require("./translators/Purge");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -46,18 +47,18 @@ let Bot = /** @class */ (() => {
             this.client = client;
             this.token = token;
             this.translators = [];
-            const liveDataStore = new LiveDataStore_1.LiveDataStore();
-            this.dependencies = new TranslatorDependencies_1.TranslatorDependencies(client, new MessageStore_1.MessageStore());
-            this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies, liveDataStore);
+            this.dependencies = new TranslatorDependencies_1.TranslatorDependencies(client, new MessageStore_1.MessageStore(), new LiveDataStore_1.LiveDataStore());
+            this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.translators.push(this.scheduleLister);
-            this.translators.push(new SelfTeamChecker_1.SelfTeamChecker(this.dependencies, liveDataStore));
-            this.translators.push(new CheckUsers_1.CheckUsers(this.dependencies, liveDataStore));
+            this.translators.push(new SelfTeamChecker_1.SelfTeamChecker(this.dependencies));
+            this.translators.push(new CheckUsers_1.CheckUsers(this.dependencies));
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
-            this.translators.push(new SearchPlayers_1.SearchPlayers(this.dependencies, liveDataStore));
-            this.translators.push(new TeamChecker_1.TeamNameChecker(this.dependencies, liveDataStore));
-            this.translators.push(new Roles_1.Roles(this.dependencies, liveDataStore));
-            this.translators.push(new RegisteredCount_1.RegisteredCount(this.dependencies, liveDataStore));
+            this.translators.push(new SearchPlayers_1.SearchPlayers(this.dependencies));
+            this.translators.push(new TeamChecker_1.TeamNameChecker(this.dependencies));
+            this.translators.push(new AssignRoles_1.AssignRoles(this.dependencies));
+            this.translators.push(new RegisteredCount_1.RegisteredCount(this.dependencies));
+            this.translators.push(new Purge_1.Purge(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }
         listen() {

@@ -13,10 +13,6 @@ exports.RegisteredCount = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 var fs = require('fs');
 class RegisteredCount extends adminTranslatorBase_1.AdminTranslatorBase {
-    constructor(translatorDependencies, liveDataStore) {
-        super(translatorDependencies);
-        this.liveDataStore = liveDataStore;
-    }
     get commandBangs() {
         return ["registered"];
     }

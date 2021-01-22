@@ -13,7 +13,7 @@ export class TeamNameChecker extends TranslatorBase {
     public async Verify(message: Message) {
         if(message.member.user.id == "163779571060178955")
             return true;
-            
+
         switch (message.guild.id) {
             case "674526786779873280":
                 return true;
@@ -29,10 +29,6 @@ export class TeamNameChecker extends TranslatorBase {
 
     public get description(): string {
         return "Will List Teams containing the values, Supports multiple searches with the space delimeter. And can include spaces by wraping the search in double quotes.";
-    }
-
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
     }
 
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {

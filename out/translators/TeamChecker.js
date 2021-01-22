@@ -14,10 +14,6 @@ const translatorBase_1 = require("./bases/translatorBase");
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
 var fs = require('fs');
 class TeamNameChecker extends translatorBase_1.TranslatorBase {
-    constructor(translatorDependencies, liveDataStore) {
-        super(translatorDependencies);
-        this.liveDataStore = liveDataStore;
-    }
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
             if (message.member.user.id == "163779571060178955")

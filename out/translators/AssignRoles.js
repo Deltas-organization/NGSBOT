@@ -9,14 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Roles = void 0;
+exports.AssignRoles = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
 var fs = require('fs');
-class Roles extends adminTranslatorBase_1.AdminTranslatorBase {
-    constructor(translatorDependencies, liveDataStore) {
-        super(translatorDependencies);
-        this.liveDataStore = liveDataStore;
+class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
+    constructor() {
+        super(...arguments);
         this._stopIteration = false;
         this._reservedRoleNames = [
             'Captains',
@@ -47,7 +46,7 @@ class Roles extends adminTranslatorBase_1.AdminTranslatorBase {
         this._reserveredRoles = [];
     }
     get commandBangs() {
-        return ["roles"];
+        return ["assign"];
     }
     get description() {
         return "Will Check all teams for users with discord tags and will assign roles.";
@@ -126,23 +125,6 @@ class Roles extends adminTranslatorBase_1.AdminTranslatorBase {
         }
         return null;
     }
-    AskIfYouWantToAddRoleToServer(messageSender, teamName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let role;
-            let reactionResponse = yield messageSender.SendReactionMessage(`It looks like the team: ${teamName} has registered, but there is not currently a role for that team. Would you like me to create this role?`, (member) => this.IsAuthenticated(member), () => __awaiter(this, void 0, void 0, function* () {
-                role = yield messageSender.originalMessage.guild.roles.create({
-                    data: {
-                        name: teamName,
-                    },
-                    reason: 'needed a new team role added'
-                });
-            }));
-            reactionResponse.message.delete();
-            if (reactionResponse.response == null)
-                this._stopIteration = true;
-            return role;
-        });
-    }
     FindGuildMember(user, guildMembers) {
         var _a;
         const ngsDiscordId = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
@@ -169,19 +151,19 @@ class Roles extends adminTranslatorBase_1.AdminTranslatorBase {
                         //await guildMember.roles.add(teamRole);
                         message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${teamRole} \n`;
                     }
-                    for (var role of rolesOfUser) {
-                        if (role == teamRole)
-                            continue;
-                        if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
-                            if (this._myRole.comparePositionTo(role) > 0)
-                                try {
-                                    //await guildMember.roles.remove(role);
-                                    message += `\u200B \u200B \u200B \u200B **Removed Role:** ${role} \n`;
-                                }
-                                catch (e) {
-                                }
-                        }
-                    }
+                    // for (var role of rolesOfUser) {
+                    //     if (role == teamRole)
+                    //         continue;
+                    //     if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
+                    //         if(this._myRole.comparePositionTo(role) > 0)                        
+                    //         try {
+                    //             //await guildMember.roles.remove(role);
+                    //             message += `\u200B \u200B \u200B \u200B **Removed Role:** ${role} \n`
+                    //         }
+                    //         catch (e) {
+                    //         }
+                    //     }
+                    // }               
                 }
                 else {
                     message += `\u200B \u200B \u200B \u200B **Not Found** \n`;
@@ -190,41 +172,6 @@ class Roles extends adminTranslatorBase_1.AdminTranslatorBase {
             return message;
         });
     }
-    CheckUsers(channelID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var myChannel = this.translatorDependencies.client.channels.cache.find(channel => channel.id == channelID);
-            this._stopIteration = false;
-            const ngsUsers = yield this.liveDataStore.GetUsers();
-            const guildMembers = myChannel.guild.members.cache.map((mem, _, __) => mem);
-            this.ReloadServerRoles(myChannel.guild);
-            let message = "";
-            for (var ngsUser of ngsUsers) {
-                const guildMember = this.FindGuildMember(ngsUser, guildMembers);
-                if (guildMember) {
-                    const teamName = ngsUser.teamName;
-                    let roleOnServer = this.lookForRole(this._serverRoles, teamName);
-                    if (!roleOnServer) {
-                        message += `Added role for team: ${teamName} \n`;
-                        // roleOnServer = await myChannel.guild.roles.create({
-                        //     data: {
-                        //         name: teamName,
-                        //     },
-                        //     reason: 'needed a new team role added'
-                        // });
-                        this._serverRoles.push(roleOnServer);
-                    }
-                    message += `Assigned: ${ngsUser.displayName} to role: ${teamName}. \n`;
-                    // guildMember.roles.add(roleOnServer);
-                }
-            }
-            yield myChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
-        });
-    }
 }
-exports.Roles = Roles;
-//# sourceMappingURL=Roles.js.map
+exports.AssignRoles = AssignRoles;
+//# sourceMappingURL=AssignRoles.js.map

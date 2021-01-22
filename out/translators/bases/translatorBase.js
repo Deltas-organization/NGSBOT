@@ -13,7 +13,9 @@ exports.TranslatorBase = void 0;
 const MessageSender_1 = require("../../helpers/MessageSender");
 class TranslatorBase {
     constructor(translatorDependencies) {
-        this.translatorDependencies = translatorDependencies;
+        this.client = translatorDependencies.client;
+        this.messageStore = translatorDependencies.messageStore;
+        this.liveDataStore = translatorDependencies.liveDataStore;
         this.Init();
     }
     Init() {
@@ -37,7 +39,7 @@ class TranslatorBase {
             });
             if (foundBang) {
                 let commands = this.RetrieveCommands(command);
-                let messageSender = new MessageSender_1.MessageSender(this.translatorDependencies.client, message, this.translatorDependencies.messageStore);
+                let messageSender = new MessageSender_1.MessageSender(this.client, message, this.messageStore);
                 this.Interpret(commands, detailed, messageSender);
             }
         });

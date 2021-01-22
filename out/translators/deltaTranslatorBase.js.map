@@ -1,1 +1,0 @@
-{"version":3,"file":"deltaTranslatorBase.js","sourceRoot":"","sources":["../../src/translators/deltaTranslatorBase.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAkD;AAIlD,MAAsB,mBAAoB,SAAQ,+BAAc;IAE5C,MAAM,CAAC,OAAgB;;YAEnC,IAAG,OAAO,CAAC,MAAM,CAAC,IAAI,CAAC,EAAE,IAAI,oBAAoB;gBAC7C,OAAO,IAAI,CAAC;YAEhB,OAAO,KAAK,CAAC;QACjB,CAAC;KAAA;CACJ;AATD,kDASC"}

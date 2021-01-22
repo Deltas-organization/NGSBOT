@@ -14,10 +14,6 @@ const translatorBase_1 = require("./bases/translatorBase");
 const Globals_1 = require("../Globals");
 var fs = require('fs');
 class SelfTeamChecker extends translatorBase_1.TranslatorBase {
-    constructor(translatorDependencies, liveDataStore) {
-        super(translatorDependencies);
-        this.liveDataStore = liveDataStore;
-    }
     get commandBangs() {
         return ["self"];
     }

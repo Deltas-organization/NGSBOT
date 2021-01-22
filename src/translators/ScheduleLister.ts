@@ -18,10 +18,6 @@ export class ScheduleLister extends AdminTranslatorBase {
         return "Displays the Schedule for Today or a future date if a number is also provided, detailed (-d) will return all days betwen now and the number provided, up to 10.";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
-    }
-
     public async getGameMessagesForToday() {
         var filteredGames = await this.getfilteredGames(0, 0);
         if(filteredGames.length <= 0)

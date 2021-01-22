@@ -12,7 +12,7 @@ export class SearchPlayers extends TranslatorBase {
     public async Verify(message: Message) {
         if(message.member.user.id == "163779571060178955")
             return true;
-            
+
         switch (message.guild.id) {
             case "674526786779873280":
                 return true;
@@ -28,10 +28,6 @@ export class SearchPlayers extends TranslatorBase {
 
     public get description(): string {
         return "searches for players by name.";
-    }
-
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {

@@ -20,10 +20,6 @@ export class RegisteredCount extends AdminTranslatorBase {
         return "Will Return number of registered teams and users.";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
-    }
-
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
         const numberOfTeams = (await this.liveDataStore.GetTeams()).length;
         const numberOfPlayers = (await this.liveDataStore.GetUsers()).length;

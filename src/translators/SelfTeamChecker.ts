@@ -19,10 +19,6 @@ export class SelfTeamChecker extends TranslatorBase {
         return "Will Return the team name that the player requesting is on.";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies, private liveDataStore: LiveDataStore) {
-        super(translatorDependencies);
-    }
-
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
         if (commands.length > 0) {
             for (var command of commands) {
