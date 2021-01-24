@@ -12,11 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Purge = void 0;
 const Globals_1 = require("../Globals");
 const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
-var fs = require('fs');
 class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     constructor() {
         super(...arguments);
-        this._stopIteration = false;
         this._reservedRoleNames = [
             'Captains',
             'Caster Hopefuls',
@@ -36,15 +34,6 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'FA Combine',
             '@everyone'
         ];
-        this._divRoles = [
-            'Storm Division',
-            'Heroic Division',
-            'Division A',
-            'Division B',
-            'Division C',
-            'Division D',
-            'Division E',
-        ];
         this._reserveredRoles = [];
     }
     get commandBangs() {
@@ -55,7 +44,6 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._stopIteration = false;
             const guildMembers = messageSender.originalMessage.guild.members.cache.map((mem, _, __) => mem);
             this.ReloadServerRoles(messageSender.originalMessage.guild);
             this.ReloadResservedRoles();
@@ -156,11 +144,9 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
                 let groomedName = this.GroomRoleNameAsLowerCase(role.name);
                 if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
                     // if (groomedName == divRole?.toLowerCase()) {
-                    //     //await guildMember.roles.remove(role);
                     //     messages.push(`\u200B \u200B \u200B \u200B Kept Role: ${role}`);
                     // }
                     if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
-                        //await guildMember.roles.remove(role);
                         messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
                     }
                     else if (this._myRole.comparePositionTo(role) > 0)

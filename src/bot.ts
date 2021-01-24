@@ -17,6 +17,9 @@ import { TeamNameChecker } from "./translators/TeamChecker";
 import { AssignRoles } from "./translators/AssignRoles";
 import { RegisteredCount } from "./translators/RegisteredCount";
 import { Purge } from "./translators/Purge";
+import { SendChannelMessage } from "./helpers/SendChannelMessage";
+import { DiscordChannels } from "./enums/DiscordChannels";
+import { HistoryDisplay } from "./scheduled/HistoryDisplay";
 
 var fs = require('fs');
 
@@ -26,6 +29,8 @@ export class Bot
     private translators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
     private dependencies: TranslatorDependencies;
+    private messageSender: SendChannelMessage;
+    private historyDisplay: HistoryDisplay;
     
 
     constructor(
@@ -33,7 +38,9 @@ export class Bot
         @inject(TYPES.Token) public token: string,
     )
     {
-        this.dependencies = new TranslatorDependencies(client, new MessageStore(), new LiveDataStore())
+        this.dependencies = new TranslatorDependencies(client, new MessageStore(), new LiveDataStore());
+        this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
+        this.historyDisplay = new HistoryDisplay(this.dependencies);
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.translators.push(this.scheduleLister);
@@ -62,6 +69,11 @@ export class Bot
 
     public OnMessageReceived(message: Message)
     {
+        this.checkTranslators(message);
+    }
+
+    private checkTranslators(message: Message)
+    {
         let originalContent = message.content;
         if (/^\>/.test(originalContent))
         {
@@ -79,20 +91,25 @@ export class Bot
         let messages = await this.scheduleLister.getGameMessagesForToday();
         if (messages)
         {
-            //My Test Server and NGS HypeChannel
-            let channelsToReceiveMessage = ["761410049926889544", "522574547405242389"];
-            for (var channelIndex = 0; channelIndex < channelsToReceiveMessage.length; channelIndex++)
+            for (var index = 0; index < messages.length; index++)
             {
-                for (var index = 0; index < messages.length; index++)
-                {
-                    await MessageSender.SendMessageToChannel(this.dependencies, messages[index], channelsToReceiveMessage[channelIndex])
-                }
+                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHype);
+                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
             }
         }
     }
 
-    public async CheckRoles()
+    public async CheckHistory()
     {
-
+        await this.dependencies.client.login(this.token);
+        let messages = await this.historyDisplay.GetRecentHistory(7);
+        if (messages)
+        {
+            for (var index = 0; index < messages.length; index++)
+            {
+                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
+                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSDiscord);
+            }
+        }
     }
 }

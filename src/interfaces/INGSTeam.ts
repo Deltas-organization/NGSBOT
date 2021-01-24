@@ -1,3 +1,4 @@
+import { INGSHistory } from "./INGSHistory";
 
 export interface INGSTeam {
     teamMembers: [{ displayName: string }];
@@ -6,4 +7,5 @@ export interface INGSTeam {
     divisionDisplayName: string;
     assistantCaptain: string[];
     descriptionOfTeam: string;
+    history: INGSHistory[];
 }

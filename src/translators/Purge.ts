@@ -1,19 +1,13 @@
-import { Client, Guild, GuildMember, Role, TextChannel, User } from "discord.js";
+import { Guild, GuildMember, Role, User } from "discord.js";
 import { MessageSender } from "../helpers/MessageSender";
-import { LiveDataStore } from "../LiveDataStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam, INGSUser } from "../interfaces";
-import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { Globals } from "../Globals";
-import { debug } from "console";
 import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
 
-var fs = require('fs');
 
 export class Purge extends ngsTranslatorBase {
 
     private _serverRoles: Role[];
-    private _stopIteration = false;
 
     private _reservedRoleNames: string[] = [
         'Captains',
@@ -34,15 +28,6 @@ export class Purge extends ngsTranslatorBase {
         'FA Combine',
         '@everyone'];
 
-    private _divRoles: string[] = [
-        'Storm Division',
-        'Heroic Division',
-        'Division A',
-        'Division B',
-        'Division C',
-        'Division D',
-        'Division E',
-    ]
 
     private _reserveredRoles: Role[] = [];
     private _myRole: Role;
@@ -56,7 +41,6 @@ export class Purge extends ngsTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
-        this._stopIteration = false;
         const guildMembers = messageSender.originalMessage.guild.members.cache.map((mem, _, __) => mem);
         this.ReloadServerRoles(messageSender.originalMessage.guild);
         this.ReloadResservedRoles();
@@ -163,11 +147,9 @@ export class Purge extends ngsTranslatorBase {
                 let groomedName = this.GroomRoleNameAsLowerCase(role.name);
                 if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
                     // if (groomedName == divRole?.toLowerCase()) {
-                    //     //await guildMember.roles.remove(role);
                     //     messages.push(`\u200B \u200B \u200B \u200B Kept Role: ${role}`);
                     // }
                     if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
-                        //await guildMember.roles.remove(role);
                         messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
 
                     }

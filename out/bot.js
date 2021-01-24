@@ -27,7 +27,6 @@ const inversify_1 = require("inversify");
 const types_1 = require("./inversify/types");
 const ScheduleLister_1 = require("./translators/ScheduleLister");
 const commandLister_1 = require("./translators/commandLister");
-const MessageSender_1 = require("./helpers/MessageSender");
 const LiveDataStore_1 = require("./LiveDataStore");
 const SelfTeamChecker_1 = require("./translators/SelfTeamChecker");
 const MessageStore_1 = require("./MessageStore");
@@ -40,6 +39,9 @@ const TeamChecker_1 = require("./translators/TeamChecker");
 const AssignRoles_1 = require("./translators/AssignRoles");
 const RegisteredCount_1 = require("./translators/RegisteredCount");
 const Purge_1 = require("./translators/Purge");
+const SendChannelMessage_1 = require("./helpers/SendChannelMessage");
+const DiscordChannels_1 = require("./enums/DiscordChannels");
+const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -48,6 +50,8 @@ let Bot = /** @class */ (() => {
             this.token = token;
             this.translators = [];
             this.dependencies = new TranslatorDependencies_1.TranslatorDependencies(client, new MessageStore_1.MessageStore(), new LiveDataStore_1.LiveDataStore());
+            this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
+            this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new SelfTeamChecker_1.SelfTeamChecker(this.dependencies));
@@ -68,6 +72,9 @@ let Bot = /** @class */ (() => {
             return this.client.login(this.token);
         }
         OnMessageReceived(message) {
+            this.checkTranslators(message);
+        }
+        checkTranslators(message) {
             let originalContent = message.content;
             if (/^\>/.test(originalContent)) {
                 var trimmedValue = originalContent.substr(1);
@@ -81,18 +88,23 @@ let Bot = /** @class */ (() => {
                 yield this.dependencies.client.login(this.token);
                 let messages = yield this.scheduleLister.getGameMessagesForToday();
                 if (messages) {
-                    //My Test Server and NGS HypeChannel
-                    let channelsToReceiveMessage = ["761410049926889544", "522574547405242389"];
-                    for (var channelIndex = 0; channelIndex < channelsToReceiveMessage.length; channelIndex++) {
-                        for (var index = 0; index < messages.length; index++) {
-                            yield MessageSender_1.MessageSender.SendMessageToChannel(this.dependencies, messages[index], channelsToReceiveMessage[channelIndex]);
-                        }
+                    for (var index = 0; index < messages.length; index++) {
+                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype);
+                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
                     }
                 }
             });
         }
-        CheckRoles() {
+        CheckHistory() {
             return __awaiter(this, void 0, void 0, function* () {
+                yield this.dependencies.client.login(this.token);
+                let messages = yield this.historyDisplay.GetRecentHistory(7);
+                if (messages) {
+                    for (var index = 0; index < messages.length; index++) {
+                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
+                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSDiscord);
+                    }
+                }
             });
         }
     };
