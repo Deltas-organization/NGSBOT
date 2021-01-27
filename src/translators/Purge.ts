@@ -151,7 +151,6 @@ export class Purge extends ngsTranslatorBase {
                     // }
                     if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
                         messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
-
                     }
                     else if (this._myRole.comparePositionTo(role) > 0)
                         //await guildMember.roles.remove(role);

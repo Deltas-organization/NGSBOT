@@ -102,13 +102,13 @@ export class Bot
     public async CheckHistory()
     {
         await this.dependencies.client.login(this.token);
-        let messages = await this.historyDisplay.GetRecentHistory(7);
+        let messages = await this.historyDisplay.GetRecentHistory(1);
         if (messages)
         {
             for (var index = 0; index < messages.length; index++)
             {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSDiscord);
+                //await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSDiscord);
             }
         }
     }

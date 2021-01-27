@@ -4,7 +4,7 @@ export interface INGSTeam {
     teamMembers: [{ displayName: string }];
     captain: string;
     teamName: string;
-    divisionDisplayName: string;
+    divisionName: string;
     assistantCaptain: string[];
     descriptionOfTeam: string;
     history: INGSHistory[];

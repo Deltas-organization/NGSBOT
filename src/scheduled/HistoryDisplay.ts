@@ -1,6 +1,7 @@
 import { stringify } from "querystring";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { IHistoryMessages } from "../interfaces/IHistoryMessage";
+import { INGSHistory } from "../interfaces/INGSHistory";
 import { LiveDataStore } from "../LiveDataStore";
 
 export class HistoryDisplay
@@ -18,11 +19,12 @@ export class HistoryDisplay
         const todaysUTC = new Date().getTime();
         const historyMaps: { team: string, historymap: Map<string, string[]> }[] = [];
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
-
         for (let team of teams)
         {
             const historyMap = new Map<string, string[]>();
-            for (let history of team.history)
+            const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp)
+            const reversedHistory = sortedHistory.slice().reverse();
+            for (let history of sortedHistory)
             {
                 const historyDate = new Date(+history.timestamp);
                 const historyUTC = historyDate.getTime();
@@ -32,8 +34,14 @@ export class HistoryDisplay
                 if (dayDifference <= days)
                 {
                     const dateString = historyDate.toLocaleString("en-US", options);
-                    const historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
+                    let historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
                     const collection = historyMap.get(dateString);
+                    if (history.action == HistoryActions.JoinedTeam)
+                    {
+                        var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
+                        if (numberOfRosterAdd > 0)
+                            historyMessage = `\u200B \u200B Roster Add #${numberOfRosterAdd}: ${history.target}`
+                    }
                     if (!collection)
                     {
                         historyMap.set(dateString, [historyMessage]);
@@ -50,6 +58,56 @@ export class HistoryDisplay
         }
 
         return this.FormatMessages(historyMaps);
+    }
+
+    public async GetTeamsCreatedThisSeason(season: number): Promise<string[]>
+    {        
+        const teams = await this.liveDataStore.GetTeams();
+        const beginningMessage = "**New Teams this season** \n"
+        let message = beginningMessage;
+        let messages = [];
+        for (let team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName)))
+        {
+            for (let history of team.history)
+            {
+                if(history.action == HistoryActions.CreatedTeam)
+                {
+                    if(history.season == season)
+                    {                        
+                        let teamMessage = `\u200B \u200B ${team.teamName} \n`;
+                        if(teamMessage.length + message.length > 2048)
+                        {
+                            messages.push(message);
+                            message = beginningMessage;
+                        }
+                        message += teamMessage;
+                    }
+                }
+            }
+        }
+        messages.push(message);
+        return messages;
+    }
+
+    GetRosterAddNumber(history: INGSHistory, sortedHistory: INGSHistory[])
+    {
+        var addsSoFar = 0;
+        var currentHistoryIndex = sortedHistory.indexOf(history);
+        for (var indexedHistory of sortedHistory)
+        {
+            if (indexedHistory.action == HistoryActions.JoinedTeam)
+            {
+                addsSoFar++;
+            }
+            if (indexedHistory.action == HistoryActions.AddedDivision)
+            {
+                if (currentHistoryIndex > addsSoFar)
+                    return 0;
+                else
+                    break;
+            }
+        }
+        return addsSoFar - currentHistoryIndex;
     }
 
     private FormatMessages(messages: { team: string, historymap: Map<string, string[]> }[]): string[]
@@ -82,21 +140,11 @@ export class HistoryDisplay
         result.push(rollingMessage);
         return result;
     }
-    private Group(list: { date: string, message: string }[])
-    {
-        const map = new Map();
-        list.forEach((item) =>
-        {
-            const key = item.date;
-            const collection = map.get(key);
-            if (!collection)
-            {
-                map.set(key, [item.message]);
-            } else
-            {
-                collection.push(item.message);
-            }
-        });
-        return map;
-    }
+}
+
+enum HistoryActions
+{
+    JoinedTeam = "Joined team",
+    AddedDivision = "Added to division",
+    CreatedTeam = "Team Created"
 }

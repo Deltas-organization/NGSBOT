@@ -9,13 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AssignRoles = void 0;
-const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
+exports.AssignRolesCommand = void 0;
 const Globals_1 = require("../Globals");
-var fs = require('fs');
-class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
-    constructor() {
-        super(...arguments);
+class AssignRolesCommand {
+    constructor(message) {
+        this.message = message;
         this._stopIteration = false;
         this._reservedRoleNames = [
             'Captains',
@@ -26,13 +24,13 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
             'Interviewee',
             'Bots',
             'Storm Casters',
-            DivisionRole.Storm,
-            DivisionRole.Heroic,
-            DivisionRole.DivA,
-            DivisionRole.DivB,
-            DivisionRole.DivC,
-            DivisionRole.DivD,
-            DivisionRole.DivE,
+            'Storm Division',
+            'Heroic Division',
+            'Division A',
+            'Division B',
+            'Division C',
+            'Division D',
+            'Division E',
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -43,7 +41,8 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
             'FA Combine',
             '@everyone'
         ];
-        this._reserveredRoles = [];
+        this.reserveredRoles = [];
+        this.guild = message.originalMessage.guild;
     }
     get commandBangs() {
         return ["assign"];
@@ -51,11 +50,11 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
     get description() {
         return "Will Check all teams for users with discord tags and will assign roles.";
     }
-    Interpret(commands, detailed, message) {
+    Create() {
         return __awaiter(this, void 0, void 0, function* () {
             this._stopIteration = false;
-            const guildMembers = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
-            this.ReloadServerRoles(message.originalMessage.guild);
+            const guildMembers = this.guild.members.cache.map((mem, _, __) => mem);
+            this.ReloadServerRoles();
             this.ReloadResservedRoles();
             this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
             const teams = yield this.liveDataStore.GetTeams();
@@ -79,8 +78,8 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
                 console.log(`didnt find role: ${roleName}`);
         }
     }
-    ReloadServerRoles(guild) {
-        this._serverRoles = guild.roles.cache.map((role, _, __) => role);
+    ReloadServerRoles() {
+        this._serverRoles = this.guild.roles.cache.map((role, _, __) => role);
         Globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
     DisplayTeamInformation(messageSender, team, guildMembers, rolesNotFound) {
@@ -89,7 +88,7 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
             const allUsers = yield this.liveDataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == teamName);
             const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageSender, teamName, rolesNotFound);
-            const divRoleOnDiscord = this.FindDivRole(team.divisionName);
+            const divRole = yield this.FindDivRole(team.divisionDisplayName);
             let message = "**Team Name** \n";
             message += `${teamName} \n`;
             message += yield this.AssignUsersToRoles(teamUsers, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
@@ -118,40 +117,6 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
             return teamRoleOnDiscord;
         });
     }
-    FindDivRole(divisionDisplayName) {
-        let divRoleName;
-        switch (divisionDisplayName.toLowerCase()) {
-            case "a west":
-            case "a east":
-                divRoleName = divRoleName.DivA;
-                break;
-            case "b west":
-            case "b east":
-                divRoleName = divRoleName.DivB;
-                break;
-            case "c west":
-            case "c east":
-                divRoleName = divRoleName.DivC;
-                break;
-            case "d west":
-            case "d east":
-                divRoleName = divRoleName.DivD;
-                break;
-            case "e west":
-            case "e east":
-                divRoleName = divRoleName.DivE;
-                break;
-            case "storm":
-            case "storm":
-                divRoleName = divRoleName.Storm;
-                break;
-            case "heroic":
-            case "heroic":
-                divRoleName = divRoleName.Heroic;
-                break;
-        }
-        return this.lookForRole(this._serverRoles, divRoleName);
-    }
     lookForRole(userRoles, roleName) {
         let roleNameTrimmed = roleName.trim().toLowerCase();
         const teamWithoutSpaces = roleNameTrimmed.replace(' ', '');
@@ -178,7 +143,7 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
         }
         return null;
     }
-    AssignUsersToRoles(teamUsers, guildMembers, teamRole, divRole) {
+    AssignUsersToRoles(teamUsers, guildMembers, teamRole) {
         return __awaiter(this, void 0, void 0, function* () {
             let message = "**Users** \n";
             for (let user of teamUsers) {
@@ -192,10 +157,6 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
                         //await guildMember.roles.add(teamRole);
                         message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${teamRole} \n`;
                     }
-                    if (divRole != null && !rolesOfUser.find(role => role == divRole)) {
-                        //await guildMember.roles.add(divRole);
-                        message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${divRole} \n`;
-                    }
                 }
                 else {
                     message += `\u200B \u200B \u200B \u200B **Not Found** \n`;
@@ -205,15 +166,5 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
         });
     }
 }
-exports.AssignRoles = AssignRoles;
-var DivisionRole;
-(function (DivisionRole) {
-    DivisionRole["DivA"] = "Division A";
-    DivisionRole["DivB"] = "Division B";
-    DivisionRole["DivC"] = "Division C";
-    DivisionRole["DivD"] = "Division D";
-    DivisionRole["DivE"] = "Division E";
-    DivisionRole["Heroic"] = "Heroic Division";
-    DivisionRole["Storm"] = "Storm Division";
-})(DivisionRole || (DivisionRole = {}));
-//# sourceMappingURL=AssignRoles.js.map
+exports.AssignRolesCommand = AssignRolesCommand;
+//# sourceMappingURL=AssignRolesCommand.js.map

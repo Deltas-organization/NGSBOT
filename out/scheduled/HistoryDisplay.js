@@ -23,15 +23,22 @@ class HistoryDisplay {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             for (let team of teams) {
                 const historyMap = new Map();
-                for (let history of team.history) {
+                const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp);
+                const reversedHistory = sortedHistory.slice().reverse();
+                for (let history of sortedHistory) {
                     const historyDate = new Date(+history.timestamp);
                     const historyUTC = historyDate.getTime();
                     const ms = todaysUTC - historyUTC;
                     const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
                     if (dayDifference <= days) {
                         const dateString = historyDate.toLocaleString("en-US", options);
-                        const historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
+                        let historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
                         const collection = historyMap.get(dateString);
+                        if (history.action == HistoryActions.JoinedTeam) {
+                            var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
+                            if (numberOfRosterAdd > 0)
+                                historyMessage = `\u200B \u200B Roster Add #${numberOfRosterAdd}: ${history.target}`;
+                        }
                         if (!collection) {
                             historyMap.set(dateString, [historyMessage]);
                         }
@@ -46,6 +53,46 @@ class HistoryDisplay {
             }
             return this.FormatMessages(historyMaps);
         });
+    }
+    GetTeamsCreatedThisSeason(season) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const teams = yield this.liveDataStore.GetTeams();
+            const beginningMessage = "**New Teams this season** \n";
+            let message = beginningMessage;
+            let messages = [];
+            for (let team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
+                for (let history of team.history) {
+                    if (history.action == HistoryActions.CreatedTeam) {
+                        if (history.season == season) {
+                            let teamMessage = `\u200B \u200B ${team.teamName} \n`;
+                            if (teamMessage.length + message.length > 2048) {
+                                messages.push(message);
+                                message = beginningMessage;
+                            }
+                            message += teamMessage;
+                        }
+                    }
+                }
+            }
+            messages.push(message);
+            return messages;
+        });
+    }
+    GetRosterAddNumber(history, sortedHistory) {
+        var addsSoFar = 0;
+        var currentHistoryIndex = sortedHistory.indexOf(history);
+        for (var indexedHistory of sortedHistory) {
+            if (indexedHistory.action == HistoryActions.JoinedTeam) {
+                addsSoFar++;
+            }
+            if (indexedHistory.action == HistoryActions.AddedDivision) {
+                if (currentHistoryIndex > addsSoFar)
+                    return 0;
+                else
+                    break;
+            }
+        }
+        return addsSoFar - currentHistoryIndex;
     }
     FormatMessages(messages) {
         let result = [];
@@ -71,20 +118,12 @@ class HistoryDisplay {
         result.push(rollingMessage);
         return result;
     }
-    Group(list) {
-        const map = new Map();
-        list.forEach((item) => {
-            const key = item.date;
-            const collection = map.get(key);
-            if (!collection) {
-                map.set(key, [item.message]);
-            }
-            else {
-                collection.push(item.message);
-            }
-        });
-        return map;
-    }
 }
 exports.HistoryDisplay = HistoryDisplay;
+var HistoryActions;
+(function (HistoryActions) {
+    HistoryActions["JoinedTeam"] = "Joined team";
+    HistoryActions["AddedDivision"] = "Added to division";
+    HistoryActions["CreatedTeam"] = "Team Created";
+})(HistoryActions || (HistoryActions = {}));
 //# sourceMappingURL=HistoryDisplay.js.map

@@ -35,6 +35,7 @@ class TeamNameChecker extends translatorBase_1.TranslatorBase {
     }
     Interpret(commands, detailed, message) {
         return __awaiter(this, void 0, void 0, function* () {
+            const foundTeams = [];
             for (var i = 0; i < commands.length; i++) {
                 let fields = [];
                 var searchTerm = commands[i];
@@ -45,10 +46,13 @@ class TeamNameChecker extends translatorBase_1.TranslatorBase {
                     yield message.SendFields(``, fields);
                 }
                 else {
-                    teams.forEach((t) => __awaiter(this, void 0, void 0, function* () {
-                        let teamMessage = this.GetTeamMessage(t);
+                    for (var team of teams) {
+                        if (foundTeams.indexOf(team) > -1)
+                            continue;
+                        foundTeams.push(team);
+                        let teamMessage = this.GetTeamMessage(team);
                         yield message.SendFields(``, teamMessage);
-                    }));
+                    }
                 }
             }
         });
@@ -56,7 +60,7 @@ class TeamNameChecker extends translatorBase_1.TranslatorBase {
     GetTeamMessage(team) {
         let result = [];
         result.push({ name: "TeamName", value: `\u0009 ${TranslationHelpers_1.Translationhelpers.GetTeamURL(team.teamName)}`, inline: true });
-        result.push({ name: "Division", value: `\u0009 ${team.divisionDisplayName}`, inline: true });
+        result.push({ name: "Division", value: `\u0009 ${team.divisionName}`, inline: true });
         result.push({ name: "Description", value: `\u0009 ${team.descriptionOfTeam} -`, inline: true });
         let firstValueArray = [];
         let secondValueArray = [];

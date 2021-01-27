@@ -98,11 +98,11 @@ let Bot = /** @class */ (() => {
         CheckHistory() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);
-                let messages = yield this.historyDisplay.GetRecentHistory(7);
+                let messages = yield this.historyDisplay.GetRecentHistory(1);
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSDiscord);
+                        //await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSDiscord);
                     }
                 }
             });

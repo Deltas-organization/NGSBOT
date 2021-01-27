@@ -1,17 +1,9 @@
-import { Client, Guild, GuildMember, Role, TextChannel, User } from "discord.js";
-import { MessageSender } from "../helpers/MessageSender";
-import { LiveDataStore } from "../LiveDataStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
-import { INGSTeam, INGSUser } from "../interfaces";
-import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
+import { Guild, Role } from "discord.js";
 import { Globals } from "../Globals";
-import { debug } from "console";
+import { MessageSender } from "../helpers/MessageSender";
 
-var fs = require('fs');
-
-export class AssignRoles extends AdminTranslatorBase
+export class AssignRolesCommand
 {
-
     private _serverRoles: Role[];
     private _stopIteration = false;
 
@@ -24,13 +16,13 @@ export class AssignRoles extends AdminTranslatorBase
         'Interviewee',
         'Bots',
         'Storm Casters',
-        DivisionRole.Storm,
-        DivisionRole.Heroic,
-        DivisionRole.DivA,
-        DivisionRole.DivB,
-        DivisionRole.DivC,
-        DivisionRole.DivD,
-        DivisionRole.DivE,
+        'Storm Division',
+        'Heroic Division',
+        'Division A',
+        'Division B',
+        'Division C',
+        'Division D',
+        'Division E',
         'Ladies of the Nexus',
         'HL Staff',
         'Editor',
@@ -41,8 +33,9 @@ export class AssignRoles extends AdminTranslatorBase
         'FA Combine',
         '@everyone'];
 
-    private _reserveredRoles: Role[] = [];
-    private _myRole: Role;
+    private reserveredRoles: Role[] = [];
+    private myRole: Role;
+    private guild: Guild;
 
     public get commandBangs(): string[]
     {
@@ -54,11 +47,16 @@ export class AssignRoles extends AdminTranslatorBase
         return "Will Check all teams for users with discord tags and will assign roles.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, message: MessageSender)
+    public constructor( public message: MessageSender)
+    {
+        this.guild = message.originalMessage.guild;
+    }
+
+    public async Create()
     {
         this._stopIteration = false;
-        const guildMembers = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
-        this.ReloadServerRoles(message.originalMessage.guild);
+        const guildMembers = this.guild.members.cache.map((mem, _, __) => mem);
+        this.ReloadServerRoles();
         this.ReloadResservedRoles();
         this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
         const teams = await this.liveDataStore.GetTeams();
@@ -86,9 +84,9 @@ export class AssignRoles extends AdminTranslatorBase
         }
     }
 
-    private ReloadServerRoles(guild: Guild)
+    private ReloadServerRoles()
     {
-        this._serverRoles = guild.roles.cache.map((role, _, __) => role);
+        this._serverRoles = this.guild.roles.cache.map((role, _, __) => role);
         Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
 
@@ -98,7 +96,7 @@ export class AssignRoles extends AdminTranslatorBase
         const allUsers = await this.liveDataStore.GetUsers();
         const teamUsers = allUsers.filter(user => user.teamName == teamName);
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageSender, teamName, rolesNotFound);
-        const divRoleOnDiscord = this.FindDivRole(team.divisionName);
+        const divRole = await this.FindDivRole(team.divisionDisplayName);
 
         let message = "**Team Name** \n";
         message += `${teamName} \n`;
@@ -130,43 +128,6 @@ export class AssignRoles extends AdminTranslatorBase
             });
         }
         return teamRoleOnDiscord
-    }
-
-    private FindDivRole(divisionDisplayName: string)
-    {
-        let divRoleName;
-        switch (divisionDisplayName.toLowerCase())
-        {
-            case "a west":
-            case "a east":
-                divRoleName = divRoleName.DivA;
-                break;
-            case "b west":
-            case "b east":
-                divRoleName = divRoleName.DivB;
-                break;
-            case "c west":
-            case "c east":
-                divRoleName = divRoleName.DivC;
-                break;
-            case "d west":
-            case "d east":
-                divRoleName = divRoleName.DivD;
-                break;
-            case "e west":
-            case "e east":
-                divRoleName = divRoleName.DivE;
-                break;
-            case "storm":
-            case "storm":
-                divRoleName = divRoleName.Storm;
-                break;
-            case "heroic":
-            case "heroic":
-                divRoleName = divRoleName.Heroic;
-                break;
-        }
-        return this.lookForRole(this._serverRoles, divRoleName);
     }
 
     private lookForRole(userRoles: Role[], roleName: string): Role
@@ -205,7 +166,7 @@ export class AssignRoles extends AdminTranslatorBase
         return null;
     }
 
-    private async AssignUsersToRoles(teamUsers: INGSUser[], guildMembers: GuildMember[], teamRole: Role, divRole: Role)
+    private async AssignUsersToRoles(teamUsers: INGSUser[], guildMembers: GuildMember[], teamRole: Role)
     {
         let message = "**Users** \n";
         for (let user of teamUsers)
@@ -222,11 +183,6 @@ export class AssignRoles extends AdminTranslatorBase
                     //await guildMember.roles.add(teamRole);
                     message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${teamRole} \n`;
                 }
-                if (divRole != null && !rolesOfUser.find(role => role == divRole))
-                {
-                    //await guildMember.roles.add(divRole);
-                    message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${divRole} \n`;
-                }
             }
             else
             {
@@ -235,15 +191,4 @@ export class AssignRoles extends AdminTranslatorBase
         }
         return message;
     }
-}
-
-enum DivisionRole
-{
-    DivA = 'Division A',
-    DivB = 'Division B',
-    DivC = 'Division C',
-    DivD = 'Division D',
-    DivE = 'Division E',
-    Heroic = 'Heroic Division',
-    Storm = 'Storm Division',
 }
