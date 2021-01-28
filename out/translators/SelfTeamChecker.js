@@ -59,7 +59,7 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
                     return true;
                 }
             }
-            yield message.SendMessage('unable to find user, no matching discord id registered.');
+            yield message.SendMessage(`unable to find user, no matching discord id registered. DiscordName: ${discordName}`);
             return false;
         });
     }

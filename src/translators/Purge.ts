@@ -5,7 +5,8 @@ import { Globals } from "../Globals";
 import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
 
 
-export class Purge extends ngsTranslatorBase {
+export class Purge extends ngsTranslatorBase
+{
 
     private _serverRoles: Role[];
 
@@ -18,6 +19,7 @@ export class Purge extends ngsTranslatorBase {
         'Interviewee',
         'Bots',
         'Storm Casters',
+        'Storm Division',
         'Ladies of the Nexus',
         'HL Staff',
         'Editor',
@@ -25,22 +27,24 @@ export class Purge extends ngsTranslatorBase {
         'It',
         'Has Cooties',
         'PoGo Raider',
-        'FA Combine',
         '@everyone'];
 
 
     private _reserveredRoles: Role[] = [];
     private _myRole: Role;
 
-    public get commandBangs(): string[] {
+    public get commandBangs(): string[]
+    {
         return ["purge"];
     }
 
-    public get description(): string {
+    public get description(): string
+    {
         return "Will Check all teams for users with discord tags and will assign roles.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
+    {
         const guildMembers = messageSender.originalMessage.guild.members.cache.map((mem, _, __) => mem);
         this.ReloadServerRoles(messageSender.originalMessage.guild);
         this.ReloadResservedRoles();
@@ -49,39 +53,48 @@ export class Purge extends ngsTranslatorBase {
         const teams = await this.liveDataStore.GetTeams();
         const messages: string[] = [];
         let rollingMessage = "";
-        for (let member of guildMembers) {
+        for (let member of guildMembers)
+        {
             const teamInformation = await this.FindInTeam(member.user, teams);
-            let message ="";
-            if (teamInformation == null) {
+            let message = "";
+            if (teamInformation == null)
+            {
                 message += `No Team Found \n`;
-                var purgeMessage = this.PurgeAllRoles(member);
+                var purgeMessage = await this.PurgeAllRoles(member);
             }
-            else {
+            else
+            {
                 message += `Team Found: **${teamInformation.NGSTeam.teamName}** \n`;
-                var purgeMessage = this.PurgeUnrelatedRoles(member, teamInformation);
+                var purgeMessage = await this.PurgeUnrelatedRoles(member, teamInformation);
             }
 
-            if (purgeMessage) {
+            if (purgeMessage)
+            {
                 message += purgeMessage + "\n";
-                if (rollingMessage.length + message.length >= 2048) {
+                if (rollingMessage.length + message.length >= 2048)
+                {
                     messages.push(rollingMessage);
                     rollingMessage = message;
                 }
-                else {
+                else
+                {
                     rollingMessage += message;
                 }
             }
         }
-        for (let message of messages) {
+        for (let message of messages)
+        {
             await messageSender.SendMessage(message);
         }
         if (rollingMessage.length > 0)
             await messageSender.SendMessage(rollingMessage);
     }
 
-    private ReloadResservedRoles() {
+    private ReloadResservedRoles()
+    {
         this._reserveredRoles = [];
-        for (var roleName of this._reservedRoleNames) {
+        for (var roleName of this._reservedRoleNames)
+        {
             let foundRole = this.lookForRole(this._serverRoles, roleName);
             if (foundRole)
                 this._reserveredRoles.push(foundRole);
@@ -90,20 +103,25 @@ export class Purge extends ngsTranslatorBase {
         }
     }
 
-    private ReloadServerRoles(guild: Guild) {
+    private ReloadServerRoles(guild: Guild)
+    {
         this._serverRoles = guild.roles.cache.map((role, _, __) => role);
         Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
 
-    private async FindInTeam(guildUser: User, teams: INGSTeam[]): Promise<teamInformation> {
+    private async FindInTeam(guildUser: User, teams: INGSTeam[]): Promise<teamInformation>
+    {
         const discordName = `${guildUser.username}#${guildUser.discriminator}`.toLowerCase();
-        for (var team of teams) {
+        for (var team of teams)
+        {
             const teamName = team.teamName;
             const allUsers = await this.liveDataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == teamName);
-            for (var ngsUser of teamUsers) {
+            for (var ngsUser of teamUsers)
+            {
                 const ngsDiscordId = ngsUser.discordTag?.replace(' ', '').toLowerCase();
-                if (discordName == ngsDiscordId) {
+                if (discordName == ngsDiscordId)
+                {
                     return new teamInformation(team, ngsUser);
                 }
             }
@@ -112,18 +130,23 @@ export class Purge extends ngsTranslatorBase {
         return null;
     }
 
-    private PurgeAllRoles(guildMember: GuildMember): string {
+    private async PurgeAllRoles(guildMember: GuildMember): Promise<string>
+    {
         const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
         let messages = [];
         messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
-        for (var role of rolesOfUser) {
-            if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
+        for (var role of rolesOfUser)
+        {
+            if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name))
+            {
                 if (this._myRole.comparePositionTo(role) > 0)
-                    try {
-                        //await guildMember.roles.remove(role);
+                    try
+                    {
+                        await guildMember.roles.remove(role);
                         messages.push(`\u200B \u200B \u200B \u200B Removed Role: ${role}`);
                     }
-                    catch (e) {
+                    catch (e)
+                    {
 
                     }
             }
@@ -134,8 +157,10 @@ export class Purge extends ngsTranslatorBase {
         return null
     }
 
-    private PurgeUnrelatedRoles(guildMember: GuildMember, teamInformation: teamInformation): string {
-        try {
+    private async PurgeUnrelatedRoles(guildMember: GuildMember, teamInformation: teamInformation): Promise<string>
+    {
+        try
+        {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
             let messages = [];
             messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
@@ -143,33 +168,38 @@ export class Purge extends ngsTranslatorBase {
             // let divRole = this._divRoles.find(role => {
             //     return role.toLowerCase().replace("division", "").trim() == teamDiv
             // });
-            for (var role of rolesOfUser) {
+            for (var role of rolesOfUser)
+            {
                 let groomedName = this.GroomRoleNameAsLowerCase(role.name);
-                if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
-                    // if (groomedName == divRole?.toLowerCase()) {
-                    //     messages.push(`\u200B \u200B \u200B \u200B Kept Role: ${role}`);
-                    // }
-                    if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
+                if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name)))
+                {
+                    if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase())
+                    {
                         messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
                     }
                     else if (this._myRole.comparePositionTo(role) > 0)
-                        //await guildMember.roles.remove(role);
+                    {
+                        await guildMember.roles.remove(role);
                         messages.push(`\u200B \u200B \u200B \u200B Removed: ${role}`);
+                    }
                 }
             }
             if (messages.length > 1)
                 return messages.join("\n") + '\n';
 
         }
-        catch (e) {
+        catch (e)
+        {
 
         }
         return null;
     }
 
-    private lookForRole(userRoles: Role[], roleName: string): Role {
+    private lookForRole(userRoles: Role[], roleName: string): Role
+    {
         let groomedRoleName = this.GroomRoleNameAsLowerCase(roleName);
-        for (const role of userRoles) {
+        for (const role of userRoles)
+        {
             let groomedServerRole = this.GroomRoleNameAsLowerCase(role.name);
             if (groomedServerRole === groomedRoleName)
                 return role;
@@ -177,10 +207,12 @@ export class Purge extends ngsTranslatorBase {
         return null;
     }
 
-    private GroomRoleNameAsLowerCase(roleName: string) {
+    private GroomRoleNameAsLowerCase(roleName: string)
+    {
         let roleNameTrimmed = roleName.trim();
         const indexOfWidthdrawn = roleNameTrimmed.indexOf('(Withdrawn');
-        if (indexOfWidthdrawn > -1) {
+        if (indexOfWidthdrawn > -1)
+        {
             roleNameTrimmed = roleNameTrimmed.slice(0, indexOfWidthdrawn).trim();
         }
 
@@ -190,6 +222,7 @@ export class Purge extends ngsTranslatorBase {
     }
 }
 
-class teamInformation {
+class teamInformation
+{
     constructor(public NGSTeam: INGSTeam, public NGSUser: INGSUser) { }
 }

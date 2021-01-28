@@ -56,7 +56,7 @@ export class SelfTeamChecker extends TranslatorBase {
                 return true;
             }
         }
-        await message.SendMessage('unable to find user, no matching discord id registered.');
+        await message.SendMessage(`unable to find user, no matching discord id registered. DiscordName: ${discordName}`);
         return false;
     }
 

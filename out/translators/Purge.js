@@ -24,6 +24,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'Interviewee',
             'Bots',
             'Storm Casters',
+            'Storm Division',
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -31,7 +32,6 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'It',
             'Has Cooties',
             'PoGo Raider',
-            'FA Combine',
             '@everyone'
         ];
         this._reserveredRoles = [];
@@ -56,11 +56,11 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
                 let message = "";
                 if (teamInformation == null) {
                     message += `No Team Found \n`;
-                    var purgeMessage = this.PurgeAllRoles(member);
+                    var purgeMessage = yield this.PurgeAllRoles(member);
                 }
                 else {
                     message += `Team Found: **${teamInformation.NGSTeam.teamName}** \n`;
-                    var purgeMessage = this.PurgeUnrelatedRoles(member, teamInformation);
+                    var purgeMessage = yield this.PurgeUnrelatedRoles(member, teamInformation);
                 }
                 if (purgeMessage) {
                     message += purgeMessage + "\n";
@@ -113,53 +113,55 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         });
     }
     PurgeAllRoles(guildMember) {
-        const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-        let messages = [];
-        messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
-        for (var role of rolesOfUser) {
-            if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
-                if (this._myRole.comparePositionTo(role) > 0)
-                    try {
-                        //await guildMember.roles.remove(role);
-                        messages.push(`\u200B \u200B \u200B \u200B Removed Role: ${role}`);
-                    }
-                    catch (e) {
-                    }
-            }
-        }
-        if (messages.length > 1)
-            return messages.join("\n") + '\n';
-        return null;
-    }
-    PurgeUnrelatedRoles(guildMember, teamInformation) {
-        try {
+        return __awaiter(this, void 0, void 0, function* () {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
             let messages = [];
             messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
-            // let teamDiv = teamInformation.NGSTeam.divisionDisplayName.split(' ')[0];
-            // let divRole = this._divRoles.find(role => {
-            //     return role.toLowerCase().replace("division", "").trim() == teamDiv
-            // });
             for (var role of rolesOfUser) {
-                let groomedName = this.GroomRoleNameAsLowerCase(role.name);
-                if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
-                    // if (groomedName == divRole?.toLowerCase()) {
-                    //     messages.push(`\u200B \u200B \u200B \u200B Kept Role: ${role}`);
-                    // }
-                    if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
-                        messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
-                    }
-                    else if (this._myRole.comparePositionTo(role) > 0)
-                        //await guildMember.roles.remove(role);
-                        messages.push(`\u200B \u200B \u200B \u200B Removed: ${role}`);
+                if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
+                    if (this._myRole.comparePositionTo(role) > 0)
+                        try {
+                            yield guildMember.roles.remove(role);
+                            messages.push(`\u200B \u200B \u200B \u200B Removed Role: ${role}`);
+                        }
+                        catch (e) {
+                        }
                 }
             }
             if (messages.length > 1)
                 return messages.join("\n") + '\n';
-        }
-        catch (e) {
-        }
-        return null;
+            return null;
+        });
+    }
+    PurgeUnrelatedRoles(guildMember, teamInformation) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
+                let messages = [];
+                messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
+                // let teamDiv = teamInformation.NGSTeam.divisionDisplayName.split(' ')[0];
+                // let divRole = this._divRoles.find(role => {
+                //     return role.toLowerCase().replace("division", "").trim() == teamDiv
+                // });
+                for (var role of rolesOfUser) {
+                    let groomedName = this.GroomRoleNameAsLowerCase(role.name);
+                    if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
+                        if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
+                            messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
+                        }
+                        else if (this._myRole.comparePositionTo(role) > 0) {
+                            yield guildMember.roles.remove(role);
+                            messages.push(`\u200B \u200B \u200B \u200B Removed: ${role}`);
+                        }
+                    }
+                }
+                if (messages.length > 1)
+                    return messages.join("\n") + '\n';
+            }
+            catch (e) {
+            }
+            return null;
+        });
     }
     lookForRole(userRoles, roleName) {
         let groomedRoleName = this.GroomRoleNameAsLowerCase(roleName);

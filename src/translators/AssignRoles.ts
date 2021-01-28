@@ -6,6 +6,7 @@ import { INGSTeam, INGSUser } from "../interfaces";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { Globals } from "../Globals";
 import { debug } from "console";
+import { TeamNameChecker } from "./TeamChecker";
 
 var fs = require('fs');
 
@@ -62,14 +63,22 @@ export class AssignRoles extends AdminTranslatorBase
         this.ReloadResservedRoles();
         this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
         const teams = await this.liveDataStore.GetTeams();
-        const rolesNotFound = [];
-        for (var team of teams)
+        const rolesAdded = [];
+        try
         {
-            await this.DisplayTeamInformation(message, team, guildMembers, rolesNotFound);
-            if (this._stopIteration)
-                break;
+            for (var team of teams.sort((t1, t2)=> t1.teamName.localeCompare(t2.teamName)))
+            {
+                await this.DisplayTeamInformation(message, team, guildMembers, rolesAdded);
+                if (this._stopIteration)
+                    break;
+            }
         }
-        message.SendMessage(`Unable to find roles: ${rolesNotFound.join(', ')}`);
+        catch (e)
+        {
+            console.log(e);
+        }
+        console.log(rolesAdded);
+        //message.SendMessage(`Unable to find roles: ${rolesNotFound.join(', ')}`);
         console.log("Done");
     }
 
@@ -92,23 +101,24 @@ export class AssignRoles extends AdminTranslatorBase
         Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
 
-    private async DisplayTeamInformation(messageSender: MessageSender, team: INGSTeam, guildMembers: GuildMember[], rolesNotFound: string[])
+    private async DisplayTeamInformation(messageSender: MessageSender, team: INGSTeam, guildMembers: GuildMember[], rolesAdded: string[])
     {
         const teamName = team.teamName;
-        const allUsers = await this.liveDataStore.GetUsers();
-        const teamUsers = allUsers.filter(user => user.teamName == teamName);
-        const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageSender, teamName, rolesNotFound);
-        const divRoleOnDiscord = this.FindDivRole(team.divisionName);
+        const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageSender, teamName, rolesAdded);
+        const divRoleOnDiscord = null;//this.FindDivRole(team.divisionName);
 
         let message = "**Team Name** \n";
         message += `${teamName} \n`;
-        message += await this.AssignUsersToRoles(teamUsers, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
+        let userRolesMessage = await this.AssignUsersToRoles(team, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
+        if (!userRolesMessage)
+            return;
 
+        message += userRolesMessage;
         await messageSender.SendMessage(message);
         return false;
     }
 
-    private async CreateOrFindTeamRole(messageSender: MessageSender, teamName: string, rolesNotFound: string[])
+    private async CreateOrFindTeamRole(messageSender: MessageSender, teamName: string, rolesAdded: string[])
     {
         teamName = teamName.trim();
         const indexOfWidthdrawn = teamName.indexOf('(Withdrawn');
@@ -120,8 +130,7 @@ export class AssignRoles extends AdminTranslatorBase
         let teamRoleOnDiscord = this.lookForRole(this._serverRoles, teamName)
         if (!teamRoleOnDiscord)
         {
-            rolesNotFound.push(teamName);
-            return;
+            rolesAdded.push(teamName);
             teamRoleOnDiscord = await messageSender.originalMessage.guild.roles.create({
                 data: {
                     name: teamName,
@@ -205,9 +214,12 @@ export class AssignRoles extends AdminTranslatorBase
         return null;
     }
 
-    private async AssignUsersToRoles(teamUsers: INGSUser[], guildMembers: GuildMember[], teamRole: Role, divRole: Role)
+    private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], teamRole: Role, divRole: Role)
     {
+        const allUsers = await this.liveDataStore.GetUsers();
+        const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
         let message = "**Users** \n";
+        let foundOne = false;
         for (let user of teamUsers)
         {
             const guildMember = this.FindGuildMember(user, guildMembers);
@@ -219,7 +231,8 @@ export class AssignRoles extends AdminTranslatorBase
                 message += `\u200B \u200B \u200B \u200B ${rolesOfUser.join(',')} \n`;
                 if (!rolesOfUser.find(role => role == teamRole))
                 {
-                    //await guildMember.roles.add(teamRole);
+                    await guildMember.roles.add(teamRole);
+                    foundOne = true;
                     message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${teamRole} \n`;
                 }
                 if (divRole != null && !rolesOfUser.find(role => role == divRole))
@@ -233,6 +246,8 @@ export class AssignRoles extends AdminTranslatorBase
                 message += `\u200B \u200B \u200B \u200B **Not Found** \n`;
             }
         }
+        if (!foundOne)
+            return null;
         return message;
     }
 }
