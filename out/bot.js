@@ -32,7 +32,6 @@ const SelfTeamChecker_1 = require("./translators/SelfTeamChecker");
 const MessageStore_1 = require("./MessageStore");
 const TranslatorDependencies_1 = require("./helpers/TranslatorDependencies");
 const DeleteMessage_1 = require("./translators/DeleteMessage");
-const CheckUsers_1 = require("./translators/CheckUsers");
 const ConfigSetter_1 = require("./translators/ConfigSetter");
 const SearchPlayers_1 = require("./translators/SearchPlayers");
 const TeamChecker_1 = require("./translators/TeamChecker");
@@ -42,6 +41,7 @@ const Purge_1 = require("./translators/Purge");
 const SendChannelMessage_1 = require("./helpers/SendChannelMessage");
 const DiscordChannels_1 = require("./enums/DiscordChannels");
 const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
+const Reload_1 = require("./translators/Reload");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -55,7 +55,6 @@ let Bot = /** @class */ (() => {
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new SelfTeamChecker_1.SelfTeamChecker(this.dependencies));
-            this.translators.push(new CheckUsers_1.CheckUsers(this.dependencies));
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
             this.translators.push(new SearchPlayers_1.SearchPlayers(this.dependencies));
@@ -63,6 +62,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new AssignRoles_1.AssignRoles(this.dependencies));
             this.translators.push(new RegisteredCount_1.RegisteredCount(this.dependencies));
             this.translators.push(new Purge_1.Purge(this.dependencies));
+            this.translators.push(new Reload_1.Reload(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }
         listen() {

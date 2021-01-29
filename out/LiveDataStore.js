@@ -21,6 +21,13 @@ class LiveDataStore {
         this.cachedTeams = new Cacher_1.Cacher(60 * 24);
         this.cachedRegisteredTeams = new Cacher_1.Cacher(60 * 24);
     }
+    Clear() {
+        this.cachedDivisions.Clear();
+        this.cachedSchedule.Clear();
+        this.cachedUsers.Clear();
+        this.cachedTeams.Clear();
+        this.cachedRegisteredTeams.Clear();
+    }
     GetDivisions() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.cachedDivisions.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/division/get/all'));

@@ -11,6 +11,15 @@ export class LiveDataStore {
     private cachedTeams = new Cacher<INGSTeam[]>(60 * 24);
     private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);
 
+    public Clear()
+    {
+        this.cachedDivisions.Clear();
+        this.cachedSchedule.Clear();
+        this.cachedUsers.Clear();
+        this.cachedTeams.Clear();
+        this.cachedRegisteredTeams.Clear();
+    }
+
     public async GetDivisions(): Promise<INGSDivision[]> {
         return this.cachedDivisions.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSDivision[]>('/division/get/all'));
     }

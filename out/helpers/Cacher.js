@@ -17,10 +17,13 @@ class Cacher {
         this.resolversWaiting = [];
         this.nextReloadTime = 0;
     }
-    TryGetFromCache(setMethod, reloadCache = false) {
+    Clear() {
+        this._reloadCache = true;
+    }
+    TryGetFromCache(setMethod) {
         return __awaiter(this, void 0, void 0, function* () {
             let currentTime = new Date().getTime();
-            if (reloadCache || currentTime > this.nextReloadTime) {
+            if (this._reloadCache || currentTime > this.nextReloadTime) {
                 this.loading = true;
                 this.nextReloadTime = currentTime + 1000 * 60 * this.refreshTimeInMinutes;
                 this.cache = yield setMethod();
@@ -28,6 +31,7 @@ class Cacher {
                 for (let resolver of this.resolversWaiting) {
                     resolver(this.cache);
                 }
+                this._reloadCache = false;
             }
             if (this.loading) {
                 return yield new Promise((resolver, rejector) => {

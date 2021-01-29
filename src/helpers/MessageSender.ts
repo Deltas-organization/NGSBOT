@@ -29,6 +29,15 @@ export class MessageSender {
         return sentMessage
     }
 
+    public async Edit(message: Message, newContent: string) {
+        return await message.edit({
+            embed: {
+                color: 0,
+                description: newContent
+            }
+        });
+    }
+
     public async SendFields(description: string, fields: { name: string, value: string }[]) {
         var sentMessage = await this.TextChannel.send({
             embed: {
@@ -55,7 +64,7 @@ export class MessageSender {
         }
     }
 
-    public async SendReactionMessage(message: string, authentication: (member: GuildMember) => boolean, yesReaction: () => Promise<any> | any, noReaction: () => Promise<any> | any = () => {}, storeMessage = true) {
+    public async SendReactionMessage(message: string, authentication: (member: GuildMember) => boolean, yesReaction: () => Promise<any> | any, noReaction: () => Promise<any> | any = () => { }, storeMessage = true) {
         var sentMessage = await this.TextChannel.send({
             embed: {
                 color: 0,
@@ -71,7 +80,7 @@ export class MessageSender {
         const members = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
         const filter = (reaction, user: User) => {
             let member = members.find(mem => mem.id == user.id);
-            return ['✅', '❌','🛑'].includes(reaction.emoji.name) && authentication(member);
+            return ['✅', '❌', '🛑'].includes(reaction.emoji.name) && authentication(member);
         };
         let response = null;
         try {
@@ -84,7 +93,7 @@ export class MessageSender {
                 await noReaction();
                 response = false;
             }
-            
+
             if (collectedReactions.first().emoji.name === '🛑') {
                 response = null;
             }

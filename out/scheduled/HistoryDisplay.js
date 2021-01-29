@@ -115,7 +115,8 @@ class HistoryDisplay {
                 rollingMessage += currentMessage;
             }
         }
-        result.push(rollingMessage);
+        if (rollingMessage)
+            result.push(rollingMessage);
         return result;
     }
 }

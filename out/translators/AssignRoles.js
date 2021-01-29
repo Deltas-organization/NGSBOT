@@ -10,10 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignRoles = void 0;
-const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
-var fs = require('fs');
-class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
+const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
+const MessageHelper_1 = require("../helpers/MessageHelper");
+const fs = require('fs');
+class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     constructor() {
         super(...arguments);
         this._stopIteration = false;
@@ -51,28 +52,46 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
     get description() {
         return "Will Check all teams for users with discord tags and will assign roles.";
     }
-    Interpret(commands, detailed, message) {
+    Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             this._stopIteration = false;
-            const guildMembers = message.originalMessage.guild.members.cache.map((mem, _, __) => mem);
-            this.ReloadServerRoles(message.originalMessage.guild);
+            this.ReloadServerRoles(messageSender.originalMessage.guild);
             this.ReloadResservedRoles();
             this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
             const teams = yield this.liveDataStore.GetTeams();
             const rolesAdded = [];
+            const messagesLog = [];
             try {
+                const guildMembers = messageSender.originalMessage.guild.members.cache.map((mem, _, __) => mem);
                 for (var team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
-                    yield this.DisplayTeamInformation(message, team, guildMembers, rolesAdded);
+                    let messageHelper = yield this.DisplayTeamInformation(messageSender, team, guildMembers, rolesAdded);
+                    if (messageHelper) {
+                        if (detailed) {
+                            if (!messageHelper.Optional) {
+                                yield messageSender.SendMessage(messageHelper.CreateStringMessage());
+                            }
+                        }
+                        else {
+                            messagesLog.push(messageHelper);
+                        }
+                    }
                     if (this._stopIteration)
                         break;
                 }
+                if (messagesLog.length > 0) {
+                    fs.writeFileSync('./files/assignedRoles.json', JSON.stringify(messagesLog.map(message => message.CreateJsonMessage())));
+                    messageSender.TextChannel.send({
+                        files: [{
+                                attachment: './files/assignedRoles.json',
+                                name: 'AssignRolesReport.json'
+                            }]
+                    }).catch(console.error);
+                }
             }
             catch (e) {
-                console.log(e);
+                Globals_1.Globals.log(e);
             }
-            console.log(rolesAdded);
-            //message.SendMessage(`Unable to find roles: ${rolesNotFound.join(', ')}`);
-            console.log("Done");
+            yield messageSender.SendMessage(`Finished Assigning Roles!`);
         });
     }
     ReloadResservedRoles() {
@@ -82,26 +101,19 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
             if (foundRole)
                 this._reserveredRoles.push(foundRole);
             else
-                console.log(`didnt find role: ${roleName}`);
+                Globals_1.Globals.logAdvanced(`didnt find role: ${roleName}`);
         }
     }
     ReloadServerRoles(guild) {
         this._serverRoles = guild.roles.cache.map((role, _, __) => role);
-        Globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
+        Globals_1.Globals.logAdvanced(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
     DisplayTeamInformation(messageSender, team, guildMembers, rolesAdded) {
         return __awaiter(this, void 0, void 0, function* () {
             const teamName = team.teamName;
             const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageSender, teamName, rolesAdded);
             const divRoleOnDiscord = null; //this.FindDivRole(team.divisionName);
-            let message = "**Team Name** \n";
-            message += `${teamName} \n`;
-            let userRolesMessage = yield this.AssignUsersToRoles(team, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
-            if (!userRolesMessage)
-                return;
-            message += userRolesMessage;
-            yield messageSender.SendMessage(message);
-            return false;
+            return yield this.AssignUsersToRoles(team, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
         });
     }
     CreateOrFindTeamRole(messageSender, teamName, rolesAdded) {
@@ -114,12 +126,12 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
             let teamRoleOnDiscord = this.lookForRole(this._serverRoles, teamName);
             if (!teamRoleOnDiscord) {
                 rolesAdded.push(teamName);
-                teamRoleOnDiscord = yield messageSender.originalMessage.guild.roles.create({
-                    data: {
-                        name: teamName,
-                    },
-                    reason: 'needed a new team role added'
-                });
+                // teamRoleOnDiscord = await messageSender.originalMessage.guild.roles.create({
+                //     data: {
+                //         name: teamName,
+                //     },
+                //     reason: 'needed a new team role added'
+                // });
             }
             return teamRoleOnDiscord;
         });
@@ -184,37 +196,45 @@ class AssignRoles extends adminTranslatorBase_1.AdminTranslatorBase {
         }
         return null;
     }
-    AssignUsersToRoles(team, guildMembers, teamRole, divRole) {
+    AssignUsersToRoles(team, guildMembers, ...rolesToLookFor) {
         return __awaiter(this, void 0, void 0, function* () {
             const allUsers = yield this.liveDataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
-            let message = "**Users** \n";
+            let message = new MessageHelper_1.MessageHelper(team.teamName);
+            message.AddNewLine("**Team Name**");
+            ;
+            message.AddNewLine(team.teamName);
+            message.AddNewLine("**Users**");
             let foundOne = false;
             for (let user of teamUsers) {
                 const guildMember = this.FindGuildMember(user, guildMembers);
-                message += `${user.displayName} \n`;
+                message.AddNewLine(`${user.displayName} : ${user.discordTag}`);
                 if (guildMember) {
                     var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-                    message += "\u200B \u200B \u200B \u200B **Current Roles** \n";
-                    message += `\u200B \u200B \u200B \u200B ${rolesOfUser.join(',')} \n`;
-                    if (!rolesOfUser.find(role => role == teamRole)) {
-                        yield guildMember.roles.add(teamRole);
-                        foundOne = true;
-                        message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${teamRole} \n`;
-                    }
-                    if (divRole != null && !rolesOfUser.find(role => role == divRole)) {
-                        //await guildMember.roles.add(divRole);
-                        message += `\u200B \u200B \u200B \u200B **Assigned Role:** ${divRole} \n`;
+                    message.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
+                    message.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
+                    for (var roleToLookFor of rolesToLookFor) {
+                        if (roleToLookFor != null && !this.HasRole(rolesOfUser, roleToLookFor)) {
+                            // await guildMember.roles.add(roleToLookFor);
+                            foundOne = true;
+                            message.AddNewLine(`**Assigned Role:** ${roleToLookFor}`, 4);
+                            message.AddJSONLine(`**Assigned Role:**: ${roleToLookFor.name}`);
+                        }
                     }
                 }
                 else {
-                    message += `\u200B \u200B \u200B \u200B **Not Found** \n`;
+                    message.AddNewLine(`**No Matching DiscordId Found**`, 4);
                 }
             }
-            if (!foundOne)
-                return null;
+            if (!foundOne) {
+                message.Optional = true;
+                return message;
+            }
             return message;
         });
+    }
+    HasRole(rolesOfUser, roleToLookFor) {
+        return rolesOfUser.find(role => role == roleToLookFor);
     }
 }
 exports.AssignRoles = AssignRoles;

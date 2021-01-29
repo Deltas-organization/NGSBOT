@@ -36,6 +36,16 @@ class MessageSender {
             return sentMessage;
         });
     }
+    Edit(message, newContent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield message.edit({
+                embed: {
+                    color: 0,
+                    description: newContent
+                }
+            });
+        });
+    }
     SendFields(description, fields) {
         return __awaiter(this, void 0, void 0, function* () {
             var sentMessage = yield this.TextChannel.send({
