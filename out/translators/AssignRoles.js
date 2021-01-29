@@ -79,7 +79,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                         break;
                 }
                 if (messagesLog.length > 0) {
-                    fs.writeFileSync('./files/assignedRoles.json', JSON.stringify(messagesLog.map(message => message.CreateJsonMessage())));
+                    fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({ AddedRoles: rolesAdded, detailedInformation: messagesLog.map(message => message.CreateJsonMessage()) }));
                     messageSender.TextChannel.send({
                         files: [{
                                 attachment: './files/assignedRoles.json',
@@ -126,12 +126,12 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             let teamRoleOnDiscord = this.lookForRole(this._serverRoles, teamName);
             if (!teamRoleOnDiscord) {
                 rolesAdded.push(teamName);
-                // teamRoleOnDiscord = await messageSender.originalMessage.guild.roles.create({
-                //     data: {
-                //         name: teamName,
-                //     },
-                //     reason: 'needed a new team role added'
-                // });
+                teamRoleOnDiscord = yield messageSender.originalMessage.guild.roles.create({
+                    data: {
+                        name: teamName,
+                    },
+                    reason: 'needed a new team role added'
+                });
             }
             return teamRoleOnDiscord;
         });
@@ -215,7 +215,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                     message.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
                     for (var roleToLookFor of rolesToLookFor) {
                         if (roleToLookFor != null && !this.HasRole(rolesOfUser, roleToLookFor)) {
-                            // await guildMember.roles.add(roleToLookFor);
+                            yield guildMember.roles.add(roleToLookFor);
                             foundOne = true;
                             message.AddNewLine(`**Assigned Role:** ${roleToLookFor}`, 4);
                             message.AddJSONLine(`**Assigned Role:**: ${roleToLookFor.name}`);
