@@ -28,7 +28,7 @@ class TranslatorBase {
             let foundBang = false;
             let detailed = false;
             this.commandBangs.forEach(bang => {
-                const scheduleRegex = new RegExp(`^${bang}`, 'i');
+                const scheduleRegex = new RegExp(`^${bang}$`, 'i');
                 if (scheduleRegex.test(command)) {
                     console.log("Runnig", this.constructor.name);
                     foundBang = true;
