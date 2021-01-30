@@ -39,7 +39,7 @@ export abstract class TranslatorBase implements ITranslate
         this.commandBangs.forEach(bang =>
         {
             const scheduleRegex = new RegExp(`^${bang}$`, 'i');
-            if (scheduleRegex.test(command))
+            if (scheduleRegex.test(command.split(" ")[0]))
             {
                 console.log("Runnig", this.constructor.name);
                 foundBang = true;
