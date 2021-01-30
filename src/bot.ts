@@ -21,6 +21,7 @@ import { SendChannelMessage } from "./helpers/SendChannelMessage";
 import { DiscordChannels } from "./enums/DiscordChannels";
 import { HistoryDisplay } from "./scheduled/HistoryDisplay";
 import { Reload } from "./translators/Reload";
+import { DeleteTeamRoles } from "./translators/DeleteTeamRoles";
 
 var fs = require('fs');
 
@@ -52,8 +53,9 @@ export class Bot
         this.translators.push(new TeamNameChecker(this.dependencies));
         this.translators.push(new AssignRoles(this.dependencies));
         this.translators.push(new RegisteredCount(this.dependencies));
-        this.translators.push(new Purge(this.dependencies))
-        this.translators.push(new Reload(this.dependencies))
+        this.translators.push(new Purge(this.dependencies));
+        this.translators.push(new Reload(this.dependencies));
+        this.translators.push(new DeleteTeamRoles(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }

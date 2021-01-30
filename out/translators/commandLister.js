@@ -16,8 +16,9 @@ class CommandLister extends translatorBase_1.TranslatorBase {
     Interpret(commands, detailed, messageSender) {
         let fields = [];
         this.translators.forEach(translator => {
-            if (translator.Verify(messageSender.originalMessage))
+            if (translator.Verify(messageSender.originalMessage)) {
                 fields.push({ name: translator.commandBangs.map(c => c += " "), value: translator.description });
+            }
         });
         messageSender.SendFields(`Available Commands. \n appending -d will perform the command but return more detail if available \n Ex: !name-d`, fields);
     }
