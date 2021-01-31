@@ -55,6 +55,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             this._stopIteration = false;
+            this.liveDataStore.Clear();
             this.ReloadServerRoles(messageSender.originalMessage.guild);
             this.ReloadResservedRoles();
             this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
@@ -66,19 +67,17 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                 for (var team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
                     let messageHelper = yield this.DisplayTeamInformation(messageSender, team, guildMembers, rolesAdded);
                     if (messageHelper) {
+                        messagesLog.push(messageHelper);
                         if (detailed) {
                             if (!messageHelper.Optional) {
                                 yield messageSender.SendMessage(messageHelper.CreateStringMessage());
                             }
                         }
-                        else {
-                            messagesLog.push(messageHelper);
-                        }
                     }
                     if (this._stopIteration)
                         break;
                 }
-                if (messagesLog.length > 0) {
+                if (!detailed) {
                     fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({ AddedRoles: rolesAdded, detailedInformation: messagesLog.map(message => message.CreateJsonMessage()) }));
                     messageSender.TextChannel.send({
                         files: [{
@@ -91,7 +90,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             catch (e) {
                 Globals_1.Globals.log(e);
             }
-            yield messageSender.SendMessage(`Finished Assigning Roles!`);
+            yield messageSender.SendMessage(`Finished Assigning Roles! \n Added ${messagesLog.map(m => m.Options.AssignedCount).reduce((m1, m2) => m1 + m2, 0)}`);
         });
     }
     ReloadResservedRoles() {
@@ -201,6 +200,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             const allUsers = yield this.liveDataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
             let message = new MessageHelper_1.MessageHelper(team.teamName);
+            message.Options.AssignedCount = 0;
             message.AddNewLine("**Team Name**");
             ;
             message.AddNewLine(team.teamName);
@@ -217,6 +217,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                         if (roleToLookFor != null && !this.HasRole(rolesOfUser, roleToLookFor)) {
                             yield guildMember.roles.add(roleToLookFor);
                             foundOne = true;
+                            message.Options.AssignedCount++;
                             message.AddNewLine(`**Assigned Role:** ${roleToLookFor}`, 4);
                             message.AddJSONLine(`**Assigned Role:**: ${roleToLookFor.name}`);
                         }
@@ -248,4 +249,6 @@ var DivisionRole;
     DivisionRole["Heroic"] = "Heroic Division";
     DivisionRole["Storm"] = "Storm Division";
 })(DivisionRole || (DivisionRole = {}));
+class MessageOptions {
+}
 //# sourceMappingURL=AssignRoles.js.map

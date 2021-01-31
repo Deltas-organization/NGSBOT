@@ -28,7 +28,7 @@ export abstract class TranslatorBase implements ITranslate
 
     }
 
-    public async Translate(command: string, message: Message)
+    public async Translate(messageText: string, message: Message)
     {
         //not enough permissions
         if (await this.Verify(message) == false)
@@ -38,22 +38,23 @@ export abstract class TranslatorBase implements ITranslate
         let detailed = false;
         this.commandBangs.forEach(bang =>
         {
-            const scheduleRegex = new RegExp(`^${bang}$`, 'i');
-            if (scheduleRegex.test(command.split(" ")[0]))
+            const command = messageText.split(" ")[0];
+            const regularCommand = new RegExp(`^${bang}$`, 'i').test(command);
+            const detailedCommand = new RegExp(`^${bang}-d$`, 'i').test(command);
+            if (regularCommand || detailedCommand)
             {
-                console.log("Runnig", this.constructor.name);
+                console.log("Running", this.constructor.name);
                 foundBang = true;
-                if (!detailed)
+                if (!detailed && detailedCommand)
                 {
-                    const detailCheckRegex = new RegExp(`^${bang}-d`, 'i');
-                    detailed = detailCheckRegex.test(command);
+                    detailed = true;
                 }
             }
         });
 
         if (foundBang)
         {
-            let commands = this.RetrieveCommands(command);
+            let commands = this.RetrieveCommands(messageText);
             let messageSender = new MessageSender(this.client, message, this.messageStore);
             this.Interpret(commands, detailed, messageSender);
         }

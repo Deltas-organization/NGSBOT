@@ -6,6 +6,7 @@ class MessageHelper {
         this.JsonPropertyName = JsonPropertyName;
         this._lines = [];
         this.Optional = false;
+        this.Options = {};
     }
     AddNewLine(message, indentCount = 0) {
         this._lines.push(new DetailedLine(message, indentCount));

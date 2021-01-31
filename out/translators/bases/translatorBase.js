@@ -20,7 +20,7 @@ class TranslatorBase {
     }
     Init() {
     }
-    Translate(command, message) {
+    Translate(messageText, message) {
         return __awaiter(this, void 0, void 0, function* () {
             //not enough permissions
             if ((yield this.Verify(message)) == false)
@@ -28,18 +28,19 @@ class TranslatorBase {
             let foundBang = false;
             let detailed = false;
             this.commandBangs.forEach(bang => {
-                const scheduleRegex = new RegExp(`^${bang}$`, 'i');
-                if (scheduleRegex.test(command.split(" ")[0])) {
-                    console.log("Runnig", this.constructor.name);
+                const command = messageText.split(" ")[0];
+                const regularCommand = new RegExp(`^${bang}$`, 'i').test(command);
+                const detailedCommand = new RegExp(`^${bang}-d$`, 'i').test(command);
+                if (regularCommand || detailedCommand) {
+                    console.log("Running", this.constructor.name);
                     foundBang = true;
-                    if (!detailed) {
-                        const detailCheckRegex = new RegExp(`^${bang}-d`, 'i');
-                        detailed = detailCheckRegex.test(command);
+                    if (!detailed && detailedCommand) {
+                        detailed = true;
                     }
                 }
             });
             if (foundBang) {
-                let commands = this.RetrieveCommands(command);
+                let commands = this.RetrieveCommands(messageText);
                 let messageSender = new MessageSender_1.MessageSender(this.client, message, this.messageStore);
                 this.Interpret(commands, detailed, messageSender);
             }
