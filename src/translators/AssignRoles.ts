@@ -88,7 +88,10 @@ export class AssignRoles extends ngsTranslatorBase
             }
             if (!detailed)
             {
-                fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({ AddedRoles: rolesAdded, detailedInformation: messagesLog.map(message => message.CreateJsonMessage()) }));
+                fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({ 
+                    AddedRoles: rolesAdded, 
+                    discordIds: guildMembers.map(guildMember => this.GetDiscordId(guildMember)),
+                    detailedInformation: messagesLog.map(message => message.CreateJsonMessage()) }));
                 messageSender.TextChannel.send({
                     files: [{
                         attachment: './files/assignedRoles.json',
@@ -219,8 +222,7 @@ export class AssignRoles extends ngsTranslatorBase
         const ngsDiscordId = user.discordTag?.replace(' ', '').toLowerCase();
         for (let member of guildMembers)
         {
-            const guildUser = member.user;
-            const discordName = `${guildUser.username}#${guildUser.discriminator}`.toLowerCase();
+            const discordName = this.GetDiscordId(member);
             if (discordName == ngsDiscordId)
             {
                 return member;
@@ -277,6 +279,12 @@ export class AssignRoles extends ngsTranslatorBase
     private HasRole(rolesOfUser: Role[], roleToLookFor: Role)
     {
         return rolesOfUser.find(role => role == roleToLookFor);
+    }
+
+    private GetDiscordId(member: GuildMember)
+    {
+        const guildUser = member.user;
+        return `${guildUser.username}#${guildUser.discriminator}`.replace(' ', '').toLowerCase();
     }
 }
 

@@ -27,7 +27,7 @@ export class MessageHelper<T> {
     }
 
     public CreateJsonMessage(): any {
-        var result = {name: this.JsonPropertyName, information: {}};
+        var result = {name: this.JsonPropertyName, options: this.Options, information: {}};
         for(var index = 0; index < this._lines.length; index++)
         {
             result.information[index] = this._lines[index].Message;
