@@ -63,7 +63,8 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             const rolesAdded = [];
             const messagesLog = [];
             try {
-                const guildMembers = messageSender.originalMessage.guild.members.cache.map((mem, _, __) => mem);
+                const aura = yield messageSender.originalMessage.guild.members.fetch('167812979616645121');
+                const guildMembers = (yield messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
                 for (var team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
                     let messageHelper = yield this.DisplayTeamInformation(messageSender, team, guildMembers, rolesAdded);
                     if (messageHelper) {
@@ -80,7 +81,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                 if (!detailed) {
                     fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
                         AddedRoles: rolesAdded,
-                        discordIds: guildMembers.map(guildMember => this.GetDiscordId(guildMember)),
+                        discordIds: guildMembers.map(guildMember => this.GetDiscordId(guildMember) + " : " + guildMember.id),
                         detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
                     }));
                     messageSender.TextChannel.send({
