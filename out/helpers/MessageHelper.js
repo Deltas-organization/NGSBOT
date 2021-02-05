@@ -23,7 +23,16 @@ class MessageHelper {
             .join("\n");
     }
     CreateJsonMessage() {
-        var result = { name: this.JsonPropertyName, options: this.Options, information: {} };
+        var result = { name: this.JsonPropertyName, information: {} };
+        for (var option in this.Options) {
+            const value = this.Options[option];
+            let name = option;
+            if (name == "name")
+                name = "optionName";
+            if (name == "information")
+                name = "optionInformation";
+            result[name] = value;
+        }
         for (var index = 0; index < this._lines.length; index++) {
             result.information[index] = this._lines[index].Message;
         }

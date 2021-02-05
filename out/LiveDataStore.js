@@ -13,6 +13,7 @@ exports.LiveDataStore = void 0;
 const Globals_1 = require("./Globals");
 const Cacher_1 = require("./helpers/Cacher");
 const NGSQueryBuilder_1 = require("./helpers/NGSQueryBuilder");
+const AugmentedNGSUser_1 = require("./models/AugmentedNGSUser");
 class LiveDataStore {
     constructor() {
         this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
@@ -58,8 +59,9 @@ class LiveDataStore {
             const teams = yield this.GetTeams();
             for (let team of teams) {
                 try {
-                    var encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
-                    const teamMembers = yield new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
+                    const encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
+                    const ngsMembers = yield new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/user/get?users=${encodedUsers.join()}`);
+                    const teamMembers = this.AugmentNgsUsers(ngsMembers, team);
                     allUsers = allUsers.concat(teamMembers);
                 }
                 catch (e) {
@@ -68,6 +70,21 @@ class LiveDataStore {
             }
             return allUsers;
         });
+    }
+    AugmentNgsUsers(ngsMembers, team) {
+        const captainName = team.captain.toLowerCase();
+        const assistantCaptains = team.assistantCaptain.map(ac => ac.toLowerCase());
+        const teamMembers = ngsMembers.map(member => new AugmentedNGSUser_1.AugmentedNGSUser(member));
+        for (var teamMember of teamMembers) {
+            const lowerCaseDisplayName = teamMember.displayName.toLowerCase();
+            if (lowerCaseDisplayName == captainName) {
+                teamMember.IsCaptain = true;
+            }
+            else if (assistantCaptains === null || assistantCaptains === void 0 ? void 0 : assistantCaptains.find(ac => ac == lowerCaseDisplayName)) {
+                teamMember.IsAssistantCaptain = true;
+            }
+        }
+        return teamMembers;
     }
     GetFreshTeams() {
         return __awaiter(this, void 0, void 0, function* () {

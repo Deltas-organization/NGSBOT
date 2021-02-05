@@ -3,16 +3,16 @@ import { Globals } from './Globals';
 import { Cacher } from './helpers/Cacher';
 import { NGSQueryBuilder } from './helpers/NGSQueryBuilder';
 import { INGSDivision, INGSSchedule, INGSTeam, INGSUser } from './interfaces';
+import { AugmentedNGSUser } from './models/AugmentedNGSUser';
 
 export class LiveDataStore {
     private cachedDivisions = new Cacher<INGSDivision[]>(60 * 24);
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
-    private cachedUsers = new Cacher<INGSUser[]>(60);
+    private cachedUsers = new Cacher<AugmentedNGSUser[]>(60);
     private cachedTeams = new Cacher<INGSTeam[]>(60 * 24);
     private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);
 
-    public Clear()
-    {
+    public Clear() {
         this.cachedDivisions.Clear();
         this.cachedSchedule.Clear();
         this.cachedUsers.Clear();
@@ -28,7 +28,7 @@ export class LiveDataStore {
         return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>('/schedule/get/matches/scheduled?season=11'));
     }
 
-    public async GetUsers(): Promise<INGSUser[]> {
+    public async GetUsers(): Promise<AugmentedNGSUser[]> {
         return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
     }
 
@@ -40,13 +40,14 @@ export class LiveDataStore {
         return this.cachedRegisteredTeams.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSTeam[]>('/team/get/registered'));
     }
 
-    private async GetFreshUsers(): Promise<INGSUser[]> {
-        let allUsers = [];
+    private async GetFreshUsers(): Promise<AugmentedNGSUser[]> {
+        let allUsers: AugmentedNGSUser[] = [];
         const teams = await this.GetTeams();
         for (let team of teams) {
             try {
-                var encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
-                const teamMembers = await new NGSQueryBuilder().GetResponse<INGSUser[]>(`/user/get?users=${encodedUsers.join()}`);
+                const encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
+                const ngsMembers = await new NGSQueryBuilder().GetResponse<INGSUser[]>(`/user/get?users=${encodedUsers.join()}`);
+                const teamMembers = this.AugmentNgsUsers(ngsMembers, team);
                 allUsers = allUsers.concat(teamMembers);
             }
             catch (e) {
@@ -55,6 +56,22 @@ export class LiveDataStore {
         }
 
         return allUsers;
+    }
+    
+    private AugmentNgsUsers(ngsMembers: INGSUser[], team: INGSTeam) {        
+        const captainName = team.captain.toLowerCase();
+        const assistantCaptains = team.assistantCaptain.map(ac => ac.toLowerCase());
+        const teamMembers = ngsMembers.map(member => new AugmentedNGSUser(member));
+        for (var teamMember of teamMembers) {
+            const lowerCaseDisplayName = teamMember.displayName.toLowerCase();
+            if (lowerCaseDisplayName == captainName) {
+                teamMember.IsCaptain = true;
+            }
+            else if (assistantCaptains?.find(ac => ac == lowerCaseDisplayName)) {
+                teamMember.IsAssistantCaptain = true;
+            }
+        }
+        return teamMembers;
     }
 
     private async GetFreshTeams(): Promise<INGSTeam[]> {
