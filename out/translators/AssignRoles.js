@@ -56,7 +56,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             this._stopIteration = false;
-            // this.liveDataStore.Clear();
+            this.liveDataStore.Clear();
             this.ReloadServerRoles(messageSender.originalMessage.guild);
             this.ReloadResservedRoles();
             this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
