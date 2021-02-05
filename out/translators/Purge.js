@@ -12,11 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Purge = void 0;
 const Globals_1 = require("../Globals");
 const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
+const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
+const MessageHelper_1 = require("../helpers/MessageHelper");
+const NGSDivisionRoles_1 = require("../enums/NGSDivisionRoles");
+const fs = require('fs');
 class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     constructor() {
         super(...arguments);
+        this._captainRoleName = 'Captains';
         this._reservedRoleNames = [
-            'Captains',
+            this._captainRoleName,
             'Caster Hopefuls',
             'Free Agents',
             'Moist',
@@ -25,6 +30,13 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'Bots',
             'Storm Casters',
             'Storm Division',
+            NGSDivisionRoles_1.DivisionRole.Storm,
+            NGSDivisionRoles_1.DivisionRole.Heroic,
+            NGSDivisionRoles_1.DivisionRole.DivA,
+            NGSDivisionRoles_1.DivisionRole.DivB,
+            NGSDivisionRoles_1.DivisionRole.DivC,
+            NGSDivisionRoles_1.DivisionRole.DivD,
+            NGSDivisionRoles_1.DivisionRole.DivE,
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -32,6 +44,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'It',
             'Has Cooties',
             'PoGo Raider',
+            'Cupid Captain',
             '@everyone'
         ];
         this._reserveredRoles = [];
@@ -44,50 +57,54 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const guildMembers = messageSender.originalMessage.guild.members.cache.map((mem, _, __) => mem);
+            const guildMembers = (yield messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
             this.ReloadServerRoles(messageSender.originalMessage.guild);
             this.ReloadResservedRoles();
             this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
             const teams = yield this.liveDataStore.GetTeams();
             const messages = [];
-            let rollingMessage = "";
             for (let member of guildMembers) {
                 const teamInformation = yield this.FindInTeam(member.user, teams);
-                let message = "";
+                const messageSender = new MessageHelper_1.MessageHelper(member.user.username);
+                messageSender.Options.rolesRemovedCount = 0;
                 if (teamInformation == null) {
-                    message += `No Team Found \n`;
-                    var purgeMessage = yield this.PurgeAllRoles(member);
+                    messageSender.AddNewLine(`No Team Found.`);
+                    yield this.PurgeAllRoles(member, messageSender);
                 }
                 else {
-                    message += `Team Found: **${teamInformation.NGSTeam.teamName}** \n`;
-                    var purgeMessage = yield this.PurgeUnrelatedRoles(member, teamInformation);
+                    messageSender.AddNewLine(`Team Found: **${teamInformation.NGSTeam.teamName}**`);
+                    yield this.PurgeUnrelatedRoles(member, teamInformation, messageSender);
                 }
-                if (purgeMessage) {
-                    message += purgeMessage + "\n";
-                    if (rollingMessage.length + message.length >= 2048) {
-                        messages.push(rollingMessage);
-                        rollingMessage = message;
-                    }
-                    else {
-                        rollingMessage += message;
-                    }
-                }
+                messages.push(messageSender);
             }
-            for (let message of messages) {
-                yield messageSender.SendMessage(message);
-            }
-            if (rollingMessage.length > 0)
-                yield messageSender.SendMessage(rollingMessage);
+            let filteredMessages = messages.filter(message => message.Options.rolesRemovedCount > 0);
+            fs.writeFileSync('./files/purgedRoles.json', JSON.stringify({
+                affectedUserCount: filteredMessages.length,
+                detailedInformation: filteredMessages.map(message => message.CreateJsonMessage())
+            }));
+            messageSender.TextChannel.send({
+                files: [{
+                        attachment: './files/purgedRoles.json',
+                        name: 'purgedRoles.json'
+                    }]
+            }).catch(console.error);
+            yield messageSender.SendMessage(`Finished Purging Roles! \n
+        Removed ${filteredMessages.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`);
         });
     }
     ReloadResservedRoles() {
         this._reserveredRoles = [];
         for (var roleName of this._reservedRoleNames) {
             let foundRole = this.lookForRole(this._serverRoles, roleName);
-            if (foundRole)
-                this._reserveredRoles.push(foundRole);
-            else
-                console.log(`didnt find role: ${roleName}`);
+            if (foundRole) {
+                if (foundRole.name == this._captainRoleName)
+                    this._captainRole = foundRole;
+                else
+                    this._reserveredRoles.push(foundRole);
+            }
+            else {
+                Globals_1.Globals.logAdvanced(`didnt find role: ${roleName}`);
+            }
         }
     }
     ReloadServerRoles(guild) {
@@ -95,16 +112,14 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         Globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
     FindInTeam(guildUser, teams) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const discordName = `${guildUser.username}#${guildUser.discriminator}`.toLowerCase();
             for (var team of teams) {
                 const teamName = team.teamName;
                 const allUsers = yield this.liveDataStore.GetUsers();
                 const teamUsers = allUsers.filter(user => user.teamName == teamName);
                 for (var ngsUser of teamUsers) {
-                    const ngsDiscordId = (_a = ngsUser.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
-                    if (discordName == ngsDiscordId) {
+                    const foundGuildUser = DiscordFuzzySearch_1.DiscordFuzzySearch.CompareGuildUser(ngsUser, guildUser);
+                    if (foundGuildUser) {
                         return new teamInformation(team, ngsUser);
                     }
                 }
@@ -112,55 +127,54 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             return null;
         });
     }
-    PurgeAllRoles(guildMember) {
+    PurgeAllRoles(guildMember, messageHelper) {
         return __awaiter(this, void 0, void 0, function* () {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-            let messages = [];
-            messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
             for (var role of rolesOfUser) {
                 if (!this._reserveredRoles.find(serverRole => serverRole.name == role.name)) {
                     if (this._myRole.comparePositionTo(role) > 0)
                         try {
                             yield guildMember.roles.remove(role);
-                            messages.push(`\u200B \u200B \u200B \u200B Removed Role: ${role}`);
+                            messageHelper.Options.rolesRemovedCount++;
+                            messageHelper.AddNewLine(`Removed Role: ${role.name}`, 4);
                         }
                         catch (e) {
+                            Globals_1.Globals.log("Error removing roles", e);
                         }
                 }
             }
-            if (messages.length > 1)
-                return messages.join("\n") + '\n';
             return null;
         });
     }
-    PurgeUnrelatedRoles(guildMember, teamInformation) {
+    PurgeUnrelatedRoles(guildMember, teamInformation, messageHelper) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-                let messages = [];
-                messages.push(`\u200B \u200B User: **${guildMember.user.username}** `);
                 // let teamDiv = teamInformation.NGSTeam.divisionDisplayName.split(' ')[0];
                 // let divRole = this._divRoles.find(role => {
                 //     return role.toLowerCase().replace("division", "").trim() == teamDiv
                 // });
+                const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(' ', '');
                 for (var role of rolesOfUser) {
                     let groomedName = this.GroomRoleNameAsLowerCase(role.name);
                     if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
-                        if (groomedName == teamInformation.NGSTeam.teamName.toLowerCase()) {
-                            messages.push(`\u200B \u200B \u200B \u200B Kept: ${role}`);
+                        if (groomedName == teamName) {
+                            messageHelper.AddNewLine(`Kept Team: ${role.name}`, 4);
+                        }
+                        else if (role == this._captainRole && (teamInformation.NGSUser.IsCaptain || teamInformation.NGSUser.IsAssistantCaptain)) {
+                            messageHelper.AddNewLine("Kept Captain Role.", 4);
                         }
                         else if (this._myRole.comparePositionTo(role) > 0) {
                             yield guildMember.roles.remove(role);
-                            messages.push(`\u200B \u200B \u200B \u200B Removed: ${role}`);
+                            messageHelper.Options.rolesRemovedCount++;
+                            messageHelper.AddNewLine(`Removed: ${role.name}`, 4);
                         }
                     }
                 }
-                if (messages.length > 1)
-                    return messages.join("\n") + '\n';
             }
             catch (e) {
+                Globals_1.Globals.log("Error removing roles", e);
             }
-            return null;
         });
     }
     lookForRole(userRoles, roleName) {
@@ -179,7 +193,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             roleNameTrimmed = roleNameTrimmed.slice(0, indexOfWidthdrawn).trim();
         }
         roleNameTrimmed = roleNameTrimmed.toLowerCase();
-        roleNameTrimmed.replace(' ', '');
+        roleNameTrimmed = roleNameTrimmed.replace(' ', '');
         return roleNameTrimmed;
     }
 }

@@ -13,6 +13,8 @@ exports.AssignRoles = void 0;
 const Globals_1 = require("../Globals");
 const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const MessageHelper_1 = require("../helpers/MessageHelper");
+const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
+const NGSDivisionRoles_1 = require("../enums/NGSDivisionRoles");
 const fs = require('fs');
 class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     constructor() {
@@ -28,13 +30,13 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             'Interviewee',
             'Bots',
             'Storm Casters',
-            DivisionRole.Storm,
-            DivisionRole.Heroic,
-            DivisionRole.DivA,
-            DivisionRole.DivB,
-            DivisionRole.DivC,
-            DivisionRole.DivD,
-            DivisionRole.DivE,
+            NGSDivisionRoles_1.DivisionRole.Storm,
+            NGSDivisionRoles_1.DivisionRole.Heroic,
+            NGSDivisionRoles_1.DivisionRole.DivA,
+            NGSDivisionRoles_1.DivisionRole.DivB,
+            NGSDivisionRoles_1.DivisionRole.DivC,
+            NGSDivisionRoles_1.DivisionRole.DivD,
+            NGSDivisionRoles_1.DivisionRole.DivE,
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -81,7 +83,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                 if (!detailed) {
                     fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
                         AddedRoles: rolesAdded,
-                        discordIds: guildMembers.map(guildMember => this.GetDiscordId(guildMember) + " : " + guildMember.id),
+                        discordIds: guildMembers.map(guildMember => DiscordFuzzySearch_1.DiscordFuzzySearch.GetDiscordId(guildMember.user) + " : " + guildMember.id),
                         detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
                     }));
                     messageSender.TextChannel.send({
@@ -97,7 +99,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             }
             yield messageSender.SendMessage(`Finished Assigning Roles! \n 
         Added ${messagesLog.map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} teamRoles \n
-        Added ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles`);
+        Added ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
         });
     }
     ReloadResservedRoles() {
@@ -195,33 +197,6 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         }
         return null;
     }
-    FindGuildMember(user, guildMembers) {
-        var _a;
-        const ngsDiscordId = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
-        if (!ngsDiscordId)
-            return null;
-        const splitNgsDiscord = ngsDiscordId.split("#");
-        if (splitNgsDiscord.length != 2)
-            return null;
-        const ngsUserName = splitNgsDiscord[0].toLowerCase();
-        const ngsDiscriminator = splitNgsDiscord[1];
-        const filteredByDiscriminator = guildMembers.filter(member => member.user.discriminator == ngsDiscriminator);
-        const possibleMembers = [];
-        for (let member of filteredByDiscriminator) {
-            const discordName = this.GetDiscordId(member);
-            if (discordName == ngsDiscordId) {
-                return member;
-            }
-            else if (member.user.username.toLowerCase().indexOf(ngsUserName) > -1) {
-                Globals_1.Globals.log(`FuzzySearch!! Website has: ${ngsUserName}, Found: ${member.user.username}`);
-                possibleMembers.push(member);
-            }
-        }
-        if (possibleMembers.length == 1) {
-            return possibleMembers[0];
-        }
-        return null;
-    }
     AssignUsersToRoles(team, guildMembers, ...rolesToLookFor) {
         return __awaiter(this, void 0, void 0, function* () {
             const allUsers = yield this.liveDataStore.GetUsers();
@@ -235,7 +210,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             message.AddNewLine("**Users**");
             let foundOne = false;
             for (let user of teamUsers) {
-                const guildMember = this.FindGuildMember(user, guildMembers);
+                const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
                 message.AddNewLine(`${user.displayName} : ${user.discordTag}`);
                 if (guildMember) {
                     var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
@@ -274,22 +249,8 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     HasRole(rolesOfUser, roleToLookFor) {
         return rolesOfUser.find(role => role == roleToLookFor);
     }
-    GetDiscordId(member) {
-        const guildUser = member.user;
-        return `${guildUser.username}#${guildUser.discriminator}`.replace(' ', '').toLowerCase();
-    }
 }
 exports.AssignRoles = AssignRoles;
-var DivisionRole;
-(function (DivisionRole) {
-    DivisionRole["DivA"] = "Division A";
-    DivisionRole["DivB"] = "Division B";
-    DivisionRole["DivC"] = "Division C";
-    DivisionRole["DivD"] = "Division D";
-    DivisionRole["DivE"] = "Division E";
-    DivisionRole["Heroic"] = "Heroic Division";
-    DivisionRole["Storm"] = "Storm Division";
-})(DivisionRole || (DivisionRole = {}));
 class MessageOptions {
 }
 //# sourceMappingURL=AssignRoles.js.map

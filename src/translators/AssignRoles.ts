@@ -9,6 +9,8 @@ import { debug } from "console";
 import { TeamNameChecker } from "./TeamChecker";
 import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
 import { MessageHelper } from "../helpers/MessageHelper";
+import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
+import { DivisionRole } from "../enums/NGSDivisionRoles";
 
 const fs = require('fs');
 
@@ -82,7 +84,7 @@ export class AssignRoles extends ngsTranslatorBase {
             if (!detailed) {
                 fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
                     AddedRoles: rolesAdded,
-                    discordIds: guildMembers.map(guildMember => this.GetDiscordId(guildMember) + " : " + guildMember.id),
+                    discordIds: guildMembers.map(guildMember => DiscordFuzzySearch.GetDiscordId(guildMember.user) + " : " + guildMember.id),
                     detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
                 }));
                 messageSender.TextChannel.send({
@@ -98,7 +100,7 @@ export class AssignRoles extends ngsTranslatorBase {
         }
         await messageSender.SendMessage(`Finished Assigning Roles! \n 
         Added ${messagesLog.map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} teamRoles \n
-        Added ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles`);
+        Added ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
     }
 
     private ReloadResservedRoles() {
@@ -141,8 +143,8 @@ export class AssignRoles extends ngsTranslatorBase {
             teamRoleOnDiscord = await messageSender.originalMessage.guild.roles.create({
                 data: {
                     name: teamName,
-                    mentionable: true,     
-                    hoist: true               
+                    mentionable: true,
+                    hoist: true
                 },
                 reason: 'needed a new team role added'
             });
@@ -204,35 +206,6 @@ export class AssignRoles extends ngsTranslatorBase {
         return null;
     }
 
-    private FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): GuildMember {
-        const ngsDiscordId = user.discordTag?.replace(' ', '').toLowerCase();
-        if (!ngsDiscordId)
-            return null;
-
-        const splitNgsDiscord = ngsDiscordId.split("#");
-        if (splitNgsDiscord.length != 2)
-            return null;
-
-        const ngsUserName = splitNgsDiscord[0].toLowerCase();
-        const ngsDiscriminator = splitNgsDiscord[1];
-        const filteredByDiscriminator = guildMembers.filter(member => member.user.discriminator == ngsDiscriminator);
-        const possibleMembers = [];
-        for (let member of filteredByDiscriminator) {
-            const discordName = this.GetDiscordId(member);
-            if (discordName == ngsDiscordId) {
-                return member;
-            }
-            else if (member.user.username.toLowerCase().indexOf(ngsUserName) > -1) {
-                Globals.log(`FuzzySearch!! Website has: ${ngsUserName}, Found: ${member.user.username}`)
-                possibleMembers.push(member);
-            }
-        }
-        if (possibleMembers.length == 1) {
-            return possibleMembers[0];
-        }
-        return null;
-    }
-
     private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], ...rolesToLookFor: Role[]): Promise<MessageHelper<MessageOptions>> {
         const allUsers = await this.liveDataStore.GetUsers();
         const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
@@ -245,7 +218,7 @@ export class AssignRoles extends ngsTranslatorBase {
         message.AddNewLine("**Users**");
         let foundOne = false;
         for (let user of teamUsers) {
-            const guildMember = this.FindGuildMember(user, guildMembers);
+            const guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
             message.AddNewLine(`${user.displayName} : ${user.discordTag}`);
             if (guildMember) {
                 var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
@@ -268,7 +241,7 @@ export class AssignRoles extends ngsTranslatorBase {
                         message.AddNewLine(`**Assigned Role:** ${this._captainRole}`, 4);
                         message.AddJSONLine(`**Assigned Role:**: ${this._captainRole.name}`);
                     }
-                }
+                }                
             }
             else {
                 message.AddNewLine(`**No Matching DiscordId Found**`, 4);
@@ -285,21 +258,8 @@ export class AssignRoles extends ngsTranslatorBase {
         return rolesOfUser.find(role => role == roleToLookFor);
     }
 
-    private GetDiscordId(member: GuildMember) {
-        const guildUser = member.user;
-        return `${guildUser.username}#${guildUser.discriminator}`.replace(' ', '').toLowerCase();
-    }
 }
 
-enum DivisionRole {
-    DivA = 'Division A',
-    DivB = 'Division B',
-    DivC = 'Division C',
-    DivD = 'Division D',
-    DivE = 'Division E',
-    Heroic = 'Heroic Division',
-    Storm = 'Storm Division',
-}
 
 class MessageOptions {
     public AssignedTeamCount: number;
