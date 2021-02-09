@@ -25,6 +25,11 @@ class MessageSender {
     }
     SendMessage(message, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
+            while (message.length > 2048) {
+                let newMessage = message.slice(0, 2048);
+                message = message.substr(2048);
+                yield this.SendMessage(newMessage);
+            }
             var sentMessage = yield this.TextChannel.send({
                 embed: {
                     color: 0,

@@ -3,7 +3,6 @@ import { TeamNameChecker } from "../translators/TeamChecker";
 export class MessageHelper<T> {
     private _lines: DetailedLine[] = [];
 
-    public Optional = false;
     public Options: T = {} as T;
 
     public constructor(private JsonPropertyName: string) {
