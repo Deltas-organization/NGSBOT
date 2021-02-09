@@ -25,7 +25,6 @@ export class Purge extends ngsTranslatorBase {
         'Interviewee',
         'Bots',
         'Storm Casters',
-        'Storm Division',
         DivisionRole.Storm,
         DivisionRole.Heroic,
         DivisionRole.DivA,
@@ -33,6 +32,7 @@ export class Purge extends ngsTranslatorBase {
         DivisionRole.DivC,
         DivisionRole.DivD,
         DivisionRole.DivE,
+        DivisionRole.Nexus,
         'Ladies of the Nexus',
         'HL Staff',
         'Editor',
@@ -155,10 +155,7 @@ export class Purge extends ngsTranslatorBase {
     private async PurgeUnrelatedRoles(guildMember: GuildMember, teamInformation: teamInformation, messageHelper: MessageHelper<any>): Promise<void> {
         try {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-            // let teamDiv = teamInformation.NGSTeam.divisionDisplayName.split(' ')[0];
-            // let divRole = this._divRoles.find(role => {
-            //     return role.toLowerCase().replace("division", "").trim() == teamDiv
-            // });
+            let teamDiv = this.FindDivRole(teamInformation.NGSTeam.divisionDisplayName);
             const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(' ', '');
             for (var role of rolesOfUser) {
                 let groomedName = this.GroomRoleNameAsLowerCase(role.name);
@@ -180,6 +177,44 @@ export class Purge extends ngsTranslatorBase {
         catch (e) {
             Globals.log("Error removing roles", e);
         }
+    }
+    
+    private FindDivRole(divisionDisplayName: string)
+    {
+        let divRoleName;
+        switch (divisionDisplayName.toLowerCase())
+        {
+            case "a west":
+            case "a east":
+                divRoleName = DivisionRole.DivA;
+                break;
+            case "b west":
+            case "b southeast":
+            case "b northeast":
+                divRoleName = DivisionRole.DivB;
+                break;
+            case "c west":
+            case "c east":
+                divRoleName = DivisionRole.DivC;
+                break;
+            case "d west":
+            case "d east":
+                divRoleName = DivisionRole.DivD;
+                break;
+            case "e west":
+            case "e east":
+                divRoleName = DivisionRole.DivE;
+                break;
+            case "nexus":
+                divRoleName = DivisionRole.Nexus;
+                break;
+            case "heroic":
+                divRoleName = DivisionRole.Heroic;
+                break;
+            case "storm":
+                return null;
+        }
+        return this.lookForRole(this._serverRoles, divRoleName);
     }
 
     private lookForRole(userRoles: Role[], roleName: string): Role {

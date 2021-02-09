@@ -51,7 +51,7 @@ export class LiveDataStore {
                 allUsers = allUsers.concat(teamMembers);
             }
             catch (e) {
-                Globals.log(`Problem Retrieving division ${team.divisionName} team: ${team.teamName}  users: ${team.teamMembers?.map(member => member.displayName)}}`);
+                Globals.log(`Problem Retrieving division ${team.divisionDisplayName} team: ${team.teamName}  users: ${team.teamMembers?.map(member => member.displayName)}}`);
             }
         }
 

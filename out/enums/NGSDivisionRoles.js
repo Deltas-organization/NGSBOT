@@ -8,6 +8,7 @@ var DivisionRole;
     DivisionRole["DivC"] = "Division C";
     DivisionRole["DivD"] = "Division D";
     DivisionRole["DivE"] = "Division E";
+    DivisionRole["Nexus"] = "Nexus Division";
     DivisionRole["Heroic"] = "Heroic Division";
     DivisionRole["Storm"] = "Storm Division";
 })(DivisionRole = exports.DivisionRole || (exports.DivisionRole = {}));

@@ -37,6 +37,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             NGSDivisionRoles_1.DivisionRole.DivC,
             NGSDivisionRoles_1.DivisionRole.DivD,
             NGSDivisionRoles_1.DivisionRole.DivE,
+            NGSDivisionRoles_1.DivisionRole.Nexus,
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -136,7 +137,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             const teamName = team.teamName;
             const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageSender, teamName, rolesAdded);
-            const divRoleOnDiscord = null; //this.FindDivRole(team.divisionName);
+            const divRoleOnDiscord = this.FindDivRole(team.divisionDisplayName);
             return yield this.AssignUsersToRoles(team, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
         });
     }
@@ -167,32 +168,33 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         switch (divisionDisplayName.toLowerCase()) {
             case "a west":
             case "a east":
-                divRoleName = divRoleName.DivA;
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivA;
                 break;
             case "b west":
-            case "b east":
-                divRoleName = divRoleName.DivB;
+            case "b southeast":
+            case "b northeast":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivB;
                 break;
             case "c west":
             case "c east":
-                divRoleName = divRoleName.DivC;
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivC;
                 break;
             case "d west":
             case "d east":
-                divRoleName = divRoleName.DivD;
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivD;
                 break;
             case "e west":
             case "e east":
-                divRoleName = divRoleName.DivE;
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivE;
                 break;
-            case "storm":
-            case "storm":
-                divRoleName = divRoleName.Storm;
+            case "nexus":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.Nexus;
                 break;
             case "heroic":
-            case "heroic":
-                divRoleName = divRoleName.Heroic;
+                divRoleName = NGSDivisionRoles_1.DivisionRole.Heroic;
                 break;
+            case "storm":
+                return null;
         }
         return this.lookForRole(this._serverRoles, divRoleName);
     }

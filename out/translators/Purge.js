@@ -29,7 +29,6 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'Interviewee',
             'Bots',
             'Storm Casters',
-            'Storm Division',
             NGSDivisionRoles_1.DivisionRole.Storm,
             NGSDivisionRoles_1.DivisionRole.Heroic,
             NGSDivisionRoles_1.DivisionRole.DivA,
@@ -37,6 +36,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             NGSDivisionRoles_1.DivisionRole.DivC,
             NGSDivisionRoles_1.DivisionRole.DivD,
             NGSDivisionRoles_1.DivisionRole.DivE,
+            NGSDivisionRoles_1.DivisionRole.Nexus,
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -150,10 +150,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-                // let teamDiv = teamInformation.NGSTeam.divisionDisplayName.split(' ')[0];
-                // let divRole = this._divRoles.find(role => {
-                //     return role.toLowerCase().replace("division", "").trim() == teamDiv
-                // });
+                let teamDiv = this.FindDivRole(teamInformation.NGSTeam.divisionDisplayName);
                 const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(' ', '');
                 for (var role of rolesOfUser) {
                     let groomedName = this.GroomRoleNameAsLowerCase(role.name);
@@ -176,6 +173,41 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
                 Globals_1.Globals.log("Error removing roles", e);
             }
         });
+    }
+    FindDivRole(divisionDisplayName) {
+        let divRoleName;
+        switch (divisionDisplayName.toLowerCase()) {
+            case "a west":
+            case "a east":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivA;
+                break;
+            case "b west":
+            case "b southeast":
+            case "b northeast":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivB;
+                break;
+            case "c west":
+            case "c east":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivC;
+                break;
+            case "d west":
+            case "d east":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivD;
+                break;
+            case "e west":
+            case "e east":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.DivE;
+                break;
+            case "nexus":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.Nexus;
+                break;
+            case "heroic":
+                divRoleName = NGSDivisionRoles_1.DivisionRole.Heroic;
+                break;
+            case "storm":
+                return null;
+        }
+        return this.lookForRole(this._serverRoles, divRoleName);
     }
     lookForRole(userRoles, roleName) {
         let groomedRoleName = this.GroomRoleNameAsLowerCase(roleName);

@@ -65,7 +65,7 @@ class LiveDataStore {
                     allUsers = allUsers.concat(teamMembers);
                 }
                 catch (e) {
-                    Globals_1.Globals.log(`Problem Retrieving division ${team.divisionName} team: ${team.teamName}  users: ${(_a = team.teamMembers) === null || _a === void 0 ? void 0 : _a.map(member => member.displayName)}}`);
+                    Globals_1.Globals.log(`Problem Retrieving division ${team.divisionDisplayName} team: ${team.teamName}  users: ${(_a = team.teamMembers) === null || _a === void 0 ? void 0 : _a.map(member => member.displayName)}}`);
                 }
             }
             return allUsers;

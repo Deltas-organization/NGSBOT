@@ -69,7 +69,7 @@ export class TeamNameChecker extends TranslatorBase
     {
         let result = [];
         result.push({ name: "TeamName", value: `\u0009 ${Translationhelpers.GetTeamURL(team.teamName)}`, inline: true });
-        result.push({ name: "Division", value: `\u0009 ${team.divisionName}`, inline: true });
+        result.push({ name: "Division", value: `\u0009 ${team.divisionDisplayName}`, inline: true });
         result.push({ name: "Description", value: `\u0009 ${team.descriptionOfTeam} -`, inline: true });
         let firstValueArray = [];
         let secondValueArray = [];

@@ -36,6 +36,7 @@ export class AssignRoles extends ngsTranslatorBase
         DivisionRole.DivC,
         DivisionRole.DivD,
         DivisionRole.DivE,
+        DivisionRole.Nexus,
         'Ladies of the Nexus',
         'HL Staff',
         'Editor',
@@ -158,7 +159,7 @@ export class AssignRoles extends ngsTranslatorBase
     {
         const teamName = team.teamName;
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageSender, teamName, rolesAdded);
-        const divRoleOnDiscord = null;//this.FindDivRole(team.divisionName);
+        const divRoleOnDiscord = this.FindDivRole(team.divisionDisplayName);
 
         return await this.AssignUsersToRoles(team, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
     }
@@ -196,32 +197,33 @@ export class AssignRoles extends ngsTranslatorBase
         {
             case "a west":
             case "a east":
-                divRoleName = divRoleName.DivA;
+                divRoleName = DivisionRole.DivA;
                 break;
             case "b west":
-            case "b east":
-                divRoleName = divRoleName.DivB;
+            case "b southeast":
+            case "b northeast":
+                divRoleName = DivisionRole.DivB;
                 break;
             case "c west":
             case "c east":
-                divRoleName = divRoleName.DivC;
+                divRoleName = DivisionRole.DivC;
                 break;
             case "d west":
             case "d east":
-                divRoleName = divRoleName.DivD;
+                divRoleName = DivisionRole.DivD;
                 break;
             case "e west":
             case "e east":
-                divRoleName = divRoleName.DivE;
+                divRoleName = DivisionRole.DivE;
                 break;
-            case "storm":
-            case "storm":
-                divRoleName = divRoleName.Storm;
+            case "nexus":
+                divRoleName = DivisionRole.Nexus;
                 break;
             case "heroic":
-            case "heroic":
-                divRoleName = divRoleName.Heroic;
+                divRoleName = DivisionRole.Heroic;
                 break;
+            case "storm":
+                return null;
         }
         return this.lookForRole(this._serverRoles, divRoleName);
     }

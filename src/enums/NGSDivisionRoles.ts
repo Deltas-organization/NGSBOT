@@ -5,6 +5,7 @@ export enum DivisionRole {
     DivC = 'Division C',
     DivD = 'Division D',
     DivE = 'Division E',
+    Nexus = 'Nexus Division',
     Heroic = 'Heroic Division',
     Storm = 'Storm Division',
 }
