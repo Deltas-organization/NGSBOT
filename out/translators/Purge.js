@@ -29,14 +29,6 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'Interviewee',
             'Bots',
             'Storm Casters',
-            NGSDivisionRoles_1.DivisionRole.Storm,
-            NGSDivisionRoles_1.DivisionRole.Heroic,
-            NGSDivisionRoles_1.DivisionRole.DivA,
-            NGSDivisionRoles_1.DivisionRole.DivB,
-            NGSDivisionRoles_1.DivisionRole.DivC,
-            NGSDivisionRoles_1.DivisionRole.DivD,
-            NGSDivisionRoles_1.DivisionRole.DivE,
-            NGSDivisionRoles_1.DivisionRole.Nexus,
             'Ladies of the Nexus',
             'HL Staff',
             'Editor',
@@ -45,9 +37,21 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             'Has Cooties',
             'PoGo Raider',
             'Cupid Captain',
+            'Trait Value',
+            NGSDivisionRoles_1.DivisionRole.Storm,
             '@everyone'
         ];
+        this._divRoleNames = [
+            NGSDivisionRoles_1.DivisionRole.Heroic,
+            NGSDivisionRoles_1.DivisionRole.DivA,
+            NGSDivisionRoles_1.DivisionRole.DivB,
+            NGSDivisionRoles_1.DivisionRole.DivC,
+            NGSDivisionRoles_1.DivisionRole.DivD,
+            NGSDivisionRoles_1.DivisionRole.DivE,
+            NGSDivisionRoles_1.DivisionRole.Nexus,
+        ];
         this._reserveredRoles = [];
+        this._divRoles = [];
     }
     get commandBangs() {
         return ["purge"];
@@ -58,8 +62,10 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             const guildMembers = (yield messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
+            this.liveDataStore.Clear();
             this.ReloadServerRoles(messageSender.originalMessage.guild);
             this.ReloadResservedRoles();
+            this.ReloadDivRoles();
             this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
             const teams = yield this.liveDataStore.GetTeams();
             const messages = [];
@@ -107,9 +113,21 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             }
         }
     }
+    ReloadDivRoles() {
+        this._divRoles = [];
+        for (var roleName of this._divRoleNames) {
+            let foundRole = this.lookForRole(this._serverRoles, roleName);
+            if (foundRole) {
+                this._divRoles.push(foundRole);
+            }
+            else {
+                Globals_1.Globals.logAdvanced(`didnt find role: ${roleName}`);
+            }
+        }
+    }
     ReloadServerRoles(guild) {
         this._serverRoles = guild.roles.cache.map((role, _, __) => role);
-        Globals_1.Globals.log(`available Roles: ${this._serverRoles.map(role => role.name)}`);
+        Globals_1.Globals.logAdvanced(`available Roles: ${this._serverRoles.map(role => role.name)}`);
     }
     FindInTeam(guildUser, teams) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -151,7 +169,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             try {
                 const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                 let teamDiv = this.FindDivRole(teamInformation.NGSTeam.divisionDisplayName);
-                const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(' ', '');
+                const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(/ /g, '');
                 for (var role of rolesOfUser) {
                     let groomedName = this.GroomRoleNameAsLowerCase(role.name);
                     if (!this._reserveredRoles.find(serverRole => groomedName == this.GroomRoleNameAsLowerCase(serverRole.name))) {
@@ -160,6 +178,9 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
                         }
                         else if (role == this._captainRole && (teamInformation.NGSUser.IsCaptain || teamInformation.NGSUser.IsAssistantCaptain)) {
                             messageHelper.AddNewLine("Kept Captain Role.", 4);
+                        }
+                        else if (role == teamDiv) {
+                            messageHelper.AddNewLine(`Kept Div: ${role.name}.`, 4);
                         }
                         else if (this._myRole.comparePositionTo(role) > 0) {
                             yield guildMember.roles.remove(role);
@@ -225,7 +246,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             roleNameTrimmed = roleNameTrimmed.slice(0, indexOfWidthdrawn).trim();
         }
         roleNameTrimmed = roleNameTrimmed.toLowerCase();
-        roleNameTrimmed = roleNameTrimmed.replace(' ', '');
+        roleNameTrimmed = roleNameTrimmed.replace(/ /g, '');
         return roleNameTrimmed;
     }
 }
