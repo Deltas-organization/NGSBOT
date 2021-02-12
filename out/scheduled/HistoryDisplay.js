@@ -21,7 +21,7 @@ class HistoryDisplay {
             const todaysUTC = new Date().getTime();
             const historyMaps = [];
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            for (let team of teams) {
+            for (let team of teams.sort((t1, t2) => this.TeamSort(t1, t2))) {
                 const historyMap = new Map();
                 const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp);
                 const reversedHistory = sortedHistory.slice().reverse();
@@ -30,7 +30,7 @@ class HistoryDisplay {
                     const historyUTC = historyDate.getTime();
                     const ms = todaysUTC - historyUTC;
                     const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
-                    if (dayDifference <= days) {
+                    if (dayDifference < days) {
                         const dateString = historyDate.toLocaleString("en-US", options);
                         let historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
                         const collection = historyMap.get(dateString);
@@ -48,7 +48,7 @@ class HistoryDisplay {
                     }
                 }
                 if (historyMap.size > 0) {
-                    historyMaps.push({ team: team.teamName, historymap: historyMap });
+                    historyMaps.push({ team: team, historymap: historyMap });
                 }
             }
             return this.FormatMessages(historyMaps);
@@ -98,7 +98,7 @@ class HistoryDisplay {
         let result = [];
         let rollingMessage = "";
         for (var message of messages) {
-            let currentMessage = `**${message.team}** \n`;
+            let currentMessage = `**${message.team.teamName}** - ${message.team.divisionDisplayName} \n`;
             let map = message.historymap;
             for (var mapkey of map.keys()) {
                 currentMessage += `${mapkey} \n`;
@@ -118,6 +118,18 @@ class HistoryDisplay {
         if (rollingMessage)
             result.push(rollingMessage);
         return result;
+    }
+    TeamSort(team1, team2) {
+        const order = ["Storm", "Heroic", "Nexus", "A E", "A W", "B SouthEast", "B NorthEast", "B W", "C E", "C W", "D E", "D W", "E E", "E W"];
+        for (var current of order) {
+            if (team1.divisionDisplayName.indexOf(current) > -1) {
+                return -1;
+            }
+            else if (team2.divisionDisplayName.indexOf(current) > -1) {
+                return 1;
+            }
+        }
+        return 0;
     }
 }
 exports.HistoryDisplay = HistoryDisplay;

@@ -14,41 +14,14 @@ const Globals_1 = require("../Globals");
 const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const MessageHelper_1 = require("../helpers/MessageHelper");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
-const NGSDivisionRoles_1 = require("../enums/NGSDivisionRoles");
+const NGSRoles_1 = require("../enums/NGSRoles");
 const fs = require('fs');
 class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     constructor() {
         super(...arguments);
+        this._testing = false;
         this._stopIteration = false;
         this._captainRoleName = 'Captains';
-        this._reservedRoleNames = [
-            this._captainRoleName,
-            'Caster Hopefuls',
-            'Free Agents',
-            'Moist',
-            'Supporter',
-            'Interviewee',
-            'Bots',
-            'Storm Casters',
-            NGSDivisionRoles_1.DivisionRole.Storm,
-            NGSDivisionRoles_1.DivisionRole.Heroic,
-            NGSDivisionRoles_1.DivisionRole.DivA,
-            NGSDivisionRoles_1.DivisionRole.DivB,
-            NGSDivisionRoles_1.DivisionRole.DivC,
-            NGSDivisionRoles_1.DivisionRole.DivD,
-            NGSDivisionRoles_1.DivisionRole.DivE,
-            NGSDivisionRoles_1.DivisionRole.Nexus,
-            'Ladies of the Nexus',
-            'HL Staff',
-            'Editor',
-            'Nitro Booster',
-            'It',
-            'Has Cooties',
-            'PoGo Raider',
-            'FA Combine',
-            '@everyone'
-        ];
-        this._reserveredRoles = [];
     }
     get commandBangs() {
         return ["assign"];
@@ -58,17 +31,23 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (commands.length > 0)
+                this._testing = true;
             this._stopIteration = false;
             this.liveDataStore.Clear();
             this.ReloadServerRoles(messageSender.originalMessage.guild);
-            this.ReloadResservedRoles();
-            this._myRole = this.lookForRole(this._serverRoles, "NGSBOT");
+            const progressMessage = yield messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
             const teams = yield this.liveDataStore.GetTeams();
+            yield messageSender.Edit(progressMessage, "Teams Loaded. \n Assigning Now.");
             const rolesAdded = [];
             const messagesLog = [];
             try {
                 const guildMembers = (yield messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
+                let count = 0;
+                let progressCount = 1;
+                let steps = 10;
                 for (var team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
+                    count++;
                     let messageHelper = yield this.AssignValidRoles(messageSender, team, guildMembers, rolesAdded);
                     if (messageHelper) {
                         messagesLog.push(messageHelper);
@@ -77,6 +56,10 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                                 yield messageSender.SendMessage(messageHelper.CreateStringMessage());
                             }
                         }
+                    }
+                    if (count > (teams.length / steps) * progressCount) {
+                        yield messageSender.Edit(progressMessage, `Assignment Continuing \n Progress: ${progressCount * (100 / steps)}%`);
+                        progressCount++;
                     }
                     if (this._stopIteration)
                         break;
@@ -100,9 +83,12 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             }
             const messageHelper = new MessageHelper_1.MessageHelper("Success");
             messageHelper.AddNewLine("Finished Assigning Roles!");
-            messageHelper.AddNewLine(`Added ${messagesLog.map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} Team Roles`);
-            messageHelper.AddNewLine(`Added ${messagesLog.map(m => m.Options.AssignedDivCount).reduce((m1, m2) => m1 + m2, 0)} Div Roles`);
-            messageHelper.AddNewLine(`Added ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
+            const teamRolesCreated = messagesLog.filter(m => m.Options.CreatedTeamRole).length;
+            if (teamRolesCreated)
+                messageHelper.AddNewLine(`Created ${teamRolesCreated} Team Roles`);
+            messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} Team Roles`);
+            messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedDivCount).reduce((m1, m2) => m1 + m2, 0)} Div Roles`);
+            messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
             const teamsWithNoValidCaptain = [];
             for (var message of messagesLog) {
                 if (!message.Options.HasCaptain) {
@@ -114,20 +100,8 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
             else
                 messageHelper.AddNewLine(`All teams Have a valid Captain`);
             yield messageSender.SendMessage(messageHelper.CreateStringMessage());
+            yield progressMessage.delete();
         });
-    }
-    ReloadResservedRoles() {
-        this._reserveredRoles = [];
-        for (var roleName of this._reservedRoleNames) {
-            let foundRole = this.lookForRole(this._serverRoles, roleName);
-            if (foundRole) {
-                this._reserveredRoles.push(foundRole);
-                if (foundRole.name == this._captainRoleName)
-                    this._captainRole = foundRole;
-            }
-            else
-                Globals_1.Globals.logAdvanced(`didnt find role: ${roleName}`);
-        }
     }
     ReloadServerRoles(guild) {
         this._serverRoles = guild.roles.cache.map((role, _, __) => role);
@@ -136,12 +110,14 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     AssignValidRoles(messageSender, team, guildMembers, rolesAdded) {
         return __awaiter(this, void 0, void 0, function* () {
             const teamName = team.teamName;
-            const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageSender, teamName, rolesAdded);
+            let result = new MessageHelper_1.MessageHelper(team.teamName);
+            const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageSender, result, teamName, rolesAdded);
             const divRoleOnDiscord = this.FindDivRole(team.divisionDisplayName);
-            return yield this.AssignUsersToRoles(team, guildMembers, teamRoleOnDiscord, divRoleOnDiscord);
+            yield this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+            return result;
         });
     }
-    CreateOrFindTeamRole(messageSender, teamName, rolesAdded) {
+    CreateOrFindTeamRole(messageSender, messageTracker, teamName, rolesAdded) {
         return __awaiter(this, void 0, void 0, function* () {
             teamName = teamName.trim();
             const indexOfWidthdrawn = teamName.indexOf('(Withdrawn');
@@ -159,6 +135,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
                     },
                     reason: 'needed a new team role added'
                 });
+                messageTracker.Options.CreatedTeamRole = true;
             }
             return teamRoleOnDiscord;
         });
@@ -168,30 +145,30 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         switch (divisionDisplayName.toLowerCase()) {
             case "a west":
             case "a east":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.DivA;
+                divRoleName = NGSRoles_1.NGSRoles.DivA;
                 break;
             case "b west":
             case "b southeast":
             case "b northeast":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.DivB;
+                divRoleName = NGSRoles_1.NGSRoles.DivB;
                 break;
             case "c west":
             case "c east":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.DivC;
+                divRoleName = NGSRoles_1.NGSRoles.DivC;
                 break;
             case "d west":
             case "d east":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.DivD;
+                divRoleName = NGSRoles_1.NGSRoles.DivD;
                 break;
             case "e west":
             case "e east":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.DivE;
+                divRoleName = NGSRoles_1.NGSRoles.DivE;
                 break;
             case "nexus":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.Nexus;
+                divRoleName = NGSRoles_1.NGSRoles.Nexus;
                 break;
             case "heroic":
-                divRoleName = NGSDivisionRoles_1.DivisionRole.Heroic;
+                divRoleName = NGSRoles_1.NGSRoles.Heroic;
                 break;
             case "storm":
                 return null;
@@ -212,55 +189,60 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         }
         return null;
     }
-    AssignUsersToRoles(team, guildMembers, teamRole, divRole) {
+    AssignUsersToRoles(team, guildMembers, messageTracker, teamRole, divRole) {
         return __awaiter(this, void 0, void 0, function* () {
             const allUsers = yield this.liveDataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
-            let message = new MessageHelper_1.MessageHelper(team.teamName);
-            message.Options = new MessageOptions(team.teamName);
-            message.AddNewLine("**Team Name**");
+            messageTracker.Options = new MessageOptions(team.teamName);
+            messageTracker.AddNewLine("**Team Name**");
             ;
-            message.AddNewLine(team.teamName);
-            message.AddNewLine("**Users**");
+            messageTracker.AddNewLine(team.teamName);
+            messageTracker.AddNewLine("**Users**");
             for (let user of teamUsers) {
                 const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
-                message.AddNewLine(`${user.displayName} : ${user.discordTag}`);
+                messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
                 if (guildMember) {
                     var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-                    message.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
-                    message.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
+                    messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
+                    messageTracker.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
                     if (teamRole != null && !this.HasRole(rolesOfUser, teamRole)) {
-                        yield guildMember.roles.add(teamRole);
-                        message.Options.AssignedTeamCount++;
-                        message.AddNewLine(`**Assigned Role:** ${teamRole}`, 4);
-                        message.AddJSONLine(`**Assigned Role:**: ${teamRole === null || teamRole === void 0 ? void 0 : teamRole.name}`);
+                        yield this.AssignRole(guildMember, teamRole);
+                        messageTracker.Options.AssignedTeamCount++;
+                        messageTracker.AddNewLine(`**Assigned Role:** ${teamRole}`, 4);
+                        messageTracker.AddJSONLine(`**Assigned Role:**: ${teamRole === null || teamRole === void 0 ? void 0 : teamRole.name}`);
                     }
                     if (divRole != null && !this.HasRole(rolesOfUser, divRole)) {
-                        yield guildMember.roles.add(divRole);
-                        message.Options.AssignedDivCount++;
-                        message.AddNewLine(`**Assigned Role:** ${divRole}`, 4);
-                        message.AddJSONLine(`**Assigned Role:**: ${divRole === null || divRole === void 0 ? void 0 : divRole.name}`);
+                        yield this.AssignRole(guildMember, divRole);
+                        messageTracker.Options.AssignedDivCount++;
+                        messageTracker.AddNewLine(`**Assigned Role:** ${divRole}`, 4);
+                        messageTracker.AddJSONLine(`**Assigned Role:**: ${divRole === null || divRole === void 0 ? void 0 : divRole.name}`);
                     }
                     if (user.IsCaptain || user.IsAssistantCaptain) {
                         if (this._captainRole && !this.HasRole(rolesOfUser, this._captainRole)) {
-                            yield guildMember.roles.add(this._captainRole);
-                            message.Options.AssignedCaptainCount++;
-                            message.AddNewLine(`**Assigned Role:** ${this._captainRole}`, 4);
-                            message.AddJSONLine(`**Assigned Role:**: ${this._captainRole.name}`);
+                            yield this.AssignRole(guildMember, this._captainRole);
+                            messageTracker.Options.AssignedCaptainCount++;
+                            messageTracker.AddNewLine(`**Assigned Role:** ${this._captainRole}`, 4);
+                            messageTracker.AddJSONLine(`**Assigned Role:**: ${this._captainRole.name}`);
                         }
                         if (user.IsCaptain)
-                            message.Options.HasCaptain = true;
+                            messageTracker.Options.HasCaptain = true;
                     }
                 }
                 else {
-                    message.AddNewLine(`**No Matching DiscordId Found**`, 4);
+                    messageTracker.AddNewLine(`**No Matching DiscordId Found**`, 4);
                 }
             }
-            return message;
+            return messageTracker;
+        });
+    }
+    AssignRole(guildMember, divRole) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield guildMember.roles.add(divRole);
         });
     }
     HasRole(rolesOfUser, roleToLookFor) {
-        return rolesOfUser.find(role => role == roleToLookFor);
+        if (!this._testing)
+            return rolesOfUser.find(role => role == roleToLookFor);
     }
 }
 exports.AssignRoles = AssignRoles;

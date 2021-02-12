@@ -104,7 +104,7 @@ let Bot = /** @class */ (() => {
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
-                        //await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSDiscord);
+                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSDiscord);
                     }
                 }
             });

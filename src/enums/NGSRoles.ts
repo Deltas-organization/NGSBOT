@@ -1,5 +1,5 @@
 
-export enum DivisionRole {
+export enum NGSRoles {
     DivA = 'Division A',
     DivB = 'Division B',
     DivC = 'Division C',
@@ -8,4 +8,5 @@ export enum DivisionRole {
     Nexus = 'Nexus Division',
     Heroic = 'Heroic Division',
     Storm = 'Storm Division',
+    Captain = "Captains"
 }
