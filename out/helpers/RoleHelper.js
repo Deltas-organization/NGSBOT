@@ -42,7 +42,7 @@ class RoleHelper {
                 divRoleName = NGSRoles_1.NGSRoles.Storm;
                 return null;
         }
-        return this.lookForRole(divRoleName);
+        return { div: divRoleName, role: this.lookForRole(divRoleName) };
     }
     lookForRole(roleName) {
         let groomedRoleName = this.GroomRoleNameAsLowerCase(roleName);

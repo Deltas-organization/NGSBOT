@@ -171,7 +171,7 @@ export class Purge extends ngsTranslatorBase {
     private async PurgeUnrelatedRoles(guildMember: GuildMember, teamInformation: teamInformation, messageHelper: MessageHelper<any>): Promise<void> {
         try {
             const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(/ /g, '');
-            let teamDivRole = this._serverRoleHelper.FindDivRole(teamInformation.NGSTeam.divisionDisplayName);
+            let teamDivRole = this._serverRoleHelper.FindDivRole(teamInformation.NGSTeam.divisionDisplayName)?.role;
             let teamRole = this._serverRoleHelper.lookForRole(teamName);
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
             for (var role of rolesOfUser) {

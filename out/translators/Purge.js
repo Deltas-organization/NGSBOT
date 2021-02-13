@@ -165,10 +165,11 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         });
     }
     PurgeUnrelatedRoles(guildMember, teamInformation, messageHelper) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(/ /g, '');
-                let teamDivRole = this._serverRoleHelper.FindDivRole(teamInformation.NGSTeam.divisionDisplayName);
+                let teamDivRole = (_a = this._serverRoleHelper.FindDivRole(teamInformation.NGSTeam.divisionDisplayName)) === null || _a === void 0 ? void 0 : _a.role;
                 let teamRole = this._serverRoleHelper.lookForRole(teamName);
                 const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                 for (var role of rolesOfUser) {

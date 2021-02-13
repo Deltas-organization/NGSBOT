@@ -5,12 +5,12 @@ import { Globals } from "../Globals";
 export class RoleHelper
 {
     constructor(private roles: Role[])
-    {        
+    {
         Globals.logAdvanced(`helping with Roles: ${roles.map(role => role.name)}`);
     }
 
-    
-    public FindDivRole(divisionDisplayName: string)
+
+    public FindDivRole(divisionDisplayName: string): { div: NGSRoles, role: Role }
     {
         let divRoleName: NGSRoles;
         switch (divisionDisplayName.toLowerCase())
@@ -46,7 +46,7 @@ export class RoleHelper
                 divRoleName = NGSRoles.Storm;
                 return null;
         }
-        return this.lookForRole(divRoleName);
+        return { div: divRoleName, role: this.lookForRole(divRoleName) };
     }
 
     public lookForRole(roleName: string): Role
