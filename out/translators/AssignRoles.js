@@ -195,12 +195,12 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     AssignRole(guildMember, divRole) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield guildMember.roles.add(divRole);
+            if (!this._testing)
+                yield guildMember.roles.add(divRole);
         });
     }
     HasRole(rolesOfUser, roleToLookFor) {
-        if (!this._testing)
-            return rolesOfUser.find(role => role == roleToLookFor);
+        return rolesOfUser.find(role => role == roleToLookFor);
     }
 }
 exports.AssignRoles = AssignRoles;

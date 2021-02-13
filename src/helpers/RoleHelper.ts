@@ -44,7 +44,7 @@ export class RoleHelper
                 break;
             case "storm":
                 divRoleName = NGSRoles.Storm;
-                return null;
+                break;
         }
         return { div: divRoleName, role: this.lookForRole(divRoleName) };
     }

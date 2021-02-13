@@ -12,6 +12,7 @@ import { MessageHelper } from "../helpers/MessageHelper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { NGSRoles } from "../enums/NGSRoles";
 import { RoleHelper } from "../helpers/RoleHelper";
+import { convertCompilerOptionsFromJson } from "typescript";
 
 const fs = require('fs');
 
@@ -138,9 +139,8 @@ export class AssignRoles extends ngsTranslatorBase
         const teamName = team.teamName;
         let result = new MessageHelper<MessageOptions>(team.teamName);
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageSender, result, teamName);
-        const roleRsponse =  this._serverRoleHelper.FindDivRole(team.divisionDisplayName); 
+        const roleRsponse = this._serverRoleHelper.FindDivRole(team.divisionDisplayName);
         const divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
-
         await this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
         return result;
     }
@@ -229,13 +229,13 @@ export class AssignRoles extends ngsTranslatorBase
 
     private async AssignRole(guildMember: GuildMember, divRole: Role)
     {
-        await guildMember.roles.add(divRole);
+        if (!this._testing)
+            await guildMember.roles.add(divRole);
     }
 
     private HasRole(rolesOfUser: Role[], roleToLookFor: Role)
     {
-        if (!this._testing)
-            return rolesOfUser.find(role => role == roleToLookFor);
+        return rolesOfUser.find(role => role == roleToLookFor);
     }
 
 }
