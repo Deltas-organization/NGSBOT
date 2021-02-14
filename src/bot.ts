@@ -111,7 +111,7 @@ export class Bot
             for (var index = 0; index < messages.length; index++)
             {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSDiscord);
+                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHistory);
             }
         }
     }
