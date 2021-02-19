@@ -1,5 +1,6 @@
 import { tagged } from "inversify";
 import { stringify } from "querystring";
+import { MessageHelper } from "../helpers/MessageHelper";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam } from "../interfaces";
 import { IHistoryMessages } from "../interfaces/IHistoryMessage";
@@ -16,40 +17,33 @@ export class HistoryDisplay {
     public async GetRecentHistory(days: number): Promise<string[]> {
         const teams = await this.liveDataStore.GetTeams();
         const todaysUTC = new Date().getTime();
-        const historyMaps: { team: INGSTeam, historymap: Map<string, string[]> }[] = [];
-        const options = { year: 'numeric', month: 'long', day: 'numeric' }
+        const validHistories: HistoryContainer[] = [];
         for (let team of teams.sort((t1, t2) => this.TeamSort(t1, t2))) {
-            const historyMap = new Map<string, string[]>();
+            const historyContainer = new HistoryContainer(team);
             const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp)
             const reversedHistory = sortedHistory.slice().reverse();
             for (let history of sortedHistory) {
                 const historyDate = new Date(+history.timestamp);
                 const historyUTC = historyDate.getTime();
-
                 const ms = todaysUTC - historyUTC;
                 const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
                 if (dayDifference < days) {
-                    const dateString = historyDate.toLocaleString("en-US", options);
-                    let historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
-                    const collection = historyMap.get(dateString);
+                    const historyInformation = new HistoryInformation(history);
                     if (history.action == HistoryActions.JoinedTeam) {
                         var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
-                        if (numberOfRosterAdd > 0)
-                            historyMessage = `\u200B \u200B Roster Add #${numberOfRosterAdd}: ${history.target}`
+                        if (numberOfRosterAdd > 0) {
+                            historyInformation.RosterAddNumber = numberOfRosterAdd;
+                        }
                     }
-                    if (!collection) {
-                        historyMap.set(dateString, [historyMessage]);
-                    } else {
-                        collection.push(historyMessage);
-                    }
+                    historyContainer.AddHistory(historyInformation);
                 }
             }
-            if (historyMap.size > 0) {
-                historyMaps.push({ team: team, historymap: historyMap });
+            if (historyContainer.HasHistories) {
+                validHistories.push(historyContainer);
             }
         }
 
-        return this.FormatMessages(historyMaps);
+        return this.FormatMessages(validHistories);
     }
 
     public async GetTeamsCreatedThisSeason(season: number): Promise<string[]> {
@@ -92,19 +86,11 @@ export class HistoryDisplay {
         return addsSoFar - currentHistoryIndex;
     }
 
-    private FormatMessages(messages: { team: INGSTeam, historymap: Map<string, string[]> }[]): string[] {
+    private FormatMessages(histories: HistoryContainer[]): string[] {
         let result = [];
         let rollingMessage = "";
-        for (var message of messages) {
-            let currentMessage = `**${message.team.teamName}** - ${message.team.divisionDisplayName} \n`;
-            let map = message.historymap;
-            for (var mapkey of map.keys()) {
-                currentMessage += `${mapkey} \n`;
-                for (var individualMessage of map.get(mapkey)) {
-                    currentMessage += `${individualMessage} \n`;
-                }
-            }
-            currentMessage += "\n";
+        for (var history of histories) {
+            let currentMessage = history.GetMessage().CreateStringMessage();
             if (rollingMessage.length + currentMessage.length > 2048) {
                 result.push(rollingMessage);
                 rollingMessage = currentMessage;
@@ -137,4 +123,56 @@ enum HistoryActions {
     JoinedTeam = "Joined team",
     AddedDivision = "Added to division",
     CreatedTeam = "Team Created"
+}
+
+class HistoryContainer {
+    private Information: Map<number, HistoryInformation[]>;
+    public get HasHistories() {
+        return this.Information.size > 0;
+    }
+
+    constructor(public Team: INGSTeam) {
+        this.Information = new Map<number, HistoryInformation[]>();
+    }
+
+    public AddHistory(historyInformation: HistoryInformation) {
+        const key = historyInformation.History.timestamp;
+        if (this.Information.has(key)) {
+            this.Information[key].push(historyInformation);
+        } else {
+            this.Information.set(key, [historyInformation]);
+        }
+    }
+
+    public GetMessage(): MessageHelper<any> {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' }
+        let currentMessage = new MessageHelper('HistoryContainer')
+        currentMessage.AddNewLine(`**[${this.Team.divisionDisplayName}] - ${this.Team.teamName}**`);
+        for (var mapkey of this.Information.keys()) {
+            const friendlyName = new Date(+mapkey).toLocaleString("en-US", options);
+            //currentMessage.AddNewLine(friendlyName);
+            for (var historyInformaiton of this.Information.get(mapkey)) {
+                currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
+            }
+        }
+        currentMessage.AddNewLine('');
+        return currentMessage;
+    }
+}
+
+class HistoryInformation {
+    public RosterAddNumber: number;
+
+    constructor(public History: INGSHistory) {
+
+    }
+
+    public GetMessage(): MessageHelper<any> {
+        let messageHelper = new MessageHelper('HistoryInformation');
+        if (this.RosterAddNumber > 0)
+            messageHelper.AddNewLine(`${this.History.target} - Roster Add #${this.RosterAddNumber}`, 2)
+        else
+            messageHelper.AddNewLine(`${this.History.target} - ${this.History.action}`, 2);
+        return messageHelper;
+    }
 }

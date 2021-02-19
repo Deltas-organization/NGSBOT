@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryDisplay = void 0;
+const MessageHelper_1 = require("../helpers/MessageHelper");
 class HistoryDisplay {
     constructor(dependencies) {
         this.dependencies = dependencies;
@@ -19,10 +20,9 @@ class HistoryDisplay {
         return __awaiter(this, void 0, void 0, function* () {
             const teams = yield this.liveDataStore.GetTeams();
             const todaysUTC = new Date().getTime();
-            const historyMaps = [];
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const validHistories = [];
             for (let team of teams.sort((t1, t2) => this.TeamSort(t1, t2))) {
-                const historyMap = new Map();
+                const historyContainer = new HistoryContainer(team);
                 const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp);
                 const reversedHistory = sortedHistory.slice().reverse();
                 for (let history of sortedHistory) {
@@ -31,27 +31,21 @@ class HistoryDisplay {
                     const ms = todaysUTC - historyUTC;
                     const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
                     if (dayDifference < days) {
-                        const dateString = historyDate.toLocaleString("en-US", options);
-                        let historyMessage = `\u200B \u200B ${history.action}: ${history.target}`;
-                        const collection = historyMap.get(dateString);
+                        const historyInformation = new HistoryInformation(history);
                         if (history.action == HistoryActions.JoinedTeam) {
                             var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
-                            if (numberOfRosterAdd > 0)
-                                historyMessage = `\u200B \u200B Roster Add #${numberOfRosterAdd}: ${history.target}`;
+                            if (numberOfRosterAdd > 0) {
+                                historyInformation.RosterAddNumber = numberOfRosterAdd;
+                            }
                         }
-                        if (!collection) {
-                            historyMap.set(dateString, [historyMessage]);
-                        }
-                        else {
-                            collection.push(historyMessage);
-                        }
+                        historyContainer.AddHistory(historyInformation);
                     }
                 }
-                if (historyMap.size > 0) {
-                    historyMaps.push({ team: team, historymap: historyMap });
+                if (historyContainer.HasHistories) {
+                    validHistories.push(historyContainer);
                 }
             }
-            return this.FormatMessages(historyMaps);
+            return this.FormatMessages(validHistories);
         });
     }
     GetTeamsCreatedThisSeason(season) {
@@ -94,19 +88,11 @@ class HistoryDisplay {
         }
         return addsSoFar - currentHistoryIndex;
     }
-    FormatMessages(messages) {
+    FormatMessages(histories) {
         let result = [];
         let rollingMessage = "";
-        for (var message of messages) {
-            let currentMessage = `**${message.team.teamName}** - ${message.team.divisionDisplayName} \n`;
-            let map = message.historymap;
-            for (var mapkey of map.keys()) {
-                currentMessage += `${mapkey} \n`;
-                for (var individualMessage of map.get(mapkey)) {
-                    currentMessage += `${individualMessage} \n`;
-                }
-            }
-            currentMessage += "\n";
+        for (var history of histories) {
+            let currentMessage = history.GetMessage().CreateStringMessage();
             if (rollingMessage.length + currentMessage.length > 2048) {
                 result.push(rollingMessage);
                 rollingMessage = currentMessage;
@@ -139,4 +125,49 @@ var HistoryActions;
     HistoryActions["AddedDivision"] = "Added to division";
     HistoryActions["CreatedTeam"] = "Team Created";
 })(HistoryActions || (HistoryActions = {}));
+class HistoryContainer {
+    constructor(Team) {
+        this.Team = Team;
+        this.Information = new Map();
+    }
+    get HasHistories() {
+        return this.Information.size > 0;
+    }
+    AddHistory(historyInformation) {
+        const key = historyInformation.History.timestamp;
+        if (this.Information.has(key)) {
+            this.Information[key].push(historyInformation);
+        }
+        else {
+            this.Information.set(key, [historyInformation]);
+        }
+    }
+    GetMessage() {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        let currentMessage = new MessageHelper_1.MessageHelper('HistoryContainer');
+        currentMessage.AddNewLine(`**[${this.Team.divisionDisplayName}] - ${this.Team.teamName}**`);
+        for (var mapkey of this.Information.keys()) {
+            const friendlyName = new Date(+mapkey).toLocaleString("en-US", options);
+            //currentMessage.AddNewLine(friendlyName);
+            for (var historyInformaiton of this.Information.get(mapkey)) {
+                currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
+            }
+        }
+        currentMessage.AddNewLine('');
+        return currentMessage;
+    }
+}
+class HistoryInformation {
+    constructor(History) {
+        this.History = History;
+    }
+    GetMessage() {
+        let messageHelper = new MessageHelper_1.MessageHelper('HistoryInformation');
+        if (this.RosterAddNumber > 0)
+            messageHelper.AddNewLine(`${this.History.target} - Roster Add #${this.RosterAddNumber}`, 2);
+        else
+            messageHelper.AddNewLine(`${this.History.target} - ${this.History.action}`, 2);
+        return messageHelper;
+    }
+}
 //# sourceMappingURL=HistoryDisplay.js.map
