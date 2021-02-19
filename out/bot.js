@@ -97,6 +97,9 @@ let Bot = /** @class */ (() => {
                 }
             });
         }
+        // public async sendSchedule(division: NGSDivisions)
+        // {
+        // }
         CheckHistory() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);

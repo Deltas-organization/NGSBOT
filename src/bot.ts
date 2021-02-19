@@ -102,6 +102,11 @@ export class Bot
         }
     }
 
+    // public async sendSchedule(division: NGSDivisions)
+    // {
+
+    // }
+
     public async CheckHistory()
     {
         await this.dependencies.client.login(this.token);

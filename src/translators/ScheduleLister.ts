@@ -7,6 +7,7 @@ import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { Globals } from "../Globals";
+import { TeamSorter } from "../helpers/TeamSorter";
 
 export class ScheduleLister extends AdminTranslatorBase {
 
@@ -75,7 +76,7 @@ export class ScheduleLister extends AdminTranslatorBase {
                 else if (timeDiff < 0)
                     return -1;
                 else 
-                    return 0;
+                    return TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
             }
 
             return result;

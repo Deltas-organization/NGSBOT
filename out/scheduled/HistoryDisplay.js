@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryDisplay = void 0;
 const MessageHelper_1 = require("../helpers/MessageHelper");
+const TeamSorter_1 = require("../helpers/TeamSorter");
 class HistoryDisplay {
     constructor(dependencies) {
         this.dependencies = dependencies;
@@ -21,7 +22,7 @@ class HistoryDisplay {
             const teams = yield this.liveDataStore.GetTeams();
             const todaysUTC = new Date().getTime();
             const validHistories = [];
-            for (let team of teams.sort((t1, t2) => this.TeamSort(t1, t2))) {
+            for (let team of teams.sort((t1, t2) => TeamSorter_1.TeamSorter.SortByTeam(t1, t2))) {
                 const historyContainer = new HistoryContainer(team);
                 const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp);
                 const reversedHistory = sortedHistory.slice().reverse();
@@ -104,18 +105,6 @@ class HistoryDisplay {
         if (rollingMessage)
             result.push(rollingMessage);
         return result;
-    }
-    TeamSort(team1, team2) {
-        const order = ["Storm", "Heroic", "Nexus", "A E", "A W", "B SouthEast", "B NorthEast", "B W", "C E", "C W", "D E", "D W", "E E", "E W"];
-        for (var current of order) {
-            if (team1.divisionDisplayName.indexOf(current) > -1) {
-                return -1;
-            }
-            else if (team2.divisionDisplayName.indexOf(current) > -1) {
-                return 1;
-            }
-        }
-        return 0;
     }
 }
 exports.HistoryDisplay = HistoryDisplay;

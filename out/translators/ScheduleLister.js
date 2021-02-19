@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
+const TeamSorter_1 = require("../helpers/TeamSorter");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["Schedule", "sch"];
@@ -76,7 +77,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     else if (timeDiff < 0)
                         return -1;
                     else
-                        return 0;
+                        return TeamSorter_1.TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
                 }
                 return result;
             });

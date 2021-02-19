@@ -1,6 +1,8 @@
 import { tagged } from "inversify";
 import { stringify } from "querystring";
+import { NGSDivisions } from "../enums/NGSDivisions";
 import { MessageHelper } from "../helpers/MessageHelper";
+import { TeamSorter } from "../helpers/TeamSorter";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam } from "../interfaces";
 import { IHistoryMessages } from "../interfaces/IHistoryMessage";
@@ -18,7 +20,7 @@ export class HistoryDisplay {
         const teams = await this.liveDataStore.GetTeams();
         const todaysUTC = new Date().getTime();
         const validHistories: HistoryContainer[] = [];
-        for (let team of teams.sort((t1, t2) => this.TeamSort(t1, t2))) {
+        for (let team of teams.sort((t1, t2) => TeamSorter.SortByTeam(t1, t2))) {
             const historyContainer = new HistoryContainer(team);
             const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp)
             const reversedHistory = sortedHistory.slice().reverse();
@@ -104,19 +106,7 @@ export class HistoryDisplay {
         return result;
     }
 
-    private TeamSort(team1: INGSTeam, team2: INGSTeam): number {
-        const order = ["Storm", "Heroic", "Nexus", "A E", "A W", "B SouthEast", "B NorthEast", "B W", "C E", "C W", "D E", "D W", "E E", "E W"];
-        for (var current of order) {
-            if (team1.divisionDisplayName.indexOf(current) > -1) {
-                return -1;
-            }
-            else if (team2.divisionDisplayName.indexOf(current) > -1) {
-                return 1;
-            }
-        }
-
-        return 0;
-    }
+   
 }
 
 enum HistoryActions {
