@@ -7,5 +7,6 @@ var DiscordChannels;
     DiscordChannels["NGSDiscord"] = "429807712222576650";
     DiscordChannels["DeltaServer"] = "761410049926889544";
     DiscordChannels["NGSHistory"] = "750452200685174965";
+    DiscordChannels["DadSchedule"] = "674530041694257192";
 })(DiscordChannels = exports.DiscordChannels || (exports.DiscordChannels = {}));
 //# sourceMappingURL=DiscordChannels.js.map

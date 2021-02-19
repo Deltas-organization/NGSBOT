@@ -8,6 +8,7 @@ import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { Globals } from "../Globals";
 import { TeamSorter } from "../helpers/TeamSorter";
+import { NGSDivisions } from "../enums/NGSDivisions";
 
 export class ScheduleLister extends AdminTranslatorBase {
 
@@ -24,6 +25,16 @@ export class ScheduleLister extends AdminTranslatorBase {
         if(filteredGames.length <= 0)
         {
             Globals.log("No games available for today.");
+            return;
+        }
+        return await this.getMessages(filteredGames);
+    }
+    
+    public async getGameMessagesForTodayByDivision(ngsDivision: NGSDivisions) {
+        var filteredGames = await this.getfilteredGames(0, 0);
+        filteredGames = filteredGames.filter(f => f.divisionDisplayName == ngsDivision);
+        if(filteredGames.length <= 0)
+        {
             return;
         }
         return await this.getMessages(filteredGames);

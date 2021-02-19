@@ -22,24 +22,23 @@ import { DiscordChannels } from "./enums/DiscordChannels";
 import { HistoryDisplay } from "./scheduled/HistoryDisplay";
 import { Reload } from "./translators/Reload";
 import { DeleteTeamRoles } from "./translators/DeleteTeamRoles";
+import { NGSDivisions } from "./enums/NGSDivisions";
 
 var fs = require('fs');
 
 @injectable()
-export class Bot
-{
+export class Bot {
     private translators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
     private dependencies: TranslatorDependencies;
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
-    
+
 
     constructor(
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
-    )
-    {
+    ) {
         this.dependencies = new TranslatorDependencies(client, new MessageStore(), new LiveDataStore());
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
         this.historyDisplay = new HistoryDisplay(this.dependencies);
@@ -60,61 +59,68 @@ export class Bot
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }
 
-    public listen(): Promise<string>
-    {
-        this.client.on('message', async (message: Message) =>
-        {
+    public listen(): Promise<string> {
+        this.client.on('message', async (message: Message) => {
             this.OnMessageReceived(message);
         });
 
         return this.client.login(this.token);
     }
 
-    public OnMessageReceived(message: Message)
-    {
+    public OnMessageReceived(message: Message) {
         this.checkTranslators(message);
     }
 
-    private checkTranslators(message: Message)
-    {
+    private checkTranslators(message: Message) {
         let originalContent = message.content;
-        if (/^\>/.test(originalContent))
-        {
+        if (/^\>/.test(originalContent)) {
             var trimmedValue = originalContent.substr(1);
-            this.translators.forEach(translator =>
-            {
+            this.translators.forEach(translator => {
                 translator.Translate(trimmedValue, message);
             });
         }
     }
 
-    public async sendSchedule()
-    {
+    public async sendSchedule() {
         await this.dependencies.client.login(this.token);
         let messages = await this.scheduleLister.getGameMessagesForToday();
-        if (messages)
-        {
-            for (var index = 0; index < messages.length; index++)
-            {
+        if (messages) {
+            for (var index = 0; index < messages.length; index++) {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHype);
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
             }
         }
     }
 
-    // public async sendSchedule(division: NGSDivisions)
-    // {
+    public async sendScheduleByDivision(division: NGSDivisions, ...channels: DiscordChannels[]) {
+        await this.dependencies.client.login(this.token);
+        let messages = await this.scheduleLister.getGameMessagesForTodayByDivision(division);
+        if (messages) {
+            for (var index = 0; index < messages.length; index++) {
+                for (var channel of channels) {
+                    await this.messageSender.SendMessageToChannel(messages[index], channel);
+                }
+            }
+        }
+    }
 
-    // }
+    public async sendScheduleForDad() {
+        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.DeltaServer, DiscordChannels.DadSchedule);
+    }
+    
+    public async sendScheduleForMom() {
+        await this.sendScheduleByDivision(NGSDivisions.DWest, DiscordChannels.DeltaServer);
+    }
+    
+    public async sendScheduleForSis() {
+        await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.DeltaServer);
+    }
 
-    public async CheckHistory()
-    {
+    public async CheckHistory() {
         await this.dependencies.client.login(this.token);
         let messages = await this.historyDisplay.GetRecentHistory(1);
-        if (messages)
-        {
-            for (var index = 0; index < messages.length; index++)
-            {
+        if (messages) {
+            for (var index = 0; index < messages.length; index++) {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHistory);
             }

@@ -43,6 +43,7 @@ const DiscordChannels_1 = require("./enums/DiscordChannels");
 const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
 const Reload_1 = require("./translators/Reload");
 const DeleteTeamRoles_1 = require("./translators/DeleteTeamRoles");
+const NGSDivisions_1 = require("./enums/NGSDivisions");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -97,9 +98,34 @@ let Bot = /** @class */ (() => {
                 }
             });
         }
-        // public async sendSchedule(division: NGSDivisions)
-        // {
-        // }
+        sendScheduleByDivision(division, ...channels) {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.dependencies.client.login(this.token);
+                let messages = yield this.scheduleLister.getGameMessagesForTodayByDivision(division);
+                if (messages) {
+                    for (var index = 0; index < messages.length; index++) {
+                        for (var channel of channels) {
+                            yield this.messageSender.SendMessageToChannel(messages[index], channel);
+                        }
+                    }
+                }
+            });
+        }
+        sendScheduleForDad() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DeltaServer, DiscordChannels_1.DiscordChannels.DadSchedule);
+            });
+        }
+        sendScheduleForMom() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.DWest, DiscordChannels_1.DiscordChannels.DeltaServer);
+            });
+        }
+        sendScheduleForSis() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.DeltaServer);
+            });
+        }
         CheckHistory() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);

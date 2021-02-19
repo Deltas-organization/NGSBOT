@@ -30,6 +30,16 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             return yield this.getMessages(filteredGames);
         });
     }
+    getGameMessagesForTodayByDivision(ngsDivision) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var filteredGames = yield this.getfilteredGames(0, 0);
+            filteredGames = filteredGames.filter(f => f.divisionDisplayName == ngsDivision);
+            if (filteredGames.length <= 0) {
+                return;
+            }
+            return yield this.getMessages(filteredGames);
+        });
+    }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             let duration = 0;
