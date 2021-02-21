@@ -113,12 +113,12 @@ let Bot = /** @class */ (() => {
         }
         sendScheduleForDad() {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DeltaServer, DiscordChannels_1.DiscordChannels.DadSchedule);
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DadSchedule);
             });
         }
         sendScheduleForMom() {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.DWest, DiscordChannels_1.DiscordChannels.DeltaServer);
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.DEast, DiscordChannels_1.DiscordChannels.MomSchedule);
             });
         }
         sendScheduleForSis() {

@@ -105,11 +105,11 @@ export class Bot {
     }
 
     public async sendScheduleForDad() {
-        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.DeltaServer, DiscordChannels.DadSchedule);
+        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.DadSchedule);
     }
     
     public async sendScheduleForMom() {
-        await this.sendScheduleByDivision(NGSDivisions.DWest, DiscordChannels.DeltaServer);
+        await this.sendScheduleByDivision(NGSDivisions.DEast, DiscordChannels.MomSchedule);
     }
     
     public async sendScheduleForSis() {
