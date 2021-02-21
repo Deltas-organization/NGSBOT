@@ -22,7 +22,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     getGameMessagesForToday() {
         return __awaiter(this, void 0, void 0, function* () {
-            var filteredGames = yield this.getfilteredGames(0, 0);
+            var filteredGames = yield this.GetGames(0, 0);
             if (filteredGames.length <= 0) {
                 Globals_1.Globals.log("No games available for today.");
                 return;
@@ -32,7 +32,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     getGameMessagesForTodayByDivision(ngsDivision) {
         return __awaiter(this, void 0, void 0, function* () {
-            var filteredGames = yield this.getfilteredGames(0, 0);
+            var filteredGames = yield this.GetGames(0, 0);
             filteredGames = filteredGames.filter(f => f.divisionDisplayName == ngsDivision);
             if (filteredGames.length <= 0) {
                 return;
@@ -63,7 +63,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 yield this.SearchByDivision(commands, messageSender);
                 return;
             }
-            let filteredGames = yield this.getfilteredGames(duration, endDays);
+            let filteredGames = yield this.GetGames(duration, endDays);
             let messages = yield this.getMessages(filteredGames);
             for (var index = 0; index < messages.length; index++) {
                 yield messageSender.SendMessage(messages[index]);
@@ -71,33 +71,35 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             yield messageSender.originalMessage.delete();
         });
     }
+    GetGames(daysInFuture, daysInFutureClamp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filteredGames = yield this.getfilteredGames(daysInFuture, daysInFutureClamp);
+            return yield this.sortSchedule(filteredGames);
+        });
+    }
     getfilteredGames(daysInFuture, daysInFutureClamp) {
         return __awaiter(this, void 0, void 0, function* () {
-            var todaysUTC = new Date().getTime();
+            var todaysUTC = this.ConvertDateToUTC(new Date());
             let scheduledGames = yield this.liveDataStore.GetSchedule();
             let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
             filteredGames = filteredGames.sort((f1, f2) => {
-                let result = f1.DaysAhead - f2.DaysAhead;
-                if (result == 0) {
-                    let f1Date = new Date(+f1.scheduledTime.startTime);
-                    let f2Date = new Date(+f2.scheduledTime.startTime);
-                    let timeDiff = f1Date.getTime() - f2Date.getTime();
-                    if (timeDiff > 0)
-                        return 1;
-                    else if (timeDiff < 0)
-                        return -1;
-                    else
-                        return TeamSorter_1.TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
-                }
-                return result;
+                let f1Date = new Date(+f1.scheduledTime.startTime);
+                let f2Date = new Date(+f2.scheduledTime.startTime);
+                let timeDiff = f1Date.getTime() - f2Date.getTime();
+                if (timeDiff > 0)
+                    return 1;
+                else if (timeDiff < 0)
+                    return -1;
+                else
+                    return TeamSorter_1.TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
             });
             return filteredGames;
         });
     }
     filterSchedule(todaysUTC, schedule, daysInFuture, daysInFutureClamp) {
         let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = scheduledDate.getTime();
-        var ms = scheduledUTC - todaysUTC;
+        let scheduledUTC = this.ConvertDateToUTC(scheduledDate);
+        var ms = scheduledUTC.getTime() - todaysUTC.getTime();
         let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
         if (dayDifference >= 0 && dayDifference <= daysInFuture) {
             if (daysInFutureClamp > -1 && dayDifference < daysInFutureClamp) {
@@ -108,21 +110,20 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
         }
         return false;
     }
+    ConvertDateToUTC(date) {
+        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    }
     sortSchedule(filteredGames) {
         return filteredGames.sort((f1, f2) => {
-            let result = f1.DaysAhead - f2.DaysAhead;
-            if (result == 0) {
-                let f1Date = new Date(+f1.scheduledTime.startTime);
-                let f2Date = new Date(+f2.scheduledTime.startTime);
-                let timeDiff = f1Date.getTime() - f2Date.getTime();
-                if (timeDiff > 0)
-                    return 1;
-                else if (timeDiff < 0)
-                    return -1;
-                else
-                    return 0;
-            }
-            return result;
+            let f1Date = new Date(+f1.scheduledTime.startTime);
+            let f2Date = new Date(+f2.scheduledTime.startTime);
+            let timeDiff = f1Date.getTime() - f2Date.getTime();
+            if (timeDiff > 0)
+                return 1;
+            else if (timeDiff < 0)
+                return -1;
+            else
+                return TeamSorter_1.TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
         });
     }
     SearchByDivision(commands, messageSender) {
@@ -162,13 +163,13 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
         return new Promise((resolver, rejector) => {
             let messagesToSend = [];
             let message = '';
-            let currentDaysAhead = -1;
             let currentTime = -1;
             let dayGroupMessages = [];
+            let currentDay = -1;
             for (var i = 0; i < scheduledMatches.length; i++) {
                 let m = scheduledMatches[i];
-                let scheduledDateUTC = new Date(+m.scheduledTime.startTime);
-                let hours = scheduledDateUTC.getUTCHours();
+                let scheduledDateUTC = this.ConvertDateToUTC(new Date(+m.scheduledTime.startTime));
+                let hours = scheduledDateUTC.getHours();
                 if (hours <= 6)
                     hours = 24 - 6 + hours;
                 else
@@ -177,14 +178,14 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 if (minutes == 0)
                     minutes = "00";
                 let newMessage = '';
-                if (currentDaysAhead != m.DaysAhead) {
+                if (currentDay != scheduledDateUTC.getDay()) {
                     dayGroupMessages.push(message);
-                    let date = scheduledDateUTC.getUTCDate();
+                    let date = scheduledDateUTC.getDate();
                     if (hours >= 19)
                         date -= 1;
                     message = "";
                     newMessage = `\n**__${scheduledDateUTC.getMonth() + 1}/${date}__** \n`;
-                    currentDaysAhead = m.DaysAhead;
+                    currentDay = scheduledDateUTC.getUTCDay();
                     currentTime = -1;
                 }
                 if (currentTime != hours + minutes) {
@@ -196,7 +197,9 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                         hours -= 12;
                         pmMessage = "pm";
                     }
-                    newMessage += `**${hours - 2}:${minutes}${pmMessage} P | ${hours - 1}:${minutes}${pmMessage} M | ${hours}:${minutes}${pmMessage} C | `;
+                    let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
+                    let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
+                    newMessage += `**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `;
                     if (hours + 1 == 12) {
                         pmMessage = "am";
                     }
@@ -227,6 +230,20 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             messagesToSend.push(message);
             resolver(messagesToSend);
         });
+    }
+    GetPacificMessage(hours, minutes, endMessage) {
+        if (hours == 2)
+            return `${12}:${minutes}${endMessage}`;
+        else if (hours == 1)
+            return `${11}:${minutes}am`;
+        else
+            return `${hours - 2}:${minutes}${endMessage}`;
+    }
+    GetMountainMessage(hours, minutes, endMessage) {
+        if (hours == 1)
+            return `${12}:${minutes}${endMessage}`;
+        else
+            return `${hours - 1}:${minutes}${endMessage}`;
     }
 }
 exports.ScheduleLister = ScheduleLister;
