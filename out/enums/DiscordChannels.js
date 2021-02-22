@@ -9,5 +9,6 @@ var DiscordChannels;
     DiscordChannels["NGSHistory"] = "750452200685174965";
     DiscordChannels["DadSchedule"] = "674530041694257192";
     DiscordChannels["MomSchedule"] = "731172083807027290";
+    DiscordChannels["SisSchedule"] = "793559101975429151";
 })(DiscordChannels = exports.DiscordChannels || (exports.DiscordChannels = {}));
 //# sourceMappingURL=DiscordChannels.js.map

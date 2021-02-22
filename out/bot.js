@@ -123,7 +123,7 @@ let Bot = /** @class */ (() => {
         }
         sendScheduleForSis() {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.DeltaServer);
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.SisSchedule);
             });
         }
         CheckHistory() {

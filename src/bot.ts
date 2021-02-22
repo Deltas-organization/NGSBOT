@@ -113,7 +113,7 @@ export class Bot {
     }
     
     public async sendScheduleForSis() {
-        await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.DeltaServer);
+        await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.SisSchedule);
     }
 
     public async CheckHistory() {
