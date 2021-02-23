@@ -8,5 +8,6 @@ export enum NGSRoles {
     Nexus = 'Nexus Division',
     Heroic = 'Heroic Division',
     Storm = 'Storm Division',
-    Captain = "Captains"
+    Captain = 'Captains',
+    FreeAgents = 'Free Agents'
 }

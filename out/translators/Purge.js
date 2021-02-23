@@ -23,7 +23,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         this._testing = false;
         this._reservedRoleNames = [
             'Caster Hopefuls',
-            'Free Agents',
+            NGSRoles_1.NGSRoles.FreeAgents,
             'Moist',
             'Supporter',
             'Interviewee',
@@ -150,6 +150,10 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
             for (var role of rolesOfUser) {
+                if (guildMember.user.username == "Murda") {
+                    Globals_1.Globals.log("didnt remove murdas roles");
+                    return;
+                }
                 if (!this._reserveredRoles.find(serverRole => serverRole == role)) {
                     if (this._myRole.comparePositionTo(role) > 0)
                         try {
@@ -184,6 +188,13 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
                             messageHelper.AddNewLine("Kept Captain Role.", 4);
                         }
                         else if (this._myRole.comparePositionTo(role) > 0) {
+                            yield this.RemoveRole(guildMember, role);
+                            messageHelper.Options.rolesRemovedCount++;
+                            messageHelper.AddNewLine(`Removed: ${role.name}`, 4);
+                        }
+                    }
+                    else if (role.name == NGSRoles_1.NGSRoles.FreeAgents) {
+                        if (this._myRole.comparePositionTo(role) > 0) {
                             yield this.RemoveRole(guildMember, role);
                             messageHelper.Options.rolesRemovedCount++;
                             messageHelper.AddNewLine(`Removed: ${role.name}`, 4);

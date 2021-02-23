@@ -12,5 +12,6 @@ var NGSRoles;
     NGSRoles["Heroic"] = "Heroic Division";
     NGSRoles["Storm"] = "Storm Division";
     NGSRoles["Captain"] = "Captains";
+    NGSRoles["FreeAgents"] = "Free Agents";
 })(NGSRoles = exports.NGSRoles || (exports.NGSRoles = {}));
 //# sourceMappingURL=NGSRoles.js.map
