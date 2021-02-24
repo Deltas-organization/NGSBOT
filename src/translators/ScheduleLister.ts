@@ -247,7 +247,7 @@ export class ScheduleLister extends AdminTranslatorBase
                     let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
                     let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
                     let easternTime = this.GetEasternTime(hours, minutes, pmMessage);
-                    let timeSection = `**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | ${easternTime} M   E **`;
+                    let timeSection = `**__${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | ${easternTime} E __**`;
 
                     scheduleContainer.AddNewTimeSection(timeSection);
 
