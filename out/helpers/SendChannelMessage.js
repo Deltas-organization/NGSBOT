@@ -19,15 +19,25 @@ class SendChannelMessage {
         return __awaiter(this, void 0, void 0, function* () {
             var myChannel = this.client.channels.cache.find(channel => channel.id == channelToSendTo);
             if (myChannel != null) {
-                var sentMessage = yield myChannel.send({
-                    embed: {
-                        color: 0,
-                        description: message
-                    }
-                });
-                this.messageStore.AddMessage(sentMessage);
-                return sentMessage;
+                while (message.length > 2048) {
+                    let newMessage = message.slice(0, 2048);
+                    message = message.substr(2048);
+                    yield this.SendMessage(myChannel, newMessage);
+                }
+                yield this.SendMessage(myChannel, message);
             }
+        });
+    }
+    SendMessage(myChannel, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var sentMessage = yield myChannel.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
+            this.messageStore.AddMessage(sentMessage);
+            return sentMessage;
         });
     }
 }

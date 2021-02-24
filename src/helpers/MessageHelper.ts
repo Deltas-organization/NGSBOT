@@ -14,6 +14,13 @@ export class MessageHelper<T> {
         this._lines.push(new DetailedLine(message, indentCount));
     }
 
+    public AddNew(message:string)
+    {
+        let line = this._lines.pop();
+        line.Message += message;
+        this._lines.push(line);
+    }
+
     public AddJSONLine(message: string)
     {
         const lineToAdd = new DetailedLine(message);

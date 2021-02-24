@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScheduleLister = void 0;
+exports.ScheduleMessage = exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
 const TeamSorter_1 = require("../helpers/TeamSorter");
+const MessageHelper_1 = require("../helpers/MessageHelper");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["Schedule", "sch"];
@@ -177,20 +178,21 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 let minutes = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
                     minutes = "00";
-                let newMessage = '';
+                let newMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
                 if (currentDay != scheduledDateUTC.getDay()) {
                     dayGroupMessages.push(message);
                     let date = scheduledDateUTC.getDate();
                     if (hours >= 19)
                         date -= 1;
                     message = "";
-                    newMessage = `\n**__${scheduledDateUTC.getMonth() + 1}/${date}__** \n`;
+                    newMessage.AddNewLine('');
+                    newMessage.AddNewLine(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
                     currentDay = scheduledDateUTC.getUTCDay();
                     currentTime = -1;
                 }
                 if (currentTime != hours + minutes) {
-                    if (currentTime != -1)
-                        newMessage += '\n';
+                    // if (currentTime != -1)
+                    //     newMessage += '\n';
                     currentTime = hours + minutes;
                     let pmMessage = "am";
                     if (hours > 12) {
@@ -199,13 +201,14 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     }
                     let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
                     let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
-                    newMessage += `**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `;
+                    newMessage.AddNewLine('');
+                    newMessage.AddNewLine(`**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `);
                     if (hours + 1 == 12) {
                         pmMessage = "am";
                     }
-                    newMessage += `${hours + 1}:${minutes}${pmMessage} E **\n`;
+                    newMessage.AddNew(`${hours + 1}:${minutes}${pmMessage} E **`);
                 }
-                newMessage += `${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}** \n`;
+                newMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
                 if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
                     if (m.casterUrl.indexOf("www") == -1) {
                         m.casterUrl = "https://www." + m.casterUrl;
@@ -213,19 +216,18 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     else if (m.casterUrl.indexOf("http") == -1) {
                         m.casterUrl = "https://" + m.casterUrl;
                     }
-                    newMessage += `[${m.casterName}](${m.casterUrl}) \n`;
+                    newMessage.AddNewLine(`[${m.casterName}](${m.casterUrl}) `);
                 }
-                message += newMessage;
+                newMessage.AddNewLine('');
+                message += newMessage.CreateStringMessage();
             }
             dayGroupMessages.push(message);
             message = "";
             for (var i = 0; i < dayGroupMessages.length; i++) {
                 let groupMessage = dayGroupMessages[i];
-                if (groupMessage.length + message.length > 2048) {
-                    messagesToSend.push(message);
-                    message = "";
+                if (groupMessage.length > 0) {
+                    message += groupMessage;
                 }
-                message += groupMessage;
             }
             messagesToSend.push(message);
             resolver(messagesToSend);
@@ -247,4 +249,10 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
 }
 exports.ScheduleLister = ScheduleLister;
+class ScheduleMessage {
+    constructor(dateTitle) {
+        this.dateTitle = dateTitle;
+    }
+}
+exports.ScheduleMessage = ScheduleMessage;
 //# sourceMappingURL=ScheduleLister.js.map

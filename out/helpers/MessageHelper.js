@@ -10,6 +10,11 @@ class MessageHelper {
     AddNewLine(message, indentCount = 0) {
         this._lines.push(new DetailedLine(message, indentCount));
     }
+    AddNew(message) {
+        let line = this._lines.pop();
+        line.Message += message;
+        this._lines.push(line);
+    }
     AddJSONLine(message) {
         const lineToAdd = new DetailedLine(message);
         lineToAdd.JsonOnly = true;

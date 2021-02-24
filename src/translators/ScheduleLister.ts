@@ -9,6 +9,7 @@ import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { Globals } from "../Globals";
 import { TeamSorter } from "../helpers/TeamSorter";
 import { NGSDivisions } from "../enums/NGSDivisions";
+import { MessageHelper } from "../helpers/MessageHelper";
 
 export class ScheduleLister extends AdminTranslatorBase
 {
@@ -218,7 +219,7 @@ export class ScheduleLister extends AdminTranslatorBase
                 if (minutes == 0)
                     minutes = "00";
 
-                let newMessage = ''
+                let newMessage = new MessageHelper<any>('scheduleMessage');
 
                 if (currentDay != scheduledDateUTC.getDay())
                 {
@@ -227,14 +228,15 @@ export class ScheduleLister extends AdminTranslatorBase
                     if (hours >= 19)
                         date -= 1;
                     message = "";
-                    newMessage = `\n**__${scheduledDateUTC.getMonth() + 1}/${date}__** \n`;
+                    newMessage.AddNewLine('');
+                    newMessage.AddNewLine(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
                     currentDay = scheduledDateUTC.getUTCDay();
                     currentTime = -1;
                 }
                 if (currentTime != hours + minutes)
                 {
-                    if (currentTime != -1)
-                        newMessage += '\n';
+                    // if (currentTime != -1)
+                    //     newMessage += '\n';
 
                     currentTime = hours + minutes;
 
@@ -247,14 +249,15 @@ export class ScheduleLister extends AdminTranslatorBase
                     let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
                     let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
 
-                    newMessage += `**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `;
+                    newMessage.AddNewLine('');
+                    newMessage.AddNewLine(`**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `);
                     if (hours + 1 == 12)
                     {
                         pmMessage = "am";
                     }
-                    newMessage += `${hours + 1}:${minutes}${pmMessage} E **\n`;
+                    newMessage.AddNew(`${hours + 1}:${minutes}${pmMessage} E **`);
                 }
-                newMessage += `${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}** \n`;
+                newMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
                 if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1)
                 {
                     if (m.casterUrl.indexOf("www") == -1)
@@ -266,10 +269,10 @@ export class ScheduleLister extends AdminTranslatorBase
                         m.casterUrl = "https://" + m.casterUrl;
                     }
 
-                    newMessage += `[${m.casterName}](${m.casterUrl}) \n`;
+                    newMessage.AddNewLine(`[${m.casterName}](${m.casterUrl}) `);
                 }
-
-                message += newMessage;
+                newMessage.AddNewLine('');
+                message += newMessage.CreateStringMessage();
             }
             dayGroupMessages.push(message);
 
@@ -277,14 +280,10 @@ export class ScheduleLister extends AdminTranslatorBase
             for (var i = 0; i < dayGroupMessages.length; i++)
             {
                 let groupMessage = dayGroupMessages[i];
-                if (groupMessage.length + message.length > 2048)
+                if (groupMessage.length > 0)
                 {
-                    messagesToSend.push(message);
-                    message = "";
+                    message += groupMessage;
                 }
-
-                message += groupMessage;
-
             }
 
             messagesToSend.push(message);
@@ -307,5 +306,15 @@ export class ScheduleLister extends AdminTranslatorBase
             return `${12}:${minutes}${endMessage}`;
         else
             return `${hours - 1}:${minutes}${endMessage}`;
+    }
+}
+
+export class ScheduleMessage
+{
+    public timeSchedules: string[];
+    
+    constructor(public dateTitle: string)
+    {
+
     }
 }

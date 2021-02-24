@@ -10,17 +10,30 @@ export class SendChannelMessage
 
     }
 
-    public async SendMessageToChannel(message: string, channelToSendTo: DiscordChannels) {
+    public async SendMessageToChannel(message: string, channelToSendTo: DiscordChannels): Promise<void>
+    {
         var myChannel = this.client.channels.cache.find(channel => channel.id == channelToSendTo) as TextChannel;
-        if (myChannel != null) {
-            var sentMessage = await myChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
-            this.messageStore.AddMessage(sentMessage);
-            return sentMessage;
+        if (myChannel != null)
+        {
+            while (message.length > 2048)
+            {
+                let newMessage = message.slice(0, 2048);
+                message = message.substr(2048);
+                await this.SendMessage(myChannel, newMessage);
+            }
+            await this.SendMessage(myChannel, message);
         }
+    }
+
+    private async SendMessage(myChannel: TextChannel, message: string)
+    {
+        var sentMessage = await myChannel.send({
+            embed: {
+                color: 0,
+                description: message
+            }
+        });
+        this.messageStore.AddMessage(sentMessage);
+        return sentMessage;
     }
 }
