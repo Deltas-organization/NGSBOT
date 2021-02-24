@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScheduleMessage = exports.ScheduleLister = void 0;
+exports.ScheduleContainer = exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
 const TeamSorter_1 = require("../helpers/TeamSorter");
@@ -163,9 +163,9 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     getMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {
             let messagesToSend = [];
-            let message = '';
+            let scheduleContainer = null;
             let currentTime = -1;
-            let dayGroupMessages = [];
+            let schedulesByDay = [];
             let currentDay = -1;
             for (var i = 0; i < scheduledMatches.length; i++) {
                 let m = scheduledMatches[i];
@@ -178,15 +178,12 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 let minutes = scheduledDateUTC.getMinutes();
                 if (minutes == 0)
                     minutes = "00";
-                let newMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
                 if (currentDay != scheduledDateUTC.getDay()) {
-                    dayGroupMessages.push(message);
                     let date = scheduledDateUTC.getDate();
                     if (hours >= 19)
                         date -= 1;
-                    message = "";
-                    newMessage.AddNewLine('');
-                    newMessage.AddNewLine(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
+                    scheduleContainer = new ScheduleContainer(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
+                    schedulesByDay.push(scheduleContainer);
                     currentDay = scheduledDateUTC.getUTCDay();
                     currentTime = -1;
                 }
@@ -201,14 +198,12 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     }
                     let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
                     let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
-                    newMessage.AddNewLine('');
-                    newMessage.AddNewLine(`**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `);
-                    if (hours + 1 == 12) {
-                        pmMessage = "am";
-                    }
-                    newMessage.AddNew(`${hours + 1}:${minutes}${pmMessage} E **`);
+                    let easternTime = this.GetEasternTime(hours, minutes, pmMessage);
+                    let timeSection = `**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | ${easternTime} M   E **`;
+                    scheduleContainer.AddNewTimeSection(timeSection);
                 }
-                newMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+                let scheduleMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
+                scheduleMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
                 if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
                     if (m.casterUrl.indexOf("www") == -1) {
                         m.casterUrl = "https://www." + m.casterUrl;
@@ -216,20 +211,15 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     else if (m.casterUrl.indexOf("http") == -1) {
                         m.casterUrl = "https://" + m.casterUrl;
                     }
-                    newMessage.AddNewLine(`[${m.casterName}](${m.casterUrl}) `);
+                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
-                newMessage.AddNewLine('');
-                message += newMessage.CreateStringMessage();
+                scheduleContainer.AddSchedule(scheduleMessage);
             }
-            dayGroupMessages.push(message);
-            message = "";
-            for (var i = 0; i < dayGroupMessages.length; i++) {
-                let groupMessage = dayGroupMessages[i];
-                if (groupMessage.length > 0) {
-                    message += groupMessage;
-                }
+            for (var daySchedule of schedulesByDay) {
+                daySchedule.GetAsStringArray().forEach(item => {
+                    messagesToSend.push(item);
+                });
             }
-            messagesToSend.push(message);
             resolver(messagesToSend);
         });
     }
@@ -247,12 +237,48 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
         else
             return `${hours - 1}:${minutes}${endMessage}`;
     }
-}
-exports.ScheduleLister = ScheduleLister;
-class ScheduleMessage {
-    constructor(dateTitle) {
-        this.dateTitle = dateTitle;
+    GetEasternTime(hours, minutes, pmMessage) {
+        if (hours + 1 == 12) {
+            pmMessage = "am";
+        }
+        return `${hours + 1}:${minutes}${pmMessage}`;
     }
 }
-exports.ScheduleMessage = ScheduleMessage;
+exports.ScheduleLister = ScheduleLister;
+class ScheduleContainer {
+    constructor(dateTitle) {
+        this.dateTitle = dateTitle;
+        this._timeAndSchedules = new Map();
+    }
+    AddNewTimeSection(sectionTitle) {
+        this._currentSection = sectionTitle;
+        this._timeAndSchedules.set(sectionTitle, []);
+    }
+    AddSchedule(scheduleMessage) {
+        this._timeAndSchedules.get(this._currentSection).push(scheduleMessage);
+    }
+    GetAsStringArray() {
+        let result = [];
+        let dateTitleString = `${this.dateTitle} \n \n`;
+        let message = dateTitleString;
+        for (var key of this._timeAndSchedules.keys()) {
+            let timeMessage = '';
+            timeMessage += key;
+            timeMessage += "\n";
+            for (var schedule of this._timeAndSchedules.get(key)) {
+                timeMessage += schedule.CreateStringMessage();
+                timeMessage += "\n";
+            }
+            timeMessage += "\n";
+            if (timeMessage.length + message.length > 2048) {
+                result.push(message);
+                message = dateTitleString;
+            }
+            message += timeMessage;
+        }
+        result.push(message);
+        return result;
+    }
+}
+exports.ScheduleContainer = ScheduleContainer;
 //# sourceMappingURL=ScheduleLister.js.map

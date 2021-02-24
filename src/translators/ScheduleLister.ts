@@ -200,9 +200,9 @@ export class ScheduleLister extends AdminTranslatorBase
         return new Promise<string[]>((resolver, rejector) =>
         {
             let messagesToSend: string[] = [];
-            let message = '';
+            let scheduleContainer: ScheduleContainer = null;
             let currentTime = -1;
-            let dayGroupMessages = [];
+            let schedulesByDay: ScheduleContainer[] = [];
             let currentDay = -1;
 
             for (var i = 0; i < scheduledMatches.length; i++)
@@ -219,17 +219,15 @@ export class ScheduleLister extends AdminTranslatorBase
                 if (minutes == 0)
                     minutes = "00";
 
-                let newMessage = new MessageHelper<any>('scheduleMessage');
 
                 if (currentDay != scheduledDateUTC.getDay())
                 {
-                    dayGroupMessages.push(message);
                     let date = scheduledDateUTC.getDate();
                     if (hours >= 19)
                         date -= 1;
-                    message = "";
-                    newMessage.AddNewLine('');
-                    newMessage.AddNewLine(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
+
+                    scheduleContainer = new ScheduleContainer(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
+                    schedulesByDay.push(scheduleContainer);
                     currentDay = scheduledDateUTC.getUTCDay();
                     currentTime = -1;
                 }
@@ -248,16 +246,15 @@ export class ScheduleLister extends AdminTranslatorBase
                     }
                     let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
                     let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
+                    let easternTime = this.GetEasternTime(hours, minutes, pmMessage);
+                    let timeSection = `**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | ${easternTime} M   E **`;
 
-                    newMessage.AddNewLine('');
-                    newMessage.AddNewLine(`**${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | `);
-                    if (hours + 1 == 12)
-                    {
-                        pmMessage = "am";
-                    }
-                    newMessage.AddNew(`${hours + 1}:${minutes}${pmMessage} E **`);
+                    scheduleContainer.AddNewTimeSection(timeSection);
+
                 }
-                newMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+
+                let scheduleMessage = new MessageHelper<any>('scheduleMessage');
+                scheduleMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
                 if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1)
                 {
                     if (m.casterUrl.indexOf("www") == -1)
@@ -269,27 +266,22 @@ export class ScheduleLister extends AdminTranslatorBase
                         m.casterUrl = "https://" + m.casterUrl;
                     }
 
-                    newMessage.AddNewLine(`[${m.casterName}](${m.casterUrl}) `);
+                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
-                newMessage.AddNewLine('');
-                message += newMessage.CreateStringMessage();
+                scheduleContainer.AddSchedule(scheduleMessage);
             }
-            dayGroupMessages.push(message);
 
-            message = "";
-            for (var i = 0; i < dayGroupMessages.length; i++)
+            for (var daySchedule of schedulesByDay)
             {
-                let groupMessage = dayGroupMessages[i];
-                if (groupMessage.length > 0)
+                daySchedule.GetAsStringArray().forEach(item =>
                 {
-                    message += groupMessage;
-                }
+                    messagesToSend.push(item);
+                })
             }
-
-            messagesToSend.push(message);
             resolver(messagesToSend);
         });
     }
+
     private GetPacificMessage(hours: number, minutes: any, endMessage: string)
     {
         if (hours == 2)
@@ -307,14 +299,63 @@ export class ScheduleLister extends AdminTranslatorBase
         else
             return `${hours - 1}:${minutes}${endMessage}`;
     }
+
+    private GetEasternTime(hours: number, minutes: any, pmMessage: string)
+    {
+        if (hours + 1 == 12)
+        {
+            pmMessage = "am";
+        }
+        return `${hours + 1}:${minutes}${pmMessage}`;
+    }
 }
 
-export class ScheduleMessage
+export class ScheduleContainer
 {
-    public timeSchedules: string[];
-    
+    private _currentSection: string;
+    private _timeAndSchedules = new Map<string, MessageHelper<any>[]>()
+
     constructor(public dateTitle: string)
     {
 
+    }
+
+    public AddNewTimeSection(sectionTitle: string)
+    {
+        this._currentSection = sectionTitle;
+        this._timeAndSchedules.set(sectionTitle, []);
+    }
+
+    public AddSchedule(scheduleMessage: MessageHelper<any>)
+    {
+        this._timeAndSchedules.get(this._currentSection).push(scheduleMessage);
+    }
+
+    public GetAsStringArray(): string[]
+    {
+        let result = [];
+        let dateTitleString = `${this.dateTitle} \n \n`;
+        let message = dateTitleString;
+        for (var key of this._timeAndSchedules.keys())
+        {
+            let timeMessage = '';
+            timeMessage += key;
+            timeMessage += "\n";
+            for (var schedule of this._timeAndSchedules.get(key))
+            {
+
+                timeMessage += schedule.CreateStringMessage();
+                timeMessage += "\n";
+            }
+            timeMessage += "\n";
+            if (timeMessage.length + message.length > 2048)
+            {
+                result.push(message);
+                message = dateTitleString
+            }
+            message += timeMessage;
+        }
+        result.push(message);
+        return result;
     }
 }
