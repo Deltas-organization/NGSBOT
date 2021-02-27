@@ -60,11 +60,12 @@ export class AssignRoles extends ngsTranslatorBase
     {
         const progressMessage = await messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
         const teams = await this.liveDataStore.GetTeams();
-        await messageSender.Edit(progressMessage, "Teams Loaded. \n Assigning Now.");
+        await messageSender.Edit(progressMessage, "Loading Discord Members.");
         const messagesLog: MessageHelper<MessageOptions>[] = [];
         try
         {
             const guildMembers = (await messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
+            await messageSender.Edit(progressMessage, "Members loaded. \n Assigning Now.");
             let count = 0;
             let progressCount = 1;
             let steps = 10;
@@ -117,18 +118,27 @@ export class AssignRoles extends ngsTranslatorBase
         messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedDivCount).reduce((m1, m2) => m1 + m2, 0)} Div Roles`);
         messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
         const teamsWithNoValidCaptain = [];
+        const teamsWithLessThen3People = [];
         for (var message of messagesLog)
         {
             if (!message.Options.HasCaptain)
             {
                 teamsWithNoValidCaptain.push(message.Options.TeamName);
             }
+            if (message.Options.PlayersInDiscord < 3)
+            {
+                teamsWithLessThen3People.push(message.Options.TeamName);
+            }
         }
         if (teamsWithNoValidCaptain.length > 0)
-            messageHelper.AddNewLine(`Teams with no Assignable Captains: ${teamsWithNoValidCaptain.join(', ')}`);
-
+            messageHelper.AddNewLine(`**Teams with no Assignable Captains**: ${teamsWithNoValidCaptain.join(', ')}`);
         else
-            messageHelper.AddNewLine(`All teams Have a valid Captain`);
+            messageHelper.AddNewLine(`All teams Have a valid Captain! woot.`);
+
+        if (teamsWithLessThen3People.length > 0)
+            messageHelper.AddNewLine(`**Teams without 3 people registered**: ${teamsWithLessThen3People.join(', ')}`);
+        else
+            messageHelper.AddNewLine(`All teams Have 3 people registed on the website and present in the discord!!!`);
 
         await messageSender.SendMessage(messageHelper.CreateStringMessage());
         await progressMessage.delete();
@@ -178,6 +188,7 @@ export class AssignRoles extends ngsTranslatorBase
         const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
 
         messageTracker.Options = new MessageOptions(team.teamName);
+        // messageTracker.Options.TeamRole = teamRole;
         messageTracker.AddNewLine("**Team Name**");;
         messageTracker.AddNewLine(team.teamName);
         messageTracker.AddNewLine("**Users**");
@@ -187,6 +198,7 @@ export class AssignRoles extends ngsTranslatorBase
             messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
             if (guildMember)
             {
+                messageTracker.Options.PlayersInDiscord++;
                 var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                 messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
                 messageTracker.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
@@ -246,8 +258,10 @@ class MessageOptions
     public AssignedTeamCount: number = 0;
     public AssignedDivCount: number = 0;
     public AssignedCaptainCount: number = 0;
+    public PlayersInDiscord: number = 0;
     public HasCaptain: boolean;
     public CreatedTeamRole: boolean;
+    public TeamRole: Role;
 
     constructor(public TeamName: string)
     {

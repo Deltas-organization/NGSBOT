@@ -9,9 +9,16 @@ export class MessageHelper<T> {
     {
     }
 
+    public AddEmptyLine()
+    {
+        this.AddNewLine('');
+        return this;
+    }
+
     public AddNewLine(message: string, indentCount: number = 0)
     {
         this._lines.push(new DetailedLine(message, indentCount));
+        return this;
     }
 
     public AddNew(message:string)

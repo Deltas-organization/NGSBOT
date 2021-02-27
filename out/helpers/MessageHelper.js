@@ -7,8 +7,13 @@ class MessageHelper {
         this._lines = [];
         this.Options = {};
     }
+    AddEmptyLine() {
+        this.AddNewLine('');
+        return this;
+    }
     AddNewLine(message, indentCount = 0) {
         this._lines.push(new DetailedLine(message, indentCount));
+        return this;
     }
     AddNew(message) {
         let line = this._lines.pop();
