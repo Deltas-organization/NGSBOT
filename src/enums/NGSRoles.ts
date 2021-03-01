@@ -9,5 +9,6 @@ export enum NGSRoles {
     Heroic = 'Heroic Division',
     Storm = 'Storm Division',
     Captain = 'Captains',
-    FreeAgents = 'Free Agents'
+    FreeAgents = 'Free Agents',
+    NGSBot = 'NGSBOT',
 }
