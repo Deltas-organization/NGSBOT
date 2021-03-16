@@ -10,6 +10,7 @@ import { Globals } from "../Globals";
 import { TeamSorter } from "../helpers/TeamSorter";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { MessageHelper } from "../helpers/MessageHelper";
+import moment = require("moment-timezone");
 
 export class ScheduleLister extends AdminTranslatorBase
 {
@@ -201,56 +202,34 @@ export class ScheduleLister extends AdminTranslatorBase
         {
             let messagesToSend: string[] = [];
             let scheduleContainer: ScheduleContainer = null;
-            let currentTime = -1;
+            let currentTime = '';
             let schedulesByDay: ScheduleContainer[] = [];
-            let currentDay = -1;
+            let currentDay = '';
 
             for (var i = 0; i < scheduledMatches.length; i++)
             {
                 let m = scheduledMatches[i];
-                let scheduledDateUTC = this.ConvertDateToUTC(new Date(+m.scheduledTime.startTime));
-                let hours = scheduledDateUTC.getHours();
-                if (hours <= 6)
-                    hours = 24 - 6 + hours;
-                else
-                    hours -= 6;
+                let momentDate = moment(+m.scheduledTime.startTime + 17000000);
+                let pacificDate = momentDate.clone().tz('America/Los_Angeles');
+                let mountainDate = momentDate.clone().tz('America/Denver');
+                let centralDate = momentDate.clone().tz('America/Chicago');
+                let easternDate = momentDate.clone().tz('America/New_York');
+                
+                let formattedDate = centralDate.format('MM/DD');
+                let formattedTime = centralDate.format('h:mma');
 
-                let minutes: any = scheduledDateUTC.getMinutes();
-                if (minutes == 0)
-                    minutes = "00";
-
-
-                if (currentDay != scheduledDateUTC.getDay())
+                if (currentDay != formattedDate)
                 {
-                    let date = scheduledDateUTC.getDate();
-                    if (hours >= 19)
-                        date -= 1;
-
-                    scheduleContainer = new ScheduleContainer(`**__${scheduledDateUTC.getMonth() + 1}/${date}__**`);
+                    scheduleContainer = new ScheduleContainer(`**__${formattedDate}__**`);
                     schedulesByDay.push(scheduleContainer);
-                    currentDay = scheduledDateUTC.getUTCDay();
-                    currentTime = -1;
+                    currentDay = formattedDate;
+                    currentTime = '';
                 }
-                if (currentTime != hours + minutes)
+                if (currentTime != formattedTime)
                 {
-                    // if (currentTime != -1)
-                    //     newMessage += '\n';
-
-                    currentTime = hours + minutes;
-
-                    let pmMessage = "am";
-                    if (hours > 12)
-                    {
-                        hours -= 12;
-                        pmMessage = "pm";
-                    }
-                    let pacificMessage = this.GetPacificMessage(hours, minutes, pmMessage);
-                    let mountainMessage = this.GetMountainMessage(hours, minutes, pmMessage);
-                    let easternTime = this.GetEasternTime(hours, minutes, pmMessage);
-                    let timeSection = `**__${pacificMessage} P | ${mountainMessage} M | ${hours}:${minutes}${pmMessage} C | ${easternTime} E __**`;
-
+                    currentTime = formattedTime;
+                    let timeSection = `**__${pacificDate.format('h:mma')} P | ${mountainDate.format('h:mma')} M | ${centralDate.format('h:mma')} C | ${easternDate.format('h:mma')} E __**`;
                     scheduleContainer.AddNewTimeSection(timeSection);
-
                 }
 
                 let scheduleMessage = new MessageHelper<any>('scheduleMessage');
