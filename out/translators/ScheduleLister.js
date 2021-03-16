@@ -170,7 +170,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             let currentDay = '';
             for (var i = 0; i < scheduledMatches.length; i++) {
                 let m = scheduledMatches[i];
-                let momentDate = moment(+m.scheduledTime.startTime + 17000000);
+                let momentDate = moment(+m.scheduledTime.startTime);
                 let pacificDate = momentDate.clone().tz('America/Los_Angeles');
                 let mountainDate = momentDate.clone().tz('America/Denver');
                 let centralDate = momentDate.clone().tz('America/Chicago');
