@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleHelper = void 0;
-const moment = require("moment-timeZone");
 const ScheduleLister_1 = require("../translators/ScheduleLister");
 const MessageHelper_1 = require("./MessageHelper");
+const moment = require("moment-timezone");
 class ScheduleHelper {
     static GetMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {

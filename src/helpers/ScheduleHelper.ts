@@ -1,7 +1,7 @@
-import moment = require("moment-timeZone");
 import { INGSSchedule } from "../interfaces";
 import { ScheduleContainer } from "../translators/ScheduleLister";
 import { MessageHelper } from "./MessageHelper";
+import moment = require("moment-timezone");
 
 export class ScheduleHelper
 {

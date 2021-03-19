@@ -10,7 +10,6 @@ import { Globals } from "../Globals";
 import { TeamSorter } from "../helpers/TeamSorter";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { MessageHelper } from "../helpers/MessageHelper";
-import moment = require("moment-timezone");
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
 
 export class ScheduleLister extends AdminTranslatorBase {
