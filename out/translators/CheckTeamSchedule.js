@@ -35,7 +35,17 @@ class CheckTeamSchedule extends translatorBase_1.TranslatorBase {
             const messages = yield this.GetScheduleMessages(team);
             if (messages) {
                 const messagesAsOne = messages.join('');
-                yield messageSender.SendMessage(messagesAsOne);
+                if (messagesAsOne.trim().length > 0)
+                    yield messageSender.SendMessage(messagesAsOne);
+                else {
+                    var random1 = Math.round(Math.random() * 99) + 1;
+                    if (random1 == 65) {
+                        yield messageSender.SendMessage("Borntoshine has been notified of your failings.");
+                    }
+                    else {
+                        yield messageSender.SendMessage("Nothing scheduled yet.");
+                    }
+                }
             }
         });
     }
@@ -47,6 +57,7 @@ class CheckTeamSchedule extends translatorBase_1.TranslatorBase {
                     return ngsUser;
                 }
             }
+            return null;
         });
     }
     GetTeam(ngsUser) {
@@ -57,6 +68,7 @@ class CheckTeamSchedule extends translatorBase_1.TranslatorBase {
                     return team;
                 }
             }
+            return null;
         });
     }
     GetScheduleMessages(ngsTeam) {

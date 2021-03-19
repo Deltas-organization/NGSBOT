@@ -32,7 +32,17 @@ export class CheckTeamSchedule extends TranslatorBase {
         const messages = await this.GetScheduleMessages(team);
         if (messages) {
             const messagesAsOne = messages.join('');
-            await messageSender.SendMessage(messagesAsOne);
+            if (messagesAsOne.trim().length > 0)
+                await messageSender.SendMessage(messagesAsOne);
+            else {
+                var random1 = Math.round(Math.random() * 99) + 1;
+                if (random1 == 65) {
+                    await messageSender.SendMessage("Borntoshine has been notified of your failings.");
+                }
+                else {
+                    await messageSender.SendMessage("Nothing scheduled yet.");
+                }
+            }
         }
     }
 
@@ -43,6 +53,7 @@ export class CheckTeamSchedule extends TranslatorBase {
                 return ngsUser;
             }
         }
+        return null;
     }
 
     private async GetTeam(ngsUser: AugmentedNGSUser) {
@@ -52,6 +63,7 @@ export class CheckTeamSchedule extends TranslatorBase {
                 return team;
             }
         }
+        return null;
     }
 
     private async GetScheduleMessages(ngsTeam: INGSTeam) {

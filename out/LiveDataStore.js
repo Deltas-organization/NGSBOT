@@ -18,7 +18,7 @@ class LiveDataStore {
     constructor() {
         this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
         this.cachedSchedule = new Cacher_1.Cacher(60);
-        this.cachedUsers = new Cacher_1.Cacher(60);
+        this.cachedUsers = new Cacher_1.Cacher(60 * 24);
         this.cachedTeams = new Cacher_1.Cacher(60 * 24);
         this.cachedRegisteredTeams = new Cacher_1.Cacher(60 * 24);
     }

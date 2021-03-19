@@ -8,7 +8,7 @@ import { AugmentedNGSUser } from './models/AugmentedNGSUser';
 export class LiveDataStore {
     private cachedDivisions = new Cacher<INGSDivision[]>(60 * 24);
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
-    private cachedUsers = new Cacher<AugmentedNGSUser[]>(60);
+    private cachedUsers = new Cacher<AugmentedNGSUser[]>(60 * 24);
     private cachedTeams = new Cacher<INGSTeam[]>(60 * 24);
     private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);
 
