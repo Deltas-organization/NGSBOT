@@ -16,7 +16,7 @@ export class SelfTeamChecker extends TranslatorBase {
     }
 
     public get description(): string {
-        return "Will Return the team name that the player requesting is on.";
+        return "Will Return the games for the team of the person sending the command.";
     }
 
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {

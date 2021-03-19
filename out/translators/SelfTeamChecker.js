@@ -18,7 +18,7 @@ class SelfTeamChecker extends translatorBase_1.TranslatorBase {
         return ["self"];
     }
     get description() {
-        return "Will Return the team name that the player requesting is on.";
+        return "Will Return the games for the team of the person sending the command.";
     }
     Interpret(commands, detailed, message) {
         return __awaiter(this, void 0, void 0, function* () {

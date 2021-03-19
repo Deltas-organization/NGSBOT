@@ -13,8 +13,7 @@ exports.ScheduleContainer = exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
 const TeamSorter_1 = require("../helpers/TeamSorter");
-const MessageHelper_1 = require("../helpers/MessageHelper");
-const moment = require("moment-timezone");
+const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["Schedule", "sch"];
@@ -29,7 +28,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 Globals_1.Globals.log("No games available for today.");
                 return;
             }
-            return yield this.getMessages(filteredGames);
+            return yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
         });
     }
     getGameMessagesForTodayByDivision(ngsDivision) {
@@ -39,7 +38,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             if (filteredGames.length <= 0) {
                 return;
             }
-            return yield this.getMessages(filteredGames);
+            return yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
         });
     }
     Interpret(commands, detailed, messageSender) {
@@ -66,7 +65,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 return;
             }
             let filteredGames = yield this.GetGames(duration, endDays);
-            let messages = yield this.getMessages(filteredGames);
+            let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
             for (var index = 0; index < messages.length; index++) {
                 yield messageSender.SendMessage(messages[index]);
             }
@@ -155,79 +154,11 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 return true;
             });
             filteredGames = this.sortSchedule(filteredGames);
-            let messages = yield this.getMessages(filteredGames);
+            let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
             for (var index = 0; index < messages.length; index++) {
                 yield messageSender.SendMessage(messages[index]);
             }
         });
-    }
-    getMessages(scheduledMatches) {
-        return new Promise((resolver, rejector) => {
-            let messagesToSend = [];
-            let scheduleContainer = null;
-            let currentTime = '';
-            let schedulesByDay = [];
-            let currentDay = '';
-            for (var i = 0; i < scheduledMatches.length; i++) {
-                let m = scheduledMatches[i];
-                let momentDate = moment(+m.scheduledTime.startTime);
-                let pacificDate = momentDate.clone().tz('America/Los_Angeles');
-                let mountainDate = momentDate.clone().tz('America/Denver');
-                let centralDate = momentDate.clone().tz('America/Chicago');
-                let easternDate = momentDate.clone().tz('America/New_York');
-                let formattedDate = centralDate.format('MM/DD');
-                let formattedTime = centralDate.format('h:mma');
-                if (currentDay != formattedDate) {
-                    scheduleContainer = new ScheduleContainer(`**__${formattedDate}__**`);
-                    schedulesByDay.push(scheduleContainer);
-                    currentDay = formattedDate;
-                    currentTime = '';
-                }
-                if (currentTime != formattedTime) {
-                    currentTime = formattedTime;
-                    let timeSection = `**__${pacificDate.format('h:mma')} P | ${mountainDate.format('h:mma')} M | ${centralDate.format('h:mma')} C | ${easternDate.format('h:mma')} E __**`;
-                    scheduleContainer.AddNewTimeSection(timeSection);
-                }
-                let scheduleMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
-                scheduleMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
-                if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
-                    if (m.casterUrl.indexOf("www") == -1) {
-                        m.casterUrl = "https://www." + m.casterUrl;
-                    }
-                    else if (m.casterUrl.indexOf("http") == -1) {
-                        m.casterUrl = "https://" + m.casterUrl;
-                    }
-                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
-                }
-                scheduleContainer.AddSchedule(scheduleMessage);
-            }
-            for (var daySchedule of schedulesByDay) {
-                daySchedule.GetAsStringArray().forEach(item => {
-                    messagesToSend.push(item);
-                });
-            }
-            resolver(messagesToSend);
-        });
-    }
-    GetPacificMessage(hours, minutes, endMessage) {
-        if (hours == 2)
-            return `${12}:${minutes}${endMessage}`;
-        else if (hours == 1)
-            return `${11}:${minutes}am`;
-        else
-            return `${hours - 2}:${minutes}${endMessage}`;
-    }
-    GetMountainMessage(hours, minutes, endMessage) {
-        if (hours == 1)
-            return `${12}:${minutes}${endMessage}`;
-        else
-            return `${hours - 1}:${minutes}${endMessage}`;
-    }
-    GetEasternTime(hours, minutes, pmMessage) {
-        if (hours + 1 == 12) {
-            pmMessage = "am";
-        }
-        return `${hours + 1}:${minutes}${pmMessage}`;
     }
 }
 exports.ScheduleLister = ScheduleLister;

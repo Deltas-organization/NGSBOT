@@ -10,7 +10,6 @@ import { SelfTeamChecker } from "./translators/SelfTeamChecker";
 import { MessageStore } from "./MessageStore";
 import { TranslatorDependencies } from "./helpers/TranslatorDependencies";
 import { DeleteMessage } from "./translators/DeleteMessage";
-import { CheckUsers } from "./translators/CheckUsers";
 import { ConfigSetter } from "./translators/ConfigSetter";
 import { SearchPlayers } from "./translators/SearchPlayers";
 import { TeamNameChecker } from "./translators/TeamChecker";
@@ -23,6 +22,7 @@ import { HistoryDisplay } from "./scheduled/HistoryDisplay";
 import { Reload } from "./translators/Reload";
 import { DeleteTeamRoles } from "./translators/DeleteTeamRoles";
 import { NGSDivisions } from "./enums/NGSDivisions";
+import { CheckTeamSchedule } from "./translators/CheckTeamSchedule";
 
 var fs = require('fs');
 
@@ -55,6 +55,7 @@ export class Bot {
         this.translators.push(new Purge(this.dependencies));
         this.translators.push(new Reload(this.dependencies));
         this.translators.push(new DeleteTeamRoles(this.dependencies));
+        this.translators.push(new CheckTeamSchedule(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }

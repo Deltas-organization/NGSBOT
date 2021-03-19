@@ -44,6 +44,7 @@ const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
 const Reload_1 = require("./translators/Reload");
 const DeleteTeamRoles_1 = require("./translators/DeleteTeamRoles");
 const NGSDivisions_1 = require("./enums/NGSDivisions");
+const CheckTeamSchedule_1 = require("./translators/CheckTeamSchedule");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -66,6 +67,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new Purge_1.Purge(this.dependencies));
             this.translators.push(new Reload_1.Reload(this.dependencies));
             this.translators.push(new DeleteTeamRoles_1.DeleteTeamRoles(this.dependencies));
+            this.translators.push(new CheckTeamSchedule_1.CheckTeamSchedule(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }
         listen() {
