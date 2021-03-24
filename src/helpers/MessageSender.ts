@@ -1,4 +1,5 @@
 import { Message, TextChannel, Client, Channel, GuildMember, User } from "discord.js";
+import { resolveModuleName } from "typescript";
 import { Globals } from "../Globals";
 import { MessageStore } from "../MessageStore";
 import { TranslatorDependencies } from "./TranslatorDependencies";
@@ -37,6 +38,46 @@ export class MessageSender
         });
         if (storeMessage)
             this.messageStore.AddMessage(sentMessage);
+        return sentMessage
+    }
+    
+    public async SendMessages(messages: string[], storeMessage = true)
+    {
+        let result: Message[] = [];
+        let combinedMessages = this.CombineMultiple(messages);
+        for(var message of combinedMessages)
+        {
+            result.push(await this.SendMessage(message, storeMessage));
+        }
+        return result;
+    }
+
+    public async DMMessages(messages: string[])
+    {
+        let result: Message[] = [];
+        let combinedMessages = this.CombineMultiple(messages);
+        for(var message of combinedMessages)
+        {
+            result.push(await this.DMMessage(message));
+        }
+        return result;
+    }
+    
+    public async DMMessage(message: string)
+    {
+        while (message.length > 2048)
+        {
+            let newMessage = message.slice(0, 2048);
+            message = message.substr(2048);
+            await this.DMMessage(newMessage);
+        }
+        var sentMessage = await this.Requester.send({
+            embed: {
+                color: 0,
+                description: message
+            }
+        });
+
         return sentMessage
     }
 
@@ -124,5 +165,22 @@ export class MessageSender
             Globals.log(`There was a problem with reaction message: ${message}. Error: ${err}`);
         }
         return { message: sentMessage, response: response };
+    }
+    
+    private CombineMultiple(messages: string[]): string[]
+    {
+        let result: string[] = [];
+        let currentMessage = '';
+        for (var message of messages)
+        {
+            if (currentMessage.length + message.length > 2048)
+            {
+                result.push(currentMessage);
+                currentMessage = '';
+            }
+            currentMessage += message;
+        }
+        result.push(currentMessage);
+        return result;
     }
 }

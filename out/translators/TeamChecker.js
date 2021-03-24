@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeamNameChecker = void 0;
 const translatorBase_1 = require("./bases/translatorBase");
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
+const NGSHelpers_1 = require("../helpers/NGSHelpers");
 var fs = require('fs');
 class TeamNameChecker extends translatorBase_1.TranslatorBase {
     Verify(message) {
@@ -37,10 +38,9 @@ class TeamNameChecker extends translatorBase_1.TranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             const foundTeams = [];
             for (var i = 0; i < commands.length; i++) {
-                let fields = [];
-                var searchTerm = commands[i];
-                const searchRegex = new RegExp(searchTerm, 'i');
-                var teams = yield (yield this.liveDataStore.GetTeams()).filter(team => searchRegex.test(team.teamName));
+                const fields = [];
+                const searchTerm = commands[i];
+                const teams = NGSHelpers_1.NGSHelpers.SearchforTeam(yield this.liveDataStore.GetTeams(), searchTerm);
                 if (teams.length <= 0) {
                     fields.push({ name: `No teams found for  \n`, value: searchTerm });
                     yield message.SendFields(``, fields);

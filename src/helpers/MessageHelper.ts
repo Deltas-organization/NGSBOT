@@ -21,9 +21,12 @@ export class MessageHelper<T> {
         return this;
     }
 
-    public AddNew(message:string)
+    public AddNew(message: string)
     {
-        let line = this._lines.pop();
+        let line = new DetailedLine("", 0);
+        if (this._lines.length > 0)
+            line = this._lines.pop();
+
         line.Message += message;
         this._lines.push(line);
     }

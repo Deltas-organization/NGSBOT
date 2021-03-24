@@ -41,6 +41,42 @@ class MessageSender {
             return sentMessage;
         });
     }
+    SendMessages(messages, storeMessage = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = [];
+            let combinedMessages = this.CombineMultiple(messages);
+            for (var message of combinedMessages) {
+                result.push(yield this.SendMessage(message, storeMessage));
+            }
+            return result;
+        });
+    }
+    DMMessages(messages) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = [];
+            let combinedMessages = this.CombineMultiple(messages);
+            for (var message of combinedMessages) {
+                result.push(yield this.DMMessage(message));
+            }
+            return result;
+        });
+    }
+    DMMessage(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            while (message.length > 2048) {
+                let newMessage = message.slice(0, 2048);
+                message = message.substr(2048);
+                yield this.DMMessage(newMessage);
+            }
+            var sentMessage = yield this.Requester.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
+            return sentMessage;
+        });
+    }
     Edit(message, newContent) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield message.edit({
@@ -117,6 +153,19 @@ class MessageSender {
             }
             return { message: sentMessage, response: response };
         });
+    }
+    CombineMultiple(messages) {
+        let result = [];
+        let currentMessage = '';
+        for (var message of messages) {
+            if (currentMessage.length + message.length > 2048) {
+                result.push(currentMessage);
+                currentMessage = '';
+            }
+            currentMessage += message;
+        }
+        result.push(currentMessage);
+        return result;
     }
 }
 exports.MessageSender = MessageSender;

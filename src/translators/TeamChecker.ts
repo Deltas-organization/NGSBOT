@@ -5,6 +5,7 @@ import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
 import { LiveDataStore } from "../LiveDataStore";
 import { INGSTeam } from "../interfaces/INGSTeam";
+import { NGSHelpers } from "../helpers/NGSHelpers";
 
 var fs = require('fs');
 
@@ -41,10 +42,9 @@ export class TeamNameChecker extends TranslatorBase
         const foundTeams = [];
         for (var i = 0; i < commands.length; i++)
         {
-            let fields = [];
-            var searchTerm = commands[i];
-            const searchRegex = new RegExp(searchTerm, 'i');
-            var teams = await (await this.liveDataStore.GetTeams()).filter(team => searchRegex.test(team.teamName));
+            const fields = [];
+            const searchTerm = commands[i];
+            const teams = NGSHelpers.SearchforTeam(await this.liveDataStore.GetTeams(), searchTerm);
             if (teams.length <= 0)
             {
                 fields.push({ name: `No teams found for  \n`, value: searchTerm });
