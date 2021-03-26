@@ -15,7 +15,7 @@ export class NonCastedGamesCommand extends SpecificChannelBase {
     }
 
     protected getAllowedChannels(): DiscordChannels[] {
-        return [DiscordChannels.DeltaServer]
+        return [DiscordChannels.DeltaServer, DiscordChannels.NGSDiscord]
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {

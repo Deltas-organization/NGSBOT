@@ -21,7 +21,7 @@ class NonCastedGamesCommand extends SpecificChannelBase_1.SpecificChannelBase {
         return "Will Return the games that don't currently have a caster. Can Specify a number to clamp the result within that number of days in the future.";
     }
     getAllowedChannels() {
-        return [DiscordChannels_1.DiscordChannels.DeltaServer];
+        return [DiscordChannels_1.DiscordChannels.DeltaServer, DiscordChannels_1.DiscordChannels.NGSDiscord];
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
