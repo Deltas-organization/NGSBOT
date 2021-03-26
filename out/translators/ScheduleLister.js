@@ -13,7 +13,6 @@ exports.ScheduleContainer = exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
-const DateHelper_1 = require("../helpers/DateHelper");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["Schedule", "sch"];
@@ -44,7 +43,6 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             let duration = 0;
-            let endDays = duration;
             if (commands.length == 1) {
                 let parsedNumber = parseInt(commands[0]);
                 if (isNaN(parsedNumber)) {
@@ -55,14 +53,13 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     yield messageSender.SendMessage(`the value provided is above 10 ${commands[0]}`);
                     return;
                 }
-                duration = parsedNumber;
-                endDays = -1;
+                duration = parsedNumber - 1;
             }
             else if (commands.length == 2) {
                 yield this.SearchByDivision(commands, messageSender);
                 return;
             }
-            let filteredGames = yield this.GetGames(duration, endDays);
+            let filteredGames = yield this.GetGames(duration);
             let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
             for (var index = 0; index < messages.length; index++) {
                 yield messageSender.SendMessage(messages[index]);
@@ -70,27 +67,12 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             yield messageSender.originalMessage.delete();
         });
     }
-    GetGames(daysInFuture, daysInFutureClamp) {
+    GetGames(daysInFuture) {
         return __awaiter(this, void 0, void 0, function* () {
             let games = yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
-            let todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
-            games = games.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
+            games = games.filter(s => ScheduleHelper_1.ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
             return games;
         });
-    }
-    filterSchedule(todaysUTC, schedule, daysInFuture, daysInFutureClamp) {
-        let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = DateHelper_1.DateHelper.ConvertDateToUTC(scheduledDate);
-        var ms = scheduledUTC.getTime() - todaysUTC.getTime();
-        let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
-        if (dayDifference >= 0 && dayDifference <= daysInFuture) {
-            if (daysInFutureClamp > -1 && dayDifference < daysInFutureClamp) {
-                return false;
-            }
-            schedule.DaysAhead = dayDifference;
-            return true;
-        }
-        return false;
     }
     SearchByDivision(commands, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -11,10 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeltaTranslatorBase = void 0;
 const translatorBase_1 = require("./translatorBase");
+const DiscordMembers_1 = require("../../enums/DiscordMembers");
 class DeltaTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.user.id == "163779571060178955")
+            if (message.member.user.id == DiscordMembers_1.DiscordMembers.Delta)
                 return true;
             return false;
         });

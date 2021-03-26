@@ -43,6 +43,7 @@ const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
 const Reload_1 = require("./translators/Reload");
 const NGSDivisions_1 = require("./enums/NGSDivisions");
 const GamesCommand_1 = require("./translators/GamesCommand");
+const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -64,6 +65,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new Purge_1.Purge(this.dependencies));
             this.translators.push(new Reload_1.Reload(this.dependencies));
             this.translators.push(new GamesCommand_1.GamesCommand(this.dependencies));
+            this.translators.push(new NonCastedGamesCommand_1.NonCastedGamesCommand(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }
         listen() {

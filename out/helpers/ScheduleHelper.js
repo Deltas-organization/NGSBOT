@@ -79,6 +79,17 @@ class ScheduleHelper {
             resolver(messagesToSend);
         });
     }
+    static GetGamesBetweenDates(schedule, daysInFuture) {
+        let todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
+        let scheduledDate = new Date(+schedule.scheduledTime.startTime);
+        let scheduledUTC = DateHelper_1.DateHelper.ConvertDateToUTC(scheduledDate);
+        var ms = scheduledUTC.getTime() - todaysUTC.getTime();
+        let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
+        if (dayDifference >= 0 && dayDifference <= daysInFuture) {
+            return true;
+        }
+        return false;
+    }
 }
 exports.ScheduleHelper = ScheduleHelper;
 //# sourceMappingURL=ScheduleHelper.js.map

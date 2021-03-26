@@ -9,19 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NonNGSTranslatorBase = void 0;
+exports.SpecificChannelBase = void 0;
 const translatorBase_1 = require("./translatorBase");
-const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
-class NonNGSTranslatorBase extends translatorBase_1.TranslatorBase {
+class SpecificChannelBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            switch (message.guild.id) {
-                case DiscordGuilds_1.DiscordGuilds.NGS:
-                    return false;
-            }
-            return true;
+            if (this.getAllowedChannels().find(channel => channel == message.channel.id))
+                return true;
+            return false;
         });
     }
 }
-exports.NonNGSTranslatorBase = NonNGSTranslatorBase;
-//# sourceMappingURL=nonNGSTranslatorBase.js.map
+exports.SpecificChannelBase = SpecificChannelBase;
+//# sourceMappingURL=SpecificChannelBase.js.map

@@ -6,7 +6,7 @@ import { DateHelper } from "./DateHelper";
 import { TeamSorter } from "./TeamSorter";
 
 export class ScheduleHelper {
-    public static GetFutureGamesSorted(scheduledGames: INGSSchedule[]) {        
+    public static GetFutureGamesSorted(scheduledGames: INGSSchedule[]) {
         let futureGames: INGSSchedule[] = [];
         const todaysUTC = DateHelper.ConvertDateToUTC(new Date());
         for (var schedule of scheduledGames) {
@@ -86,5 +86,20 @@ export class ScheduleHelper {
             }
             resolver(messagesToSend);
         });
+    }
+
+    public static GetGamesBetweenDates(schedule: INGSSchedule, daysInFuture: number) {
+        let todaysUTC = DateHelper.ConvertDateToUTC(new Date());
+        let scheduledDate = new Date(+schedule.scheduledTime.startTime);
+        let scheduledUTC = DateHelper.ConvertDateToUTC(scheduledDate)
+
+        var ms = scheduledUTC.getTime() - todaysUTC.getTime();
+        let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
+
+        if (dayDifference >= 0 && dayDifference <= daysInFuture) {
+            return true;
+        }
+
+        return false;
     }
 }

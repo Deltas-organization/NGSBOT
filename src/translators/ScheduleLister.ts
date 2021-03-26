@@ -42,7 +42,6 @@ export class ScheduleLister extends AdminTranslatorBase {
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
         let duration = 0;
-        let endDays = duration;
         if (commands.length == 1) {
             let parsedNumber = parseInt(commands[0])
             if (isNaN(parsedNumber)) {
@@ -53,15 +52,14 @@ export class ScheduleLister extends AdminTranslatorBase {
                 await messageSender.SendMessage(`the value provided is above 10 ${commands[0]}`)
                 return;
             }
-            duration = parsedNumber;
-            endDays = -1;
+            duration = parsedNumber -1;
         }
         else if (commands.length == 2) {
             await this.SearchByDivision(commands, messageSender);
             return;
         }
 
-        let filteredGames = await this.GetGames(duration, endDays);
+        let filteredGames = await this.GetGames(duration);
         let messages = await ScheduleHelper.GetMessages(filteredGames);
         for (var index = 0; index < messages.length; index++) {
             await messageSender.SendMessage(messages[index]);
@@ -69,31 +67,12 @@ export class ScheduleLister extends AdminTranslatorBase {
         await messageSender.originalMessage.delete();
     }
 
-    private async GetGames(daysInFuture: number, daysInFutureClamp: number) {
+    private async GetGames(daysInFuture: number) {
         let games = await ScheduleHelper.GetFutureGamesSorted(await this.liveDataStore.GetSchedule());
-        let todaysUTC = DateHelper.ConvertDateToUTC(new Date());
-        games = games.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
+        games = games.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
         return games;
     }
 
-    private filterSchedule(todaysUTC: Date, schedule: INGSSchedule, daysInFuture: number, daysInFutureClamp: number) {
-        let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = DateHelper.ConvertDateToUTC(scheduledDate)
-
-        var ms = scheduledUTC.getTime() - todaysUTC.getTime();
-        let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
-
-        if (dayDifference >= 0 && dayDifference <= daysInFuture) {
-            if (daysInFutureClamp > -1 && dayDifference < daysInFutureClamp) {
-                return false;
-            }
-
-            schedule.DaysAhead = dayDifference;
-            return true;
-        }
-
-        return false;
-    }
 
     private async SearchByDivision(commands: string[], messageSender: MessageSender) {
         var division = commands[0];

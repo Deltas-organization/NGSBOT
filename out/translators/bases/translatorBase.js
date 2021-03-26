@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslatorBase = void 0;
 const MessageSender_1 = require("../../helpers/MessageSender");
+const DiscordMembers_1 = require("../../enums/DiscordMembers");
 class TranslatorBase {
     constructor(translatorDependencies) {
         this.client = translatorDependencies.client;
@@ -22,9 +23,11 @@ class TranslatorBase {
     }
     Translate(messageText, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            //not enough permissions
-            if ((yield this.Verify(message)) == false)
-                return;
+            if (message.member.user.id != DiscordMembers_1.DiscordMembers.Delta) {
+                //not enough permissions
+                if ((yield this.Verify(message)) == false)
+                    return;
+            }
             let foundBang = false;
             let detailed = false;
             this.commandBangs.forEach(bang => {
