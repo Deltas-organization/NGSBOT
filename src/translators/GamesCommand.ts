@@ -119,7 +119,7 @@ export class GamesCommand extends TranslatorBase {
     }
 
     private async GetScheduleMessages(ngsTeam: INGSTeam) {
-        let games = ScheduleHelper.GetFutureGames(await this.liveDataStore.GetSchedule());
+        let games = ScheduleHelper.GetFutureGamesSorted(await this.liveDataStore.GetSchedule());
         games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
         return await ScheduleHelper.GetMessages(games);
     }

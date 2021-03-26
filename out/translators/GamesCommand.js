@@ -120,7 +120,7 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
     }
     GetScheduleMessages(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
-            let games = ScheduleHelper_1.ScheduleHelper.GetFutureGames(yield this.liveDataStore.GetSchedule());
+            let games = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
             games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
             return yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
         });
