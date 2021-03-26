@@ -69,6 +69,20 @@ class TranslatorBase {
             return true;
         });
     }
+    SearchforTeams(searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const searchRegex = new RegExp(searchTerm, 'i');
+            const allTeams = yield this.liveDataStore.GetTeams();
+            return allTeams.filter(team => searchRegex.test(team.teamName));
+        });
+    }
+    SearchForPlayers(searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const users = yield this.liveDataStore.GetUsers();
+            const searchRegex = new RegExp(searchTerm, 'i');
+            return users.filter(p => searchRegex.test(p.displayName));
+        });
+    }
 }
 exports.TranslatorBase = TranslatorBase;
 //# sourceMappingURL=translatorBase.js.map

@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleContainer = exports.ScheduleLister = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const Globals_1 = require("../Globals");
-const TeamSorter_1 = require("../helpers/TeamSorter");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
+const DateHelper_1 = require("../helpers/DateHelper");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["Schedule", "sch"];
@@ -56,9 +56,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                     return;
                 }
                 duration = parsedNumber;
-                endDays = duration;
-                if (detailed)
-                    endDays = -1;
+                endDays = -1;
             }
             else if (commands.length == 2) {
                 yield this.SearchByDivision(commands, messageSender);
@@ -74,32 +72,15 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     GetGames(daysInFuture, daysInFutureClamp) {
         return __awaiter(this, void 0, void 0, function* () {
-            let filteredGames = yield this.getfilteredGames(daysInFuture, daysInFutureClamp);
-            return yield this.sortSchedule(filteredGames);
-        });
-    }
-    getfilteredGames(daysInFuture, daysInFutureClamp) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var todaysUTC = this.ConvertDateToUTC(new Date());
-            let scheduledGames = yield this.liveDataStore.GetSchedule();
-            let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
-            filteredGames = filteredGames.sort((f1, f2) => {
-                let f1Date = new Date(+f1.scheduledTime.startTime);
-                let f2Date = new Date(+f2.scheduledTime.startTime);
-                let timeDiff = f1Date.getTime() - f2Date.getTime();
-                if (timeDiff > 0)
-                    return 1;
-                else if (timeDiff < 0)
-                    return -1;
-                else
-                    return TeamSorter_1.TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
-            });
-            return filteredGames;
+            let games = yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
+            let todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
+            games = games.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
+            return games;
         });
     }
     filterSchedule(todaysUTC, schedule, daysInFuture, daysInFutureClamp) {
         let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = this.ConvertDateToUTC(scheduledDate);
+        let scheduledUTC = DateHelper_1.DateHelper.ConvertDateToUTC(scheduledDate);
         var ms = scheduledUTC.getTime() - todaysUTC.getTime();
         let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
         if (dayDifference >= 0 && dayDifference <= daysInFuture) {
@@ -110,22 +91,6 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             return true;
         }
         return false;
-    }
-    ConvertDateToUTC(date) {
-        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-    }
-    sortSchedule(filteredGames) {
-        return filteredGames.sort((f1, f2) => {
-            let f1Date = new Date(+f1.scheduledTime.startTime);
-            let f2Date = new Date(+f2.scheduledTime.startTime);
-            let timeDiff = f1Date.getTime() - f2Date.getTime();
-            if (timeDiff > 0)
-                return 1;
-            else if (timeDiff < 0)
-                return -1;
-            else
-                return TeamSorter_1.TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
-        });
     }
     SearchByDivision(commands, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -139,25 +104,14 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 else
                     division += `-${coast}`;
             }
-            var todaysUTC = new Date().getTime();
-            let scheduledGames = yield this.liveDataStore.GetSchedule();
-            let filteredGames = scheduledGames.filter(s => {
-                let scheduledDate = new Date(+s.scheduledTime.startTime);
-                let scheduledUTC = scheduledDate.getTime();
-                if (scheduledUTC < todaysUTC)
-                    return false;
+            let scheduledGames = yield this.GetGames(0, 0);
+            scheduledGames = scheduledGames.filter(s => {
                 if (!s.divisionConcat.startsWith(division))
                     return false;
-                const ms = scheduledUTC - todaysUTC;
-                const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
-                s.DaysAhead = dayDifference;
                 return true;
             });
-            filteredGames = this.sortSchedule(filteredGames);
-            let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
-            for (var index = 0; index < messages.length; index++) {
-                yield messageSender.SendMessage(messages[index]);
-            }
+            let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(scheduledGames);
+            yield messageSender.SendMessages(messages);
         });
     }
 }

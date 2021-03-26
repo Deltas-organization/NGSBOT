@@ -1,32 +1,10 @@
-import { Client, Message } from "discord.js";
-import { TranslatorBase } from "./bases/translatorBase";
 import { MessageSender } from "../helpers/MessageSender";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
-import { LiveDataStore } from "../LiveDataStore";
 import { INGSTeam } from "../interfaces/INGSTeam";
-import { NGSHelpers } from "../helpers/NGSHelpers";
+import { NonNGSTranslatorBase } from "./bases/nonNGSTranslatorBase";
 
-var fs = require('fs');
-
-export class TeamNameChecker extends TranslatorBase
+export class TeamNameChecker extends NonNGSTranslatorBase
 {
-
-    public async Verify(message: Message)
-    {
-        if (message.member.user.id == "163779571060178955")
-            return true;
-
-        switch (message.guild.id)
-        {
-            case "674526786779873280":
-                return true;
-            case "618209192339046421":
-                return true;
-        }
-        return false;
-    }
-
     public get commandBangs(): string[]
     {
         return ["team"];
@@ -44,7 +22,7 @@ export class TeamNameChecker extends TranslatorBase
         {
             const fields = [];
             const searchTerm = commands[i];
-            const teams = NGSHelpers.SearchforTeam(await this.liveDataStore.GetTeams(), searchTerm);
+            const teams = await this.SearchforTeams(searchTerm);
             if (teams.length <= 0)
             {
                 fields.push({ name: `No teams found for  \n`, value: searchTerm });

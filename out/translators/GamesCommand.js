@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GamesCommand = void 0;
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
-const NGSHelpers_1 = require("../helpers/NGSHelpers");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
 const translatorBase_1 = require("./bases/translatorBase");
 class GamesCommand extends translatorBase_1.TranslatorBase {
@@ -76,7 +75,7 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
     }
     GetMessagesForTeam(teamSearchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            let teams = NGSHelpers_1.NGSHelpers.SearchforTeam(yield this.liveDataStore.GetTeams(), teamSearchTerm);
+            let teams = yield this.SearchforTeams(teamSearchTerm);
             if (teams.length < 1)
                 return ["No team found"];
             else if (teams.length > 1)
@@ -114,42 +113,17 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
     CreateTeamMessage(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
             const message = new MessageHelper_1.MessageHelper("Team");
-            message.AddNew(`**Games for: ${ngsTeam.teamName}**`);
+            message.AddNew(`Games for: **${ngsTeam.teamName}**`);
             message.AddEmptyLine();
             return message;
         });
     }
     GetScheduleMessages(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
-            const scheduledGames = yield this.liveDataStore.GetSchedule();
-            const sortedGames = scheduledGames.sort((s1, s2) => {
-                let f1Date = new Date(+s1.scheduledTime.startTime);
-                let f2Date = new Date(+s2.scheduledTime.startTime);
-                let timeDiff = f1Date.getTime() - f2Date.getTime();
-                if (timeDiff > 0)
-                    return 1;
-                else if (timeDiff < 0)
-                    return -1;
-                return 0;
-            });
-            const todaysUTC = this.ConvertDateToUTC(new Date());
-            const teamsGames = [];
-            for (var schedule of sortedGames) {
-                if (schedule.home.teamName == ngsTeam.teamName ||
-                    schedule.away.teamName == ngsTeam.teamName) {
-                    let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-                    let scheduledUTC = this.ConvertDateToUTC(scheduledDate);
-                    var ms = scheduledUTC.getTime() - todaysUTC.getTime();
-                    if (ms > 0) {
-                        teamsGames.push(schedule);
-                    }
-                }
-            }
-            return yield ScheduleHelper_1.ScheduleHelper.GetMessages(teamsGames);
+            let games = ScheduleHelper_1.ScheduleHelper.GetFutureGames(yield this.liveDataStore.GetSchedule());
+            games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
+            return yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
         });
-    }
-    ConvertDateToUTC(date) {
-        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
     }
 }
 exports.GamesCommand = GamesCommand;

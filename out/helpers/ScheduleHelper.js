@@ -4,7 +4,33 @@ exports.ScheduleHelper = void 0;
 const ScheduleLister_1 = require("../translators/ScheduleLister");
 const MessageHelper_1 = require("./MessageHelper");
 const moment = require("moment-timezone");
+const DateHelper_1 = require("./DateHelper");
+const TeamSorter_1 = require("./TeamSorter");
 class ScheduleHelper {
+    static GetFutureGamesSorted(scheduledGames) {
+        let futureGames = [];
+        const todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
+        for (var schedule of scheduledGames) {
+            let scheduledDate = new Date(+schedule.scheduledTime.startTime);
+            let scheduledUTC = DateHelper_1.DateHelper.ConvertDateToUTC(scheduledDate);
+            var ms = scheduledUTC.getTime() - todaysUTC.getTime();
+            if (ms > 0) {
+                futureGames.push(schedule);
+            }
+        }
+        futureGames = futureGames.sort((s1, s2) => {
+            let f1Date = new Date(+s1.scheduledTime.startTime);
+            let f2Date = new Date(+s2.scheduledTime.startTime);
+            let timeDiff = f1Date.getTime() - f2Date.getTime();
+            if (timeDiff > 0)
+                return 1;
+            else if (timeDiff < 0)
+                return -1;
+            else
+                return TeamSorter_1.TeamSorter.SortByDivision(s1.divisionDisplayName, s2.divisionDisplayName);
+        });
+        return futureGames;
+    }
     static GetMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {
             let messagesToSend = [];

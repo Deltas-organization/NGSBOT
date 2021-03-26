@@ -11,6 +11,7 @@ import { TeamSorter } from "../helpers/TeamSorter";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
+import { DateHelper } from "../helpers/DateHelper";
 
 export class ScheduleLister extends AdminTranslatorBase {
     public get commandBangs(): string[] {
@@ -53,15 +54,12 @@ export class ScheduleLister extends AdminTranslatorBase {
                 return;
             }
             duration = parsedNumber;
-            endDays = duration;
-            if (detailed)
-                endDays = -1;
+            endDays = -1;
         }
         else if (commands.length == 2) {
             await this.SearchByDivision(commands, messageSender);
             return;
         }
-
 
         let filteredGames = await this.GetGames(duration, endDays);
         let messages = await ScheduleHelper.GetMessages(filteredGames);
@@ -72,31 +70,15 @@ export class ScheduleLister extends AdminTranslatorBase {
     }
 
     private async GetGames(daysInFuture: number, daysInFutureClamp: number) {
-        let filteredGames = await this.getfilteredGames(daysInFuture, daysInFutureClamp)
-        return await this.sortSchedule(filteredGames);
-    }
-
-    private async getfilteredGames(daysInFuture: number, daysInFutureClamp: number) {
-        var todaysUTC = this.ConvertDateToUTC(new Date());
-        let scheduledGames = await this.liveDataStore.GetSchedule();
-        let filteredGames = scheduledGames.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
-        filteredGames = filteredGames.sort((f1, f2) => {
-            let f1Date = new Date(+f1.scheduledTime.startTime);
-            let f2Date = new Date(+f2.scheduledTime.startTime);
-            let timeDiff = f1Date.getTime() - f2Date.getTime();
-            if (timeDiff > 0)
-                return 1;
-            else if (timeDiff < 0)
-                return -1;
-            else
-                return TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
-        });
-        return filteredGames;
+        let games = await ScheduleHelper.GetFutureGamesSorted(await this.liveDataStore.GetSchedule());
+        let todaysUTC = DateHelper.ConvertDateToUTC(new Date());
+        games = games.filter(s => this.filterSchedule(todaysUTC, s, daysInFuture, daysInFutureClamp));
+        return games;
     }
 
     private filterSchedule(todaysUTC: Date, schedule: INGSSchedule, daysInFuture: number, daysInFutureClamp: number) {
         let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = this.ConvertDateToUTC(scheduledDate)
+        let scheduledUTC = DateHelper.ConvertDateToUTC(scheduledDate)
 
         var ms = scheduledUTC.getTime() - todaysUTC.getTime();
         let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
@@ -113,24 +95,6 @@ export class ScheduleLister extends AdminTranslatorBase {
         return false;
     }
 
-    private ConvertDateToUTC(date: Date): Date {
-        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-    }
-
-    private sortSchedule(filteredGames: INGSSchedule[]): INGSSchedule[] {
-        return filteredGames.sort((f1, f2) => {
-            let f1Date = new Date(+f1.scheduledTime.startTime);
-            let f2Date = new Date(+f2.scheduledTime.startTime);
-            let timeDiff = f1Date.getTime() - f2Date.getTime();
-            if (timeDiff > 0)
-                return 1;
-            else if (timeDiff < 0)
-                return -1;
-            else
-                return TeamSorter.SortByDivision(f1.divisionDisplayName, f2.divisionDisplayName);
-        });
-    }
-
     private async SearchByDivision(commands: string[], messageSender: MessageSender) {
         var division = commands[0];
         if (commands.length == 2) {
@@ -143,30 +107,15 @@ export class ScheduleLister extends AdminTranslatorBase {
                 division += `-${coast}`;
         }
 
-        var todaysUTC = new Date().getTime();
-        let scheduledGames = await this.liveDataStore.GetSchedule();
-        let filteredGames = scheduledGames.filter(s => {
-            let scheduledDate = new Date(+s.scheduledTime.startTime);
-            let scheduledUTC = scheduledDate.getTime();
-
-            if (scheduledUTC < todaysUTC)
-                return false;
-
+        let scheduledGames = await this.GetGames(0, 0);
+        scheduledGames = scheduledGames.filter(s => {
             if (!s.divisionConcat.startsWith(division))
                 return false;
 
-            const ms = scheduledUTC - todaysUTC;
-            const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
-
-            s.DaysAhead = dayDifference;
-
             return true;
         });
-        filteredGames = this.sortSchedule(filteredGames);
-        let messages = await ScheduleHelper.GetMessages(filteredGames);
-        for (var index = 0; index < messages.length; index++) {
-            await messageSender.SendMessage(messages[index]);
-        }
+        let messages = await ScheduleHelper.GetMessages(scheduledGames);
+        await messageSender.SendMessages(messages);
     }
 }
 

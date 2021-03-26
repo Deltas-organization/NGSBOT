@@ -28,7 +28,6 @@ const types_1 = require("./inversify/types");
 const ScheduleLister_1 = require("./translators/ScheduleLister");
 const commandLister_1 = require("./translators/commandLister");
 const LiveDataStore_1 = require("./LiveDataStore");
-const SelfTeamChecker_1 = require("./translators/SelfTeamChecker");
 const MessageStore_1 = require("./MessageStore");
 const TranslatorDependencies_1 = require("./helpers/TranslatorDependencies");
 const DeleteMessage_1 = require("./translators/DeleteMessage");
@@ -42,7 +41,6 @@ const SendChannelMessage_1 = require("./helpers/SendChannelMessage");
 const DiscordChannels_1 = require("./enums/DiscordChannels");
 const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
 const Reload_1 = require("./translators/Reload");
-const DeleteTeamRoles_1 = require("./translators/DeleteTeamRoles");
 const NGSDivisions_1 = require("./enums/NGSDivisions");
 const GamesCommand_1 = require("./translators/GamesCommand");
 var fs = require('fs');
@@ -57,7 +55,6 @@ let Bot = /** @class */ (() => {
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.translators.push(this.scheduleLister);
-            this.translators.push(new SelfTeamChecker_1.SelfTeamChecker(this.dependencies));
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
             this.translators.push(new SearchPlayers_1.SearchPlayers(this.dependencies));
@@ -66,7 +63,6 @@ let Bot = /** @class */ (() => {
             this.translators.push(new RegisteredCount_1.RegisteredCount(this.dependencies));
             this.translators.push(new Purge_1.Purge(this.dependencies));
             this.translators.push(new Reload_1.Reload(this.dependencies));
-            this.translators.push(new DeleteTeamRoles_1.DeleteTeamRoles(this.dependencies));
             this.translators.push(new GamesCommand_1.GamesCommand(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }

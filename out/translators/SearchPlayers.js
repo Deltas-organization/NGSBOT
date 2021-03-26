@@ -10,21 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchPlayers = void 0;
-const translatorBase_1 = require("./bases/translatorBase");
-class SearchPlayers extends translatorBase_1.TranslatorBase {
-    Verify(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.user.id == "163779571060178955")
-                return true;
-            switch (message.guild.id) {
-                case "674526786779873280":
-                    return true;
-                case "618209192339046421":
-                    return true;
-            }
-            return false;
-        });
-    }
+const nonNGSTranslatorBase_1 = require("./bases/nonNGSTranslatorBase");
+class SearchPlayers extends nonNGSTranslatorBase_1.NonNGSTranslatorBase {
     get commandBangs() {
         return ["name"];
     }
@@ -36,7 +23,7 @@ class SearchPlayers extends translatorBase_1.TranslatorBase {
             var message = "";
             for (var i = 0; i < commands.length; i++) {
                 var playerName = commands[i];
-                var players = yield this.GetPlayers(playerName);
+                var players = yield this.SearchForPlayers(playerName);
                 if (players.length <= 0)
                     message += `No players found for: ${playerName} \n`;
                 else
@@ -58,13 +45,6 @@ class SearchPlayers extends translatorBase_1.TranslatorBase {
             result.push(playerResult);
         });
         return result.join("\n");
-    }
-    GetPlayers(playerName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let lowerCase = playerName.toLowerCase();
-            let users = yield this.liveDataStore.GetUsers();
-            return users.filter(p => p.displayName.toLowerCase().includes(lowerCase));
-        });
     }
 }
 exports.SearchPlayers = SearchPlayers;

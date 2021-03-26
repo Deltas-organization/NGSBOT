@@ -4,9 +4,7 @@ import { TYPES } from "./inversify/types";
 import { ITranslate } from "./interfaces/ITranslator";
 import { ScheduleLister } from "./translators/ScheduleLister";
 import { CommandLister } from "./translators/commandLister";
-import { MessageSender } from "./helpers/MessageSender";
 import { LiveDataStore } from "./LiveDataStore";
-import { SelfTeamChecker } from "./translators/SelfTeamChecker";
 import { MessageStore } from "./MessageStore";
 import { TranslatorDependencies } from "./helpers/TranslatorDependencies";
 import { DeleteMessage } from "./translators/DeleteMessage";
@@ -20,7 +18,6 @@ import { SendChannelMessage } from "./helpers/SendChannelMessage";
 import { DiscordChannels } from "./enums/DiscordChannels";
 import { HistoryDisplay } from "./scheduled/HistoryDisplay";
 import { Reload } from "./translators/Reload";
-import { DeleteTeamRoles } from "./translators/DeleteTeamRoles";
 import { NGSDivisions } from "./enums/NGSDivisions";
 import { GamesCommand } from "./translators/GamesCommand";
 
@@ -45,7 +42,6 @@ export class Bot {
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.translators.push(this.scheduleLister);
-        this.translators.push(new SelfTeamChecker(this.dependencies));
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
         this.translators.push(new SearchPlayers(this.dependencies));
@@ -54,7 +50,6 @@ export class Bot {
         this.translators.push(new RegisteredCount(this.dependencies));
         this.translators.push(new Purge(this.dependencies));
         this.translators.push(new Reload(this.dependencies));
-        this.translators.push(new DeleteTeamRoles(this.dependencies));
         this.translators.push(new GamesCommand(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));

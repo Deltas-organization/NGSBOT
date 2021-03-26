@@ -2,40 +2,63 @@ import { INGSSchedule } from "../interfaces";
 import { ScheduleContainer } from "../translators/ScheduleLister";
 import { MessageHelper } from "./MessageHelper";
 import moment = require("moment-timezone");
+import { DateHelper } from "./DateHelper";
+import { TeamSorter } from "./TeamSorter";
 
-export class ScheduleHelper
-{
-    public static GetMessages(scheduledMatches: INGSSchedule[]): Promise<string[]>
-    {
-        return new Promise<string[]>((resolver, rejector) =>
-        {
+export class ScheduleHelper {
+    public static GetFutureGamesSorted(scheduledGames: INGSSchedule[]) {        
+        let futureGames: INGSSchedule[] = [];
+        const todaysUTC = DateHelper.ConvertDateToUTC(new Date());
+        for (var schedule of scheduledGames) {
+            let scheduledDate = new Date(+schedule.scheduledTime.startTime);
+            let scheduledUTC = DateHelper.ConvertDateToUTC(scheduledDate)
+            var ms = scheduledUTC.getTime() - todaysUTC.getTime();
+            if (ms > 0) {
+                futureGames.push(schedule);
+            }
+        }
+
+        futureGames = futureGames.sort((s1, s2) => {
+            let f1Date = new Date(+s1.scheduledTime.startTime);
+            let f2Date = new Date(+s2.scheduledTime.startTime);
+            let timeDiff = f1Date.getTime() - f2Date.getTime();
+            if (timeDiff > 0)
+                return 1;
+            else if (timeDiff < 0)
+                return -1;
+            else
+                return TeamSorter.SortByDivision(s1.divisionDisplayName, s2.divisionDisplayName);
+        });
+
+        return futureGames;
+    }
+
+    public static GetMessages(scheduledMatches: INGSSchedule[]): Promise<string[]> {
+        return new Promise<string[]>((resolver, rejector) => {
             let messagesToSend: string[] = [];
             let scheduleContainer: ScheduleContainer = null;
             let currentTime = '';
             let schedulesByDay: ScheduleContainer[] = [];
             let currentDay = '';
 
-            for (var i = 0; i < scheduledMatches.length; i++)
-            {
+            for (var i = 0; i < scheduledMatches.length; i++) {
                 let m = scheduledMatches[i];
                 let momentDate = moment(+m.scheduledTime.startTime);
                 let pacificDate = momentDate.clone().tz('America/Los_Angeles');
                 let mountainDate = momentDate.clone().tz('America/Denver');
                 let centralDate = momentDate.clone().tz('America/Chicago');
                 let easternDate = momentDate.clone().tz('America/New_York');
-                
+
                 let formattedDate = centralDate.format('MM/DD');
                 let formattedTime = centralDate.format('h:mma');
 
-                if (currentDay != formattedDate)
-                {
+                if (currentDay != formattedDate) {
                     scheduleContainer = new ScheduleContainer(`**__${formattedDate}__**`);
                     schedulesByDay.push(scheduleContainer);
                     currentDay = formattedDate;
                     currentTime = '';
                 }
-                if (currentTime != formattedTime)
-                {
+                if (currentTime != formattedTime) {
                     currentTime = formattedTime;
                     let timeSection = `**__${pacificDate.format('h:mma')} P | ${mountainDate.format('h:mma')} M | ${centralDate.format('h:mma')} C | ${easternDate.format('h:mma')} E __**`;
                     scheduleContainer.AddNewTimeSection(timeSection);
@@ -43,14 +66,11 @@ export class ScheduleHelper
 
                 let scheduleMessage = new MessageHelper<any>('scheduleMessage');
                 scheduleMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
-                if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1)
-                {
-                    if (m.casterUrl.indexOf("www") == -1)
-                    {
+                if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
+                    if (m.casterUrl.indexOf("www") == -1) {
                         m.casterUrl = "https://www." + m.casterUrl;
                     }
-                    else if (m.casterUrl.indexOf("http") == -1)
-                    {
+                    else if (m.casterUrl.indexOf("http") == -1) {
                         m.casterUrl = "https://" + m.casterUrl;
                     }
 
@@ -59,10 +79,8 @@ export class ScheduleHelper
                 scheduleContainer.AddSchedule(scheduleMessage);
             }
 
-            for (var daySchedule of schedulesByDay)
-            {
-                daySchedule.GetAsStringArray().forEach(item =>
-                {
+            for (var daySchedule of schedulesByDay) {
+                daySchedule.GetAsStringArray().forEach(item => {
                     messagesToSend.push(item);
                 })
             }

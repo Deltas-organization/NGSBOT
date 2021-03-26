@@ -10,24 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeamNameChecker = void 0;
-const translatorBase_1 = require("./bases/translatorBase");
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
-const NGSHelpers_1 = require("../helpers/NGSHelpers");
-var fs = require('fs');
-class TeamNameChecker extends translatorBase_1.TranslatorBase {
-    Verify(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.user.id == "163779571060178955")
-                return true;
-            switch (message.guild.id) {
-                case "674526786779873280":
-                    return true;
-                case "618209192339046421":
-                    return true;
-            }
-            return false;
-        });
-    }
+const nonNGSTranslatorBase_1 = require("./bases/nonNGSTranslatorBase");
+class TeamNameChecker extends nonNGSTranslatorBase_1.NonNGSTranslatorBase {
     get commandBangs() {
         return ["team"];
     }
@@ -40,7 +25,7 @@ class TeamNameChecker extends translatorBase_1.TranslatorBase {
             for (var i = 0; i < commands.length; i++) {
                 const fields = [];
                 const searchTerm = commands[i];
-                const teams = NGSHelpers_1.NGSHelpers.SearchforTeam(yield this.liveDataStore.GetTeams(), searchTerm);
+                const teams = yield this.SearchforTeams(searchTerm);
                 if (teams.length <= 0) {
                     fields.push({ name: `No teams found for  \n`, value: searchTerm });
                     yield message.SendFields(``, fields);

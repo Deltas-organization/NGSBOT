@@ -6,21 +6,9 @@ import { Globals } from "../Globals";
 import { INGSUser } from "../interfaces";
 import { Message } from "discord.js";
 import { TranslatorBase } from "./bases/translatorBase";
+import { NonNGSTranslatorBase } from "./bases/nonNGSTranslatorBase";
 
-export class SearchPlayers extends TranslatorBase {
-
-    public async Verify(message: Message) {
-        if(message.member.user.id == "163779571060178955")
-            return true;
-
-        switch (message.guild.id) {
-            case "674526786779873280":
-                return true;
-            case "618209192339046421":
-                return true;
-        }
-        return false;
-    }
+export class SearchPlayers extends NonNGSTranslatorBase {
 
     public get commandBangs(): string[] {
         return ["name"];
@@ -34,7 +22,7 @@ export class SearchPlayers extends TranslatorBase {
         var message = "";
         for (var i = 0; i < commands.length; i++) {
             var playerName = commands[i];
-            var players = await this.GetPlayers(playerName);
+            var players = await this.SearchForPlayers(playerName);
             if (players.length <= 0)
                 message += `No players found for: ${playerName} \n`;
             else
@@ -59,9 +47,4 @@ export class SearchPlayers extends TranslatorBase {
         return result.join("\n");
     }
 
-    private async GetPlayers(playerName: string): Promise<INGSUser[]> {
-        let lowerCase = playerName.toLowerCase();
-        let users = await this.liveDataStore.GetUsers();
-        return users.filter(p => p.displayName.toLowerCase().includes(lowerCase));
-    }
 }

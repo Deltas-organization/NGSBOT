@@ -4,10 +4,10 @@ import { MessageSender } from "../../helpers/MessageSender";
 import { MessageStore } from "../../MessageStore";
 import { TranslatorDependencies } from "../../helpers/TranslatorDependencies";
 import { LiveDataStore } from "../../LiveDataStore";
+import { INGSTeam, INGSUser } from "../../interfaces";
 
 export abstract class TranslatorBase implements ITranslate
 {
-
     public abstract get commandBangs(): string[];
     public abstract get description(): string;
     protected readonly liveDataStore: LiveDataStore;
@@ -91,4 +91,17 @@ export abstract class TranslatorBase implements ITranslate
     }
 
     protected abstract Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
+
+    
+    protected async SearchforTeams(searchTerm: string): Promise<INGSTeam[]> {
+        const searchRegex = new RegExp(searchTerm, 'i');
+        const allTeams = await this.liveDataStore.GetTeams();
+        return allTeams.filter(team => searchRegex.test(team.teamName));
+    }
+
+    protected async SearchForPlayers(searchTerm: string): Promise<INGSUser[]> {
+        const users = await this.liveDataStore.GetUsers();
+        const searchRegex = new RegExp(searchTerm, 'i');
+        return users.filter(p => searchRegex.test(p.displayName));
+    }
 }
