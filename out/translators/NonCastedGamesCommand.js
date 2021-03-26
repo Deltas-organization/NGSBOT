@@ -25,6 +25,10 @@ class NonCastedGamesCommand extends SpecificChannelBase_1.SpecificChannelBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
+            this._multiMessageCommand = (messages, _) => messageSender.DMMessages(messages);
+            if (detailed) {
+                this._multiMessageCommand = (messages, storeMessage) => messageSender.SendMessages(messages, storeMessage);
+            }
             let futureDays = 99;
             if (commands.length > 0) {
                 let parsedNumber = parseInt(commands[0]);
@@ -35,8 +39,14 @@ class NonCastedGamesCommand extends SpecificChannelBase_1.SpecificChannelBase {
                 futureDays = parsedNumber - 1;
             }
             let nonCastedGames = yield this.GetNonCastedGames(futureDays);
-            let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(nonCastedGames);
-            yield messageSender.SendMessages(messages);
+            if (nonCastedGames.length <= 0) {
+                yield messageSender.SendMessage("All games have a caster");
+            }
+            else {
+                let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(nonCastedGames);
+                yield this._multiMessageCommand(messages);
+            }
+            messageSender.originalMessage.delete();
         });
     }
     GetNonCastedGames(futureDays) {

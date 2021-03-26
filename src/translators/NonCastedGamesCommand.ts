@@ -6,6 +6,8 @@ import { SpecificChannelBase } from "./bases/SpecificChannelBase";
 import { TranslatorBase } from "./bases/translatorBase";
 
 export class NonCastedGamesCommand extends SpecificChannelBase {
+    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<Message[]>;
+
     public get commandBangs(): string[] {
         return ["noncasted"];
     }
@@ -19,6 +21,11 @@ export class NonCastedGamesCommand extends SpecificChannelBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+        this._multiMessageCommand = (messages: string[], _?: boolean) => messageSender.DMMessages(messages);
+        if (detailed) {
+            this._multiMessageCommand = (messages: string[], storeMessage?: boolean) => messageSender.SendMessages(messages, storeMessage);
+        }
+
         let futureDays = 99;
         if (commands.length > 0) {
             let parsedNumber = parseInt(commands[0])
@@ -26,11 +33,17 @@ export class NonCastedGamesCommand extends SpecificChannelBase {
                 await messageSender.SendMessage(`The parameter ${commands[0]} is not a valid number`)
                 return;
             }
-            futureDays = parsedNumber -1;
+            futureDays = parsedNumber - 1;
         }
         let nonCastedGames = await this.GetNonCastedGames(futureDays);
-        let messages = await ScheduleHelper.GetMessages(nonCastedGames);
-        await messageSender.SendMessages(messages);
+        if (nonCastedGames.length <= 0) {
+            await messageSender.SendMessage("All games have a caster");
+        }
+        else {
+            let messages = await ScheduleHelper.GetMessages(nonCastedGames);
+            await this._multiMessageCommand(messages);
+        }
+        messageSender.originalMessage.delete();
     }
 
     protected async GetNonCastedGames(futureDays: number) {
