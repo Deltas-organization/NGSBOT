@@ -10,18 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NonCastedGamesCommand = void 0;
-const DiscordChannels_1 = require("../enums/DiscordChannels");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
-const SpecificChannelBase_1 = require("./bases/SpecificChannelBase");
-class NonCastedGamesCommand extends SpecificChannelBase_1.SpecificChannelBase {
+const translatorBase_1 = require("./bases/translatorBase");
+class NonCastedGamesCommand extends translatorBase_1.TranslatorBase {
     get commandBangs() {
         return ["noncasted"];
     }
     get description() {
         return "Will Return the games that don't currently have a caster. Can Specify a number to clamp the result within that number of days in the future.";
-    }
-    getAllowedChannels() {
-        return [DiscordChannels_1.DiscordChannels.DeltaServer, DiscordChannels_1.DiscordChannels.NGSDiscord];
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {

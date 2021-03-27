@@ -22,7 +22,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     getGameMessagesForToday() {
         return __awaiter(this, void 0, void 0, function* () {
-            var filteredGames = yield this.GetGames(0, 0);
+            var filteredGames = yield this.GetGames();
             if (filteredGames.length <= 0) {
                 Globals_1.Globals.log("No games available for today.");
                 return;
@@ -32,7 +32,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     getGameMessagesForTodayByDivision(ngsDivision) {
         return __awaiter(this, void 0, void 0, function* () {
-            var filteredGames = yield this.GetGames(0, 0);
+            var filteredGames = yield this.GetGames();
             filteredGames = filteredGames.filter(f => f.divisionDisplayName == ngsDivision);
             if (filteredGames.length <= 0) {
                 return;
@@ -67,7 +67,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
             yield messageSender.originalMessage.delete();
         });
     }
-    GetGames(daysInFuture) {
+    GetGames(daysInFuture = 0) {
         return __awaiter(this, void 0, void 0, function* () {
             let games = yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
             games = games.filter(s => ScheduleHelper_1.ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
@@ -86,7 +86,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
                 else
                     division += `-${coast}`;
             }
-            let scheduledGames = yield this.GetGames(0, 0);
+            let scheduledGames = yield this.GetGames();
             scheduledGames = scheduledGames.filter(s => {
                 if (!s.divisionConcat.startsWith(division))
                     return false;

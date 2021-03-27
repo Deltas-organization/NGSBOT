@@ -23,7 +23,7 @@ export class ScheduleLister extends AdminTranslatorBase {
     }
 
     public async getGameMessagesForToday() {
-        var filteredGames = await this.GetGames(0, 0);
+        var filteredGames = await this.GetGames();
         if (filteredGames.length <= 0) {
             Globals.log("No games available for today.");
             return;
@@ -32,7 +32,7 @@ export class ScheduleLister extends AdminTranslatorBase {
     }
 
     public async getGameMessagesForTodayByDivision(ngsDivision: NGSDivisions) {
-        var filteredGames = await this.GetGames(0, 0);
+        var filteredGames = await this.GetGames();
         filteredGames = filteredGames.filter(f => f.divisionDisplayName == ngsDivision);
         if (filteredGames.length <= 0) {
             return;
@@ -67,7 +67,7 @@ export class ScheduleLister extends AdminTranslatorBase {
         await messageSender.originalMessage.delete();
     }
 
-    private async GetGames(daysInFuture: number) {
+    private async GetGames(daysInFuture: number = 0) {
         let games = await ScheduleHelper.GetFutureGamesSorted(await this.liveDataStore.GetSchedule());
         games = games.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
         return games;
@@ -86,7 +86,7 @@ export class ScheduleLister extends AdminTranslatorBase {
                 division += `-${coast}`;
         }
 
-        let scheduledGames = await this.GetGames(0, 0);
+        let scheduledGames = await this.GetGames();
         scheduledGames = scheduledGames.filter(s => {
             if (!s.divisionConcat.startsWith(division))
                 return false;

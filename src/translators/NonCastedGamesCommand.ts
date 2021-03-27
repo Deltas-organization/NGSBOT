@@ -5,7 +5,7 @@ import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { SpecificChannelBase } from "./bases/SpecificChannelBase";
 import { TranslatorBase } from "./bases/translatorBase";
 
-export class NonCastedGamesCommand extends SpecificChannelBase {
+export class NonCastedGamesCommand extends TranslatorBase {
     private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<Message[]>;
 
     public get commandBangs(): string[] {
@@ -14,10 +14,6 @@ export class NonCastedGamesCommand extends SpecificChannelBase {
 
     public get description(): string {
         return "Will Return the games that don't currently have a caster. Can Specify a number to clamp the result within that number of days in the future.";
-    }
-
-    protected getAllowedChannels(): DiscordChannels[] {
-        return [DiscordChannels.DeltaServer, DiscordChannels.NGSDiscord]
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
