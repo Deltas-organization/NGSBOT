@@ -1,5 +1,5 @@
 import { MessageSender } from "../helpers/MessageSender";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { Globals } from "../Globals";
 
@@ -13,7 +13,7 @@ export class ConfigSetter extends DeltaTranslatorBase {
         return "Set config variables for more logging. Supports: basic (true), advanced (false), info";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies) {
+    constructor(translatorDependencies: CommandDependencies) {
         super(translatorDependencies);
     }
 

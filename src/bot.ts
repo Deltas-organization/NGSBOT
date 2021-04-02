@@ -6,7 +6,7 @@ import { ScheduleLister } from "./translators/ScheduleLister";
 import { CommandLister } from "./translators/commandLister";
 import { LiveDataStore } from "./LiveDataStore";
 import { MessageStore } from "./MessageStore";
-import { TranslatorDependencies } from "./helpers/TranslatorDependencies";
+import { CommandDependencies } from "./helpers/TranslatorDependencies";
 import { DeleteMessage } from "./translators/DeleteMessage";
 import { ConfigSetter } from "./translators/ConfigSetter";
 import { SearchPlayers } from "./translators/SearchPlayers";
@@ -21,6 +21,7 @@ import { Reload } from "./translators/Reload";
 import { NGSDivisions } from "./enums/NGSDivisions";
 import { GamesCommand } from "./translators/GamesCommand";
 import { NonCastedGamesCommand } from "./translators/NonCastedGamesCommand";
+import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
 
 var fs = require('fs');
 
@@ -28,7 +29,7 @@ var fs = require('fs');
 export class Bot {
     private translators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
-    private dependencies: TranslatorDependencies;
+    private dependencies: CommandDependencies;
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
 
@@ -37,7 +38,7 @@ export class Bot {
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
     ) {
-        this.dependencies = new TranslatorDependencies(client, new MessageStore(), new LiveDataStore());
+        this.dependencies = new CommandDependencies(client, new MessageStore(), new LiveDataStore());
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
         this.historyDisplay = new HistoryDisplay(this.dependencies);
 
@@ -65,7 +66,15 @@ export class Bot {
         return this.client.login(this.token);
     }
 
-    public OnMessageReceived(message: Message) {
+    public watchForUserJoin() {
+        this.client.on('guildMemberAdd', async member => {
+            let newUserCommand = new AssignNewUserCommand(this.dependencies);
+            let message = await newUserCommand.AssignUser(member);
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
+        });
+    }
+
+    private OnMessageReceived(message: Message) {
         this.checkTranslators(message);
     }
 
@@ -105,11 +114,11 @@ export class Bot {
     public async sendScheduleForDad() {
         await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.DadSchedule);
     }
-    
+
     public async sendScheduleForMom() {
         await this.sendScheduleByDivision(NGSDivisions.DEast, DiscordChannels.MomSchedule);
     }
-    
+
     public async sendScheduleForSis() {
         await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.SisSchedule);
     }

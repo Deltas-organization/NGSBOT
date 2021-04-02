@@ -56,7 +56,7 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
     }
     GetMessagesForMessageSender(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ngsUser = yield this.GetNGSUser(messageSender.Requester);
+            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(messageSender.Requester, yield this.liveDataStore.GetUsers());
             if (!ngsUser) {
                 yield this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.");
                 return;
@@ -86,17 +86,6 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
             result.push(teamMessage.CreateStringMessage());
             result = result.concat(yield this.GetScheduleMessages(team));
             return result;
-        });
-    }
-    GetNGSUser(user) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const users = yield this.liveDataStore.GetUsers();
-            for (var ngsUser of users) {
-                if (DiscordFuzzySearch_1.DiscordFuzzySearch.CompareGuildUser(ngsUser, user)) {
-                    return ngsUser;
-                }
-            }
-            return null;
         });
     }
     GetTeam(ngsUser) {

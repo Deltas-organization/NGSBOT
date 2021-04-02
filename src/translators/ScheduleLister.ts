@@ -5,7 +5,7 @@ import { LiveDataStore } from "../LiveDataStore";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { MessageStore } from "../MessageStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { Globals } from "../Globals";
 import { TeamSorter } from "../helpers/TeamSorter";
 import { NGSDivisions } from "../enums/NGSDivisions";

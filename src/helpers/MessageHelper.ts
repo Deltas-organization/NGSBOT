@@ -5,24 +5,20 @@ export class MessageHelper<T> {
 
     public Options: T = {} as T;
 
-    public constructor(private JsonPropertyName: string)
-    {
+    public constructor(private JsonPropertyName: string) {
     }
 
-    public AddEmptyLine()
-    {
+    public AddEmptyLine() {
         this.AddNewLine('');
         return this;
     }
 
-    public AddNewLine(message: string, indentCount: number = 0)
-    {
+    public AddNewLine(message: string, indentCount: number = 0) {
         this._lines.push(new DetailedLine(message, indentCount));
         return this;
     }
 
-    public AddNew(message: string)
-    {
+    public AddNew(message: string) {
         let line = new DetailedLine("", 0);
         if (this._lines.length > 0)
             line = this._lines.pop();
@@ -31,26 +27,22 @@ export class MessageHelper<T> {
         this._lines.push(line);
     }
 
-    public AddJSONLine(message: string)
-    {
+    public AddJSONLine(message: string) {
         const lineToAdd = new DetailedLine(message);
         lineToAdd.JsonOnly = true;
         this._lines.push(lineToAdd);
     }
 
-    public CreateStringMessage(): string
-    {
+    public CreateStringMessage(): string {
         return this._lines
             .filter(line => !line.JsonOnly)
             .map(line => line.AsString())
             .join("\n");
     }
 
-    public CreateJsonMessage(): any
-    {
+    public CreateJsonMessage(): any {
         var result: any = { name: this.JsonPropertyName, information: {} };
-        for (var option in this.Options)
-        {
+        for (var option in this.Options) {
             const value = this.Options[option];
             let name: string = option;
             if (name == "name")
@@ -61,23 +53,24 @@ export class MessageHelper<T> {
 
             result[name] = value;
         }
-        for (var index = 0; index < this._lines.length; index++)
-        {
+        for (var index = 0; index < this._lines.length; index++) {
             result.information[index] = this._lines[index].Message;
         }
         return result;
     }
+
+    public Append(newMessageHelper: MessageHelper<T>): void {
+        this.AddNewLine(newMessageHelper.CreateStringMessage());
+    }
 }
 
-class DetailedLine
-{
+class DetailedLine {
     private readonly _indent = "\u200B ";
     public JsonOnly: boolean = false;
 
     constructor(public Message: string, private indentCount: number = 0) { }
 
-    public AsString()
-    {
+    public AsString() {
         return this._indent.repeat(this.indentCount) + this.Message;
     }
 }

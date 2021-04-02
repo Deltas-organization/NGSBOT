@@ -2,7 +2,7 @@ import { ITranslate } from "../../interfaces/ITranslator";
 import { Client, TextChannel, Message, MessageMentions } from "discord.js";
 import { MessageSender } from "../../helpers/MessageSender";
 import { MessageStore } from "../../MessageStore";
-import { TranslatorDependencies } from "../../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { LiveDataStore } from "../../LiveDataStore";
 import { INGSTeam, INGSUser } from "../../interfaces";
 import { DiscordMembers } from "../../enums/DiscordMembers";
@@ -14,7 +14,7 @@ export abstract class TranslatorBase implements ITranslate {
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
 
-    constructor(translatorDependencies: TranslatorDependencies) {
+    constructor(translatorDependencies: CommandDependencies) {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
         this.liveDataStore = translatorDependencies.liveDataStore;

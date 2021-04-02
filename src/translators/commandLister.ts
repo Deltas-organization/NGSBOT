@@ -4,7 +4,7 @@ import { execFile } from "child_process";
 import { ITranslate } from "../interfaces/ITranslator";
 import { TranslatorBase } from "./bases/translatorBase";
 import { MessageStore } from "../MessageStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 
 export class CommandLister extends TranslatorBase {
 
@@ -16,7 +16,7 @@ export class CommandLister extends TranslatorBase {
         return "Lists the available commands";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies, private translators: ITranslate[]) {
+    constructor(translatorDependencies: CommandDependencies, private translators: ITranslate[]) {
         super(translatorDependencies);
     }
 

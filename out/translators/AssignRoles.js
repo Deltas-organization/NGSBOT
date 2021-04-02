@@ -16,6 +16,7 @@ const MessageHelper_1 = require("../helpers/MessageHelper");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const NGSRoles_1 = require("../enums/NGSRoles");
 const RoleHelper_1 = require("../helpers/RoleHelper");
+const AssignRolesOptions_1 = require("../message-helpers/AssignRolesOptions");
 const fs = require('fs');
 class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     constructor() {
@@ -160,7 +161,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             const allUsers = yield this.liveDataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
-            messageTracker.Options = new MessageOptions(team.teamName);
+            messageTracker.Options = new AssignRolesOptions_1.AssignRolesOptions(team.teamName);
             // messageTracker.Options.TeamRole = teamRole;
             messageTracker.AddNewLine("**Team Name**");
             ;
@@ -215,22 +216,4 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
 }
 exports.AssignRoles = AssignRoles;
-class MessageOptions {
-    constructor(TeamName) {
-        this.TeamName = TeamName;
-        this.AssignedTeamCount = 0;
-        this.AssignedDivCount = 0;
-        this.AssignedCaptainCount = 0;
-        this.PlayersInDiscord = 0;
-    }
-    get HasValue() {
-        if (this.AssignedCaptainCount > 0)
-            return true;
-        if (this.AssignedDivCount > 0)
-            return true;
-        if (this.AssignedCaptainCount > 0)
-            return true;
-        return false;
-    }
-}
 //# sourceMappingURL=AssignRoles.js.map

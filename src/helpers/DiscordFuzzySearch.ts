@@ -1,6 +1,7 @@
 import { GuildMember, User } from "discord.js";
 import { Globals } from "../Globals";
 import { INGSUser } from "../interfaces";
+import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class DiscordFuzzySearch {
     public static FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): GuildMember {
@@ -60,5 +61,14 @@ export class DiscordFuzzySearch {
 
     public static GetDiscordId(guildUser: User) {
         return `${guildUser.username}#${guildUser.discriminator}`.replace(' ', '').toLowerCase();
+    }
+    
+    public static async GetNGSUser(user: User, users: AugmentedNGSUser[]): Promise<AugmentedNGSUser | undefined> {
+        for (var ngsUser of users) {
+            if (DiscordFuzzySearch.CompareGuildUser(ngsUser, user)) {
+                return ngsUser;
+            }
+        }
+        return null;
     }
 }

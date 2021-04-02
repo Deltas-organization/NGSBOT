@@ -49,6 +49,9 @@ class MessageHelper {
         }
         return result;
     }
+    Append(newMessageHelper) {
+        this.AddNewLine(newMessageHelper.CreateStringMessage());
+    }
 }
 exports.MessageHelper = MessageHelper;
 class DetailedLine {

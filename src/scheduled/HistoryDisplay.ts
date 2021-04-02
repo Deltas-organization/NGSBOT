@@ -3,7 +3,7 @@ import { stringify } from "querystring";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { TeamSorter } from "../helpers/TeamSorter";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam } from "../interfaces";
 import { IHistoryMessages } from "../interfaces/IHistoryMessage";
 import { INGSHistory } from "../interfaces/INGSHistory";
@@ -12,7 +12,7 @@ import { LiveDataStore } from "../LiveDataStore";
 export class HistoryDisplay {
     private liveDataStore: LiveDataStore;
 
-    constructor(public dependencies: TranslatorDependencies) {
+    constructor(public dependencies: CommandDependencies) {
         this.liveDataStore = dependencies.liveDataStore;
     }
 

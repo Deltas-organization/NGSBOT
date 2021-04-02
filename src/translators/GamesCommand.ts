@@ -56,7 +56,7 @@ export class GamesCommand extends TranslatorBase {
     }
 
     private async GetMessagesForMessageSender(messageSender: MessageSender) {
-        const ngsUser = await this.GetNGSUser(messageSender.Requester);
+        const ngsUser = await DiscordFuzzySearch.GetNGSUser(messageSender.Requester, await this.liveDataStore.GetUsers());
         if (!ngsUser) {
             await this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.")
             return;
@@ -89,16 +89,6 @@ export class GamesCommand extends TranslatorBase {
         result = result.concat(await this.GetScheduleMessages(team))
 
         return result;
-    }
-
-    private async GetNGSUser(user: User): Promise<AugmentedNGSUser | undefined> {
-        const users = await this.liveDataStore.GetUsers();
-        for (var ngsUser of users) {
-            if (DiscordFuzzySearch.CompareGuildUser(ngsUser, user)) {
-                return ngsUser;
-            }
-        }
-        return null;
     }
 
     private async GetTeam(ngsUser: AugmentedNGSUser) {

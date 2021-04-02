@@ -2,7 +2,7 @@ import { Message, TextChannel, Client, Channel, GuildMember, User } from "discor
 import { resolveModuleName } from "typescript";
 import { Globals } from "../Globals";
 import { MessageStore } from "../MessageStore";
-import { TranslatorDependencies } from "./TranslatorDependencies";
+import { CommandDependencies } from "./TranslatorDependencies";
 
 export class MessageSender
 {
@@ -104,7 +104,7 @@ export class MessageSender
         return sentMessage;
     }
 
-    public static async SendMessageToChannel(dependencies: TranslatorDependencies, message: string, channelID: string)
+    public static async SendMessageToChannel(dependencies: CommandDependencies, message: string, channelID: string)
     {
         var myChannel = dependencies.client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
         if (myChannel != null)

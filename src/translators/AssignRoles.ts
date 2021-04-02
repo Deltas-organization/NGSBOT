@@ -1,18 +1,13 @@
-import { Client, Guild, GuildMember, MessageAttachment, Role, TextChannel, User } from "discord.js";
+import { Guild, GuildMember, Role } from "discord.js";
 import { MessageSender } from "../helpers/MessageSender";
-import { LiveDataStore } from "../LiveDataStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
-import { INGSTeam, INGSUser } from "../interfaces";
-import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
+import { INGSTeam } from "../interfaces";
 import { Globals } from "../Globals";
-import { debug } from "console";
-import { TeamNameChecker } from "./TeamChecker";
 import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { NGSRoles } from "../enums/NGSRoles";
 import { RoleHelper } from "../helpers/RoleHelper";
-import { convertCompilerOptionsFromJson } from "typescript";
+import { AssignRolesOptions } from "../message-helpers/AssignRolesOptions";
 
 const fs = require('fs');
 
@@ -61,7 +56,7 @@ export class AssignRoles extends ngsTranslatorBase
         const progressMessage = await messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
         const teams = await this.liveDataStore.GetTeams();
         await messageSender.Edit(progressMessage, "Loading Discord Members.");
-        const messagesLog: MessageHelper<MessageOptions>[] = [];
+        const messagesLog: MessageHelper<AssignRolesOptions>[] = [];
         try
         {
             const guildMembers = (await messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
@@ -147,7 +142,7 @@ export class AssignRoles extends ngsTranslatorBase
     private async AssignValidRoles(messageSender: MessageSender, team: INGSTeam, guildMembers: GuildMember[])
     {
         const teamName = team.teamName;
-        let result = new MessageHelper<MessageOptions>(team.teamName);
+        let result = new MessageHelper<AssignRolesOptions>(team.teamName);
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageSender, result, teamName);
         const roleRsponse = this._serverRoleHelper.FindDivRole(team.divisionDisplayName);
         const divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
@@ -155,7 +150,7 @@ export class AssignRoles extends ngsTranslatorBase
         return result;
     }
 
-    private async CreateOrFindTeamRole(messageSender: MessageSender, messageTracker: MessageHelper<MessageOptions>, teamName: string)
+    private async CreateOrFindTeamRole(messageSender: MessageSender, messageTracker: MessageHelper<AssignRolesOptions>, teamName: string)
     {
         teamName = teamName.trim();
         const indexOfWidthdrawn = teamName.indexOf('(Withdrawn');
@@ -179,15 +174,15 @@ export class AssignRoles extends ngsTranslatorBase
             messageTracker.Options.CreatedTeamRole = true;
         }
 
-        return teamRoleOnDiscord
+        return teamRoleOnDiscord;
     }
 
-    private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], messageTracker: MessageHelper<MessageOptions>, teamRole: Role, divRole: Role): Promise<MessageHelper<MessageOptions>>
+    private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], messageTracker: MessageHelper<AssignRolesOptions>, teamRole: Role, divRole: Role): Promise<MessageHelper<AssignRolesOptions>>
     {
         const allUsers = await this.liveDataStore.GetUsers();
         const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
 
-        messageTracker.Options = new MessageOptions(team.teamName);
+        messageTracker.Options = new AssignRolesOptions(team.teamName);
         // messageTracker.Options.TeamRole = teamRole;
         messageTracker.AddNewLine("**Team Name**");;
         messageTracker.AddNewLine(team.teamName);
@@ -250,32 +245,4 @@ export class AssignRoles extends ngsTranslatorBase
         return rolesOfUser.find(role => role == roleToLookFor);
     }
 
-}
-
-
-class MessageOptions
-{
-    public AssignedTeamCount: number = 0;
-    public AssignedDivCount: number = 0;
-    public AssignedCaptainCount: number = 0;
-    public PlayersInDiscord: number = 0;
-    public HasCaptain: boolean;
-    public CreatedTeamRole: boolean;
-    public TeamRole: Role;
-
-    constructor(public TeamName: string)
-    {
-
-    }
-
-    public get HasValue()
-    {
-        if (this.AssignedCaptainCount > 0)
-            return true;
-        if (this.AssignedDivCount > 0)
-            return true;
-        if (this.AssignedCaptainCount > 0)
-            return true;
-        return false;
-    }
 }

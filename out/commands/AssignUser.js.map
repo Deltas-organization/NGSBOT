@@ -1,0 +1,1 @@
+{"version":3,"file":"AssignUser.js","sourceRoot":"","sources":["../../src/commands/AssignUser.ts"],"names":[],"mappings":";;;AAEA,MAAa,iBAAiB;IAE1B,YAAY,sBAA2C;QACnD,IAAI,CAAC,MAAM,GAAG,sBAAsB,CAAC,MAAM,CAAC;QAC5C,IAAI,CAAC,YAAY,GAAG,sBAAsB,CAAC,YAAY,CAAC;QACxD,IAAI,CAAC,aAAa,GAAG,sBAAsB,CAAC,aAAa,CAAC;QAE1D,IAAI,CAAC,IAAI,EAAE,CAAC;IAChB,CAAC;CACJ;AATD,8CASC"}

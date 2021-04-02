@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TranslatorDependencies = void 0;
-class TranslatorDependencies {
+exports.CommandDependencies = void 0;
+class CommandDependencies {
     constructor(client, messageStore, liveDataStore) {
         this.client = client;
         this.messageStore = messageStore;
         this.liveDataStore = liveDataStore;
     }
 }
-exports.TranslatorDependencies = TranslatorDependencies;
+exports.CommandDependencies = CommandDependencies;
 //# sourceMappingURL=TranslatorDependencies.js.map

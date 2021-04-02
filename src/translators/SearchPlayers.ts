@@ -1,6 +1,6 @@
 import { MessageSender } from "../helpers/MessageSender";
 import { LiveDataStore } from "../LiveDataStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { Globals } from "../Globals";
 import { INGSUser } from "../interfaces";

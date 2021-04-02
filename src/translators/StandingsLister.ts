@@ -7,12 +7,12 @@ import { INGSStanding } from "../interfaces/INGSStanding";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { MessageStore } from "../MessageStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { NGSQueryBuilder } from "../helpers/NGSQueryBuilder";
 
 export class StandingsLister extends DeltaTranslatorBase {
 
-    constructor(translatorDependencies: TranslatorDependencies) {
+    constructor(translatorDependencies: CommandDependencies) {
         super(translatorDependencies);
     }
 

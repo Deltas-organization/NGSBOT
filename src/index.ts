@@ -8,3 +8,5 @@ bot.listen().then(() => {
 }).catch((error) => {
   console.log('Oh no! ', error)
 });
+
+bot.watchForUserJoin();

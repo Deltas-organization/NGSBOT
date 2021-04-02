@@ -6,7 +6,7 @@ import { TranslatorBase } from "./bases/translatorBase";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
-import { TranslatorDependencies } from "../helpers/TranslatorDependencies";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
 
 export class DeleteMessage extends AdminTranslatorBase {
 
@@ -18,7 +18,7 @@ export class DeleteMessage extends AdminTranslatorBase {
         return "Will delete the last message sent by the bot on this server";
     }
 
-    constructor(translatorDependencies: TranslatorDependencies) {
+    constructor(translatorDependencies: CommandDependencies) {
         super(translatorDependencies);
     }
 
