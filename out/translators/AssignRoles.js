@@ -39,7 +39,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Setup(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.liveDataStore.Clear();
+            this.dataStore.Clear();
             yield this.InitializeRoleHelper(messageSender.originalMessage.guild);
             this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
         });
@@ -54,7 +54,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     BeginAssigning(messageSender, detailed) {
         return __awaiter(this, void 0, void 0, function* () {
             const progressMessage = yield messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
-            const teams = yield this.liveDataStore.GetTeams();
+            const teams = yield this.dataStore.GetTeams();
             yield messageSender.Edit(progressMessage, "Loading Discord Members.");
             const messagesLog = [];
             try {
@@ -159,13 +159,12 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     AssignUsersToRoles(team, guildMembers, messageTracker, teamRole, divRole) {
         return __awaiter(this, void 0, void 0, function* () {
-            const allUsers = yield this.liveDataStore.GetUsers();
-            const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
-            messageTracker.Options = new AssignRolesOptions_1.AssignRolesOptions(team.teamName);
-            // messageTracker.Options.TeamRole = teamRole;
+            const teamName = team.teamName;
+            const teamUsers = yield this.dataStore.GetUsersOnTeam(teamName);
+            messageTracker.Options = new AssignRolesOptions_1.AssignRolesOptions(teamName);
             messageTracker.AddNewLine("**Team Name**");
             ;
-            messageTracker.AddNewLine(team.teamName);
+            messageTracker.AddNewLine(teamName);
             messageTracker.AddNewLine("**Users**");
             for (let user of teamUsers) {
                 const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);

@@ -68,7 +68,7 @@ export class ScheduleLister extends AdminTranslatorBase {
     }
 
     private async GetGames(daysInFuture: number = 0) {
-        let games = await ScheduleHelper.GetFutureGamesSorted(await this.liveDataStore.GetSchedule());
+        let games = await ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule());
         games = games.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
         return games;
     }

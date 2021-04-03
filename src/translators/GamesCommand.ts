@@ -56,13 +56,13 @@ export class GamesCommand extends TranslatorBase {
     }
 
     private async GetMessagesForMessageSender(messageSender: MessageSender) {
-        const ngsUser = await DiscordFuzzySearch.GetNGSUser(messageSender.Requester, await this.liveDataStore.GetUsers());
+        const ngsUser = await DiscordFuzzySearch.GetNGSUser(messageSender.Requester, await this.dataStore.GetUsers());
         if (!ngsUser) {
             await this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.")
             return;
         }
 
-        const team = await this.GetTeam(ngsUser);
+        const team = await this.dataStore.LookForTeam(ngsUser);
         if (!team) {
             await this._messageCommand("Unable to find your ngsTeam");
             return;
@@ -91,16 +91,6 @@ export class GamesCommand extends TranslatorBase {
         return result;
     }
 
-    private async GetTeam(ngsUser: AugmentedNGSUser) {
-        const teams = await this.liveDataStore.GetTeams();
-        for (var team of teams) {
-            if (team.teamName == ngsUser.teamName) {
-                return team;
-            }
-        }
-        return null;
-    }
-
     private async CreateTeamMessage(ngsTeam: INGSTeam) {
         const message = new MessageHelper<any>("Team");
         message.AddNew(`Games for: **${ngsTeam.teamName}**`);
@@ -109,7 +99,7 @@ export class GamesCommand extends TranslatorBase {
     }
 
     private async GetScheduleMessages(ngsTeam: INGSTeam) {
-        let games = ScheduleHelper.GetFutureGamesSorted(await this.liveDataStore.GetSchedule());
+        let games = ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule());
         games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
         return await ScheduleHelper.GetMessages(games);
     }

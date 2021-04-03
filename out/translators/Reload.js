@@ -20,14 +20,14 @@ class Reload extends deltaTranslatorBase_1.DeltaTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.liveDataStore.Clear();
-            yield this.liveDataStore.GetDivisions();
+            this.dataStore.Clear();
+            yield this.dataStore.GetDivisions();
             let message = yield messageSender.SendMessage("Reloaded 1/4");
-            yield this.liveDataStore.GetSchedule();
+            yield this.dataStore.GetSchedule();
             yield messageSender.Edit(message, "Reloaded 2/4");
-            yield this.liveDataStore.GetTeams();
+            yield this.dataStore.GetTeams();
             yield messageSender.Edit(message, "Reloaded 3/4");
-            yield this.liveDataStore.GetUsers();
+            yield this.dataStore.GetUsers();
             yield messageSender.Edit(message, "Reload Complete");
         });
     }

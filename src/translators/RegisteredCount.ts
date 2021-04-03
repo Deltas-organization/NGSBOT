@@ -21,8 +21,8 @@ export class RegisteredCount extends AdminTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
-        const numberOfTeams = (await this.liveDataStore.GetTeams()).length;
-        const numberOfPlayers = (await this.liveDataStore.GetUsers()).length;
+        const numberOfTeams = (await this.dataStore.GetTeams()).length;
+        const numberOfPlayers = (await this.dataStore.GetUsers()).length;
 
         await message.SendMessage(`Registered Team Count: ${numberOfTeams} \n Number of users on said teams: ${numberOfPlayers}`);
     }

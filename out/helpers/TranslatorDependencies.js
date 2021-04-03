@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandDependencies = void 0;
 class CommandDependencies {
-    constructor(client, messageStore, liveDataStore) {
+    constructor(client, messageStore, dataStore) {
         this.client = client;
         this.messageStore = messageStore;
-        this.liveDataStore = liveDataStore;
+        this.dataStore = dataStore;
     }
 }
 exports.CommandDependencies = CommandDependencies;

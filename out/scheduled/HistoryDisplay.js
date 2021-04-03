@@ -15,11 +15,11 @@ const TeamSorter_1 = require("../helpers/TeamSorter");
 class HistoryDisplay {
     constructor(dependencies) {
         this.dependencies = dependencies;
-        this.liveDataStore = dependencies.liveDataStore;
+        this.dataStore = dependencies.dataStore;
     }
     GetRecentHistory(days) {
         return __awaiter(this, void 0, void 0, function* () {
-            const teams = yield this.liveDataStore.GetTeams();
+            const teams = yield this.dataStore.GetTeams();
             const todaysUTC = new Date().getTime();
             const validHistories = [];
             for (let team of teams.sort((t1, t2) => TeamSorter_1.TeamSorter.SortByTeam(t1, t2))) {
@@ -51,7 +51,7 @@ class HistoryDisplay {
     }
     GetTeamsCreatedThisSeason(season) {
         return __awaiter(this, void 0, void 0, function* () {
-            const teams = yield this.liveDataStore.GetTeams();
+            const teams = yield this.dataStore.GetTeams();
             const beginningMessage = "**New Teams this season** \n";
             let message = beginningMessage;
             let messages = [];
@@ -132,12 +132,9 @@ class HistoryContainer {
         }
     }
     GetMessage() {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
         let currentMessage = new MessageHelper_1.MessageHelper('HistoryContainer');
         currentMessage.AddNewLine(`**[${this.Team.divisionDisplayName}] - ${this.Team.teamName}**`);
         for (var mapkey of this.Information.keys()) {
-            const friendlyName = new Date(+mapkey).toLocaleString("en-US", options);
-            //currentMessage.AddNewLine(friendlyName);
             for (var historyInformaiton of this.Information.get(mapkey)) {
                 currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
             }

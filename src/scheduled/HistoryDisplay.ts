@@ -1,6 +1,7 @@
 import { tagged } from "inversify";
 import { stringify } from "querystring";
 import { NGSDivisions } from "../enums/NGSDivisions";
+import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { TeamSorter } from "../helpers/TeamSorter";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
@@ -10,14 +11,14 @@ import { INGSHistory } from "../interfaces/INGSHistory";
 import { LiveDataStore } from "../LiveDataStore";
 
 export class HistoryDisplay {
-    private liveDataStore: LiveDataStore;
+    private dataStore: DataStoreWrapper;
 
     constructor(public dependencies: CommandDependencies) {
-        this.liveDataStore = dependencies.liveDataStore;
+        this.dataStore = dependencies.dataStore;
     }
 
     public async GetRecentHistory(days: number): Promise<string[]> {
-        const teams = await this.liveDataStore.GetTeams();
+        const teams = await this.dataStore.GetTeams();
         const todaysUTC = new Date().getTime();
         const validHistories: HistoryContainer[] = [];
         for (let team of teams.sort((t1, t2) => TeamSorter.SortByTeam(t1, t2))) {
@@ -49,7 +50,7 @@ export class HistoryDisplay {
     }
 
     public async GetTeamsCreatedThisSeason(season: number): Promise<string[]> {
-        const teams = await this.liveDataStore.GetTeams();
+        const teams = await this.dataStore.GetTeams();
         const beginningMessage = "**New Teams this season** \n"
         let message = beginningMessage;
         let messages = [];
@@ -135,12 +136,9 @@ class HistoryContainer {
     }
 
     public GetMessage(): MessageHelper<any> {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' }
         let currentMessage = new MessageHelper('HistoryContainer')
         currentMessage.AddNewLine(`**[${this.Team.divisionDisplayName}] - ${this.Team.teamName}**`);
         for (var mapkey of this.Information.keys()) {
-            const friendlyName = new Date(+mapkey).toLocaleString("en-US", options);
-            //currentMessage.AddNewLine(friendlyName);
             for (var historyInformaiton of this.Information.get(mapkey)) {
                 currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
             }

@@ -45,6 +45,7 @@ const NGSDivisions_1 = require("./enums/NGSDivisions");
 const GamesCommand_1 = require("./translators/GamesCommand");
 const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
+const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 var fs = require('fs');
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
@@ -52,7 +53,7 @@ let Bot = /** @class */ (() => {
             this.client = client;
             this.token = token;
             this.translators = [];
-            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new LiveDataStore_1.LiveDataStore());
+            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore()));
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);

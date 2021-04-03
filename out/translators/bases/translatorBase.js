@@ -16,7 +16,7 @@ class TranslatorBase {
     constructor(translatorDependencies) {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
-        this.liveDataStore = translatorDependencies.liveDataStore;
+        this.dataStore = translatorDependencies.dataStore;
         this.Init();
     }
     Init() {
@@ -74,14 +74,12 @@ class TranslatorBase {
     }
     SearchforTeams(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            const searchRegex = new RegExp(searchTerm, 'i');
-            const allTeams = yield this.liveDataStore.GetTeams();
-            return allTeams.filter(team => searchRegex.test(team.teamName));
+            return this.dataStore.SearchForTeams(searchTerm);
         });
     }
     SearchForPlayers(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            const users = yield this.liveDataStore.GetUsers();
+            const users = yield this.dataStore.GetUsers();
             const searchRegex = new RegExp(searchTerm, 'i');
             return users.filter(p => searchRegex.test(p.displayName));
         });

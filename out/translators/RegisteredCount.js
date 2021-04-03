@@ -21,8 +21,8 @@ class RegisteredCount extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     Interpret(commands, detailed, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            const numberOfTeams = (yield this.liveDataStore.GetTeams()).length;
-            const numberOfPlayers = (yield this.liveDataStore.GetUsers()).length;
+            const numberOfTeams = (yield this.dataStore.GetTeams()).length;
+            const numberOfPlayers = (yield this.dataStore.GetUsers()).length;
             yield message.SendMessage(`Registered Team Count: ${numberOfTeams} \n Number of users on said teams: ${numberOfPlayers}`);
         });
     }

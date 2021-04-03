@@ -56,12 +56,12 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
     }
     GetMessagesForMessageSender(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(messageSender.Requester, yield this.liveDataStore.GetUsers());
+            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(messageSender.Requester, yield this.dataStore.GetUsers());
             if (!ngsUser) {
                 yield this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.");
                 return;
             }
-            const team = yield this.GetTeam(ngsUser);
+            const team = yield this.dataStore.LookForTeam(ngsUser);
             if (!team) {
                 yield this._messageCommand("Unable to find your ngsTeam");
                 return;
@@ -88,17 +88,6 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
             return result;
         });
     }
-    GetTeam(ngsUser) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const teams = yield this.liveDataStore.GetTeams();
-            for (var team of teams) {
-                if (team.teamName == ngsUser.teamName) {
-                    return team;
-                }
-            }
-            return null;
-        });
-    }
     CreateTeamMessage(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
             const message = new MessageHelper_1.MessageHelper("Team");
@@ -109,7 +98,7 @@ class GamesCommand extends translatorBase_1.TranslatorBase {
     }
     GetScheduleMessages(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
-            let games = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
+            let games = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule());
             games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
             return yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
         });

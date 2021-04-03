@@ -39,7 +39,7 @@ export class AssignRoles extends ngsTranslatorBase
 
     private async Setup(messageSender: MessageSender)
     {
-        this.liveDataStore.Clear();
+        this.dataStore.Clear();
         await this.InitializeRoleHelper(messageSender.originalMessage.guild);
         this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
     }
@@ -54,7 +54,7 @@ export class AssignRoles extends ngsTranslatorBase
     private async BeginAssigning(messageSender: MessageSender, detailed: boolean)
     {
         const progressMessage = await messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
-        const teams = await this.liveDataStore.GetTeams();
+        const teams = await this.dataStore.GetTeams();
         await messageSender.Edit(progressMessage, "Loading Discord Members.");
         const messagesLog: MessageHelper<AssignRolesOptions>[] = [];
         try
@@ -179,13 +179,12 @@ export class AssignRoles extends ngsTranslatorBase
 
     private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], messageTracker: MessageHelper<AssignRolesOptions>, teamRole: Role, divRole: Role): Promise<MessageHelper<AssignRolesOptions>>
     {
-        const allUsers = await this.liveDataStore.GetUsers();
-        const teamUsers = allUsers.filter(user => user.teamName == team.teamName);
+        const teamName = team.teamName;
+        const teamUsers = await this.dataStore.GetUsersOnTeam(teamName);
 
-        messageTracker.Options = new AssignRolesOptions(team.teamName);
-        // messageTracker.Options.TeamRole = teamRole;
+        messageTracker.Options = new AssignRolesOptions(teamName);
         messageTracker.AddNewLine("**Team Name**");;
-        messageTracker.AddNewLine(team.teamName);
+        messageTracker.AddNewLine(teamName);
         messageTracker.AddNewLine("**Users**");
         for (let user of teamUsers)
         {

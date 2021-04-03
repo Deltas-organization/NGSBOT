@@ -24,7 +24,7 @@ export class LiveDataStore {
         return this.cachedDivisions.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSDivision[]>('/division/get/all'));
     }
 
-    public GetSchedule(): Promise<INGSSchedule[]> | INGSSchedule[] {
+    public async GetSchedule(): Promise<INGSSchedule[]> {
         return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>('/schedule/get/matches/scheduled?season=11'));
     }
 

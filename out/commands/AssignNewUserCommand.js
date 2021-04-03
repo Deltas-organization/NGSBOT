@@ -17,15 +17,15 @@ const RoleHelper_1 = require("../helpers/RoleHelper");
 class AssignNewUserCommand {
     constructor(dependencies) {
         this.client = dependencies.client;
-        this.liveDataStore = dependencies.liveDataStore;
+        this.dateStore = dependencies.dataStore;
     }
     AssignUser(guildMember) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.Setup(guildMember);
             const messageOptions = new MessageHelper_1.MessageHelper("NewUsers");
             messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
-            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.liveDataStore.GetUsers());
-            const team = yield this.LookForTeam(ngsUser);
+            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dateStore.GetUsers());
+            const team = yield this.dateStore.LookForTeam(ngsUser);
             if (team) {
                 messageOptions.Options.FoundTeam = true;
                 messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);
@@ -49,21 +49,6 @@ class AssignNewUserCommand {
             const roleInformation = yield guild.roles.fetch();
             const roles = roleInformation.cache.map((role, _, __) => role);
             this._serverRoleHelper = new RoleHelper_1.RoleHelper(roles);
-        });
-    }
-    LookForTeam(ngsUser) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const searchRegex = new RegExp(ngsUser.teamName, 'i');
-                const allTeams = yield this.liveDataStore.GetTeams();
-                let validTeams = allTeams.filter(team => searchRegex.test(team.teamName));
-                if (validTeams.length == 1) {
-                    return validTeams[0];
-                }
-            }
-            catch (ex) {
-                console.log(ex);
-            }
         });
     }
     AssignValidRoles(team, guildMember, ngsUser) {

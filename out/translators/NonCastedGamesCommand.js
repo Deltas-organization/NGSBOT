@@ -47,7 +47,7 @@ class NonCastedGamesCommand extends translatorBase_1.TranslatorBase {
     }
     GetNonCastedGames(futureDays) {
         return __awaiter(this, void 0, void 0, function* () {
-            let futureGames = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
+            let futureGames = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule());
             futureGames = futureGames.filter(game => ScheduleHelper_1.ScheduleHelper.GetGamesBetweenDates(game, futureDays));
             return futureGames.filter(game => !game.casterName);
         });

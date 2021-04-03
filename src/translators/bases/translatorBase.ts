@@ -6,18 +6,19 @@ import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { LiveDataStore } from "../../LiveDataStore";
 import { INGSTeam, INGSUser } from "../../interfaces";
 import { DiscordMembers } from "../../enums/DiscordMembers";
+import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 
 export abstract class TranslatorBase implements ITranslate {
     public abstract get commandBangs(): string[];
     public abstract get description(): string;
-    protected readonly liveDataStore: LiveDataStore;
+    protected readonly dataStore: DataStoreWrapper;
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
 
     constructor(translatorDependencies: CommandDependencies) {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
-        this.liveDataStore = translatorDependencies.liveDataStore;
+        this.dataStore = translatorDependencies.dataStore;
 
         this.Init();
     }
@@ -84,13 +85,11 @@ export abstract class TranslatorBase implements ITranslate {
 
 
     protected async SearchforTeams(searchTerm: string): Promise<INGSTeam[]> {
-        const searchRegex = new RegExp(searchTerm, 'i');
-        const allTeams = await this.liveDataStore.GetTeams();
-        return allTeams.filter(team => searchRegex.test(team.teamName));
+        return this.dataStore.SearchForTeams(searchTerm);
     }
 
     protected async SearchForPlayers(searchTerm: string): Promise<INGSUser[]> {
-        const users = await this.liveDataStore.GetUsers();
+        const users = await this.dataStore.GetUsers();
         const searchRegex = new RegExp(searchTerm, 'i');
         return users.filter(p => searchRegex.test(p.displayName));
     }

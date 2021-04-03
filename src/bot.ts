@@ -22,6 +22,7 @@ import { NGSDivisions } from "./enums/NGSDivisions";
 import { GamesCommand } from "./translators/GamesCommand";
 import { NonCastedGamesCommand } from "./translators/NonCastedGamesCommand";
 import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
+import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
 
 var fs = require('fs');
 
@@ -38,7 +39,7 @@ export class Bot {
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
     ) {
-        this.dependencies = new CommandDependencies(client, new MessageStore(), new LiveDataStore());
+        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore()));
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
         this.historyDisplay = new HistoryDisplay(this.dependencies);
 

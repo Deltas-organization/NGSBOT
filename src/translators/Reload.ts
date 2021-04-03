@@ -12,14 +12,14 @@ export class Reload extends DeltaTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
-        this.liveDataStore.Clear();
-        await this.liveDataStore.GetDivisions();
+        this.dataStore.Clear();
+        await this.dataStore.GetDivisions();
         let message = await messageSender.SendMessage("Reloaded 1/4");
-        await this.liveDataStore.GetSchedule();
+        await this.dataStore.GetSchedule();
         await messageSender.Edit(message, "Reloaded 2/4");
-        await this.liveDataStore.GetTeams();
+        await this.dataStore.GetTeams();
         await messageSender.Edit(message, "Reloaded 3/4");
-        await this.liveDataStore.GetUsers();
+        await this.dataStore.GetUsers();
         await messageSender.Edit(message, "Reload Complete");
     }
 }

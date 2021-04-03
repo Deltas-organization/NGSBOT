@@ -59,7 +59,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Setup(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.liveDataStore.Clear();
+            this.dataStore.Clear();
             yield this.InitializeRoleHelper(messageSender.originalMessage.guild);
             this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
             this._myRole = this._serverRoleHelper.lookForRole(NGSRoles_1.NGSRoles.NGSBot);
@@ -90,7 +90,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     BeginPurge(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             const progressMessage = yield messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
-            const teams = yield this.liveDataStore.GetTeams();
+            const teams = yield this.dataStore.GetTeams();
             yield messageSender.Edit(progressMessage, `Purging STARTED... STAND BY...`);
             const messages = [];
             const guildMembers = (yield messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
@@ -156,7 +156,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             for (var team of teams) {
                 const teamName = team.teamName;
-                const allUsers = yield this.liveDataStore.GetUsers();
+                const allUsers = yield this.dataStore.GetUsers();
                 const teamUsers = allUsers.filter(user => user.teamName == teamName);
                 for (var ngsUser of teamUsers) {
                     const foundGuildUser = DiscordFuzzySearch_1.DiscordFuzzySearch.CompareGuildUser(ngsUser, guildUser);

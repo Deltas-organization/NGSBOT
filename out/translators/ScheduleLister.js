@@ -69,7 +69,7 @@ class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     GetGames(daysInFuture = 0) {
         return __awaiter(this, void 0, void 0, function* () {
-            let games = yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.liveDataStore.GetSchedule());
+            let games = yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule());
             games = games.filter(s => ScheduleHelper_1.ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
             return games;
         });

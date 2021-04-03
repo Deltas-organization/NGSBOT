@@ -1,6 +1,7 @@
 import { Client, Guild, GuildMember, PartialGuildMember, Role, TextChannel, User } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSRoles } from "../enums/NGSRoles";
+import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { RoleHelper } from "../helpers/RoleHelper";
@@ -13,22 +14,22 @@ import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class AssignNewUserCommand {
     private client: Client;
-    private liveDataStore: LiveDataStore;
+    private dateStore: DataStoreWrapper;
 
     private _captainRole: Role;
     private _serverRoleHelper: RoleHelper;
 
     constructor(dependencies: CommandDependencies) {
         this.client = dependencies.client;
-        this.liveDataStore = dependencies.liveDataStore;
+        this.dateStore = dependencies.dataStore;
     }
 
     public async AssignUser(guildMember: GuildMember | PartialGuildMember) {
         await this.Setup(guildMember);
         const messageOptions = new MessageHelper<AssignNewUserOptions>("NewUsers");
         messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
-        const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.liveDataStore.GetUsers());
-        const team = await this.LookForTeam(ngsUser);
+        const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.dateStore.GetUsers());
+        const team = await this.dateStore.LookForTeam(ngsUser);
         if (team) {
             messageOptions.Options.FoundTeam = true;
             messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);
@@ -50,20 +51,6 @@ export class AssignNewUserCommand {
         const roleInformation = await guild.roles.fetch();
         const roles = roleInformation.cache.map((role, _, __) => role);
         this._serverRoleHelper = new RoleHelper(roles);
-    }
-
-    private async LookForTeam(ngsUser: AugmentedNGSUser) {
-        try {
-            const searchRegex = new RegExp(ngsUser.teamName, 'i');
-            const allTeams = await this.liveDataStore.GetTeams();
-            let validTeams = allTeams.filter(team => searchRegex.test(team.teamName));
-            if (validTeams.length == 1) {
-                return validTeams[0];
-            }
-        }
-        catch (ex) {
-            console.log(ex);
-        }
     }
 
     private async AssignValidRoles(team: INGSTeam, guildMember: GuildMember | PartialGuildMember, ngsUser: AugmentedNGSUser) {

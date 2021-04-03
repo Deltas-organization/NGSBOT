@@ -65,7 +65,7 @@ export class Purge extends ngsTranslatorBase
 
     private async Setup(messageSender: MessageSender)
     {
-        this.liveDataStore.Clear();
+        this.dataStore.Clear();
         await this.InitializeRoleHelper(messageSender.originalMessage.guild);
         this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
         this._myRole = this._serverRoleHelper.lookForRole(NGSRoles.NGSBot);
@@ -101,7 +101,7 @@ export class Purge extends ngsTranslatorBase
     private async BeginPurge(messageSender: MessageSender)
     {
         const progressMessage = await messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
-        const teams = await this.liveDataStore.GetTeams();
+        const teams = await this.dataStore.GetTeams();
         await messageSender.Edit(progressMessage, `Purging STARTED... STAND BY...`);
         const messages: MessageHelper<IPurgeInformation>[] = [];
         const guildMembers = (await messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
@@ -182,7 +182,7 @@ export class Purge extends ngsTranslatorBase
         for (var team of teams)
         {
             const teamName = team.teamName;
-            const allUsers = await this.liveDataStore.GetUsers();
+            const allUsers = await this.dataStore.GetUsers();
             const teamUsers = allUsers.filter(user => user.teamName == teamName);
             for (var ngsUser of teamUsers)
             {
