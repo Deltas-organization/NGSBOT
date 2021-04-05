@@ -22,10 +22,10 @@ class TeamSorter {
             NGSDivisions_1.NGSDivisions.EEast,
             NGSDivisions_1.NGSDivisions.EWest];
         for (var current of order) {
-            if (divisionDisplay1.indexOf(current) > -1) {
+            if ((divisionDisplay1 === null || divisionDisplay1 === void 0 ? void 0 : divisionDisplay1.indexOf(current)) > -1) {
                 return -1;
             }
-            else if (divisionDisplay2.indexOf(current) > -1) {
+            else if ((divisionDisplay2 === null || divisionDisplay2 === void 0 ? void 0 : divisionDisplay2.indexOf(current)) > -1) {
                 return 1;
             }
         }
