@@ -1,3 +1,4 @@
+import { Globals } from "../Globals";
 import { INGSTeam } from "../interfaces";
 import { LiveDataStore } from "../LiveDataStore";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
@@ -48,7 +49,7 @@ export class DataStoreWrapper
         }
         catch (ex)
         {
-            console.log(ex);
+            Globals.log(ex);
         }
     }
 
@@ -82,7 +83,6 @@ export class DataStoreWrapper
             teamName = team.teamName
 
         const users = await this.GetUsers();
-        const searchRegex = new RegExp(teamName, 'i');
-        return users.filter(user => searchRegex.test(user.teamName));
+        return users.filter(user => user.teamName == teamName);
     }
 }

@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataStoreWrapper = void 0;
+const Globals_1 = require("../Globals");
 class DataStoreWrapper {
     constructor(_dataStore) {
         this._dataStore = _dataStore;
@@ -48,7 +49,7 @@ class DataStoreWrapper {
                 }
             }
             catch (ex) {
-                console.log(ex);
+                Globals_1.Globals.log(ex);
             }
         });
     }
@@ -79,8 +80,7 @@ class DataStoreWrapper {
             else
                 teamName = team.teamName;
             const users = yield this.GetUsers();
-            const searchRegex = new RegExp(teamName, 'i');
-            return users.filter(user => searchRegex.test(user.teamName));
+            return users.filter(user => user.teamName == teamName);
         });
     }
 }
