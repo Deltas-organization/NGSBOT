@@ -10,6 +10,7 @@ import { MessageStore } from "../MessageStore";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { NGSQueryBuilder } from "../helpers/NGSQueryBuilder";
 
+//Not in use atm
 export class StandingsLister extends DeltaTranslatorBase {
 
     constructor(translatorDependencies: CommandDependencies) {

@@ -3,8 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeamSorter = void 0;
 const NGSDivisions_1 = require("../enums/NGSDivisions");
 class TeamSorter {
-    static SortByTeam(team1, team2) {
+    static SortByTeamDivision(team1, team2) {
         return this.SortByDivision(team1.divisionDisplayName, team2.divisionDisplayName);
+    }
+    static SortByTeamName(team1, team2) {
+        if (team1.teamName.toUpperCase() < team2.teamName.toUpperCase())
+            return -1;
+        else
+            return 1;
     }
     static SortByDivision(divisionDisplay1, divisionDisplay2) {
         const order = [NGSDivisions_1.NGSDivisions.Storm,

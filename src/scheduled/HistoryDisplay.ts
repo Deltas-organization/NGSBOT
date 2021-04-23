@@ -21,7 +21,7 @@ export class HistoryDisplay {
         const teams = await this.dataStore.GetTeams();
         const todaysUTC = new Date().getTime();
         const validHistories: HistoryContainer[] = [];
-        for (let team of teams.sort((t1, t2) => TeamSorter.SortByTeam(t1, t2))) {
+        for (let team of teams.sort((t1, t2) => TeamSorter.SortByTeamDivision(t1, t2))) {
             const historyContainer = new HistoryContainer(team);
             const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp)
             const reversedHistory = sortedHistory.slice().reverse();

@@ -46,7 +46,7 @@ const GamesCommand_1 = require("./translators/GamesCommand");
 const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
-var fs = require('fs');
+const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token) {
@@ -57,6 +57,7 @@ let Bot = /** @class */ (() => {
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
+            this.captainsListCommand = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
@@ -145,6 +146,13 @@ let Bot = /** @class */ (() => {
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHistory);
                     }
                 }
+            });
+        }
+        CreateCaptainList() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.dependencies.client.login(this.token);
+                let message = yield this.captainsListCommand.UpdateDivisionList(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DeltaServer);
+                yield this.messageSender.OverwriteMessage(message, "835238360288067644", DiscordChannels_1.DiscordChannels.DeltaServer, true);
             });
         }
     };

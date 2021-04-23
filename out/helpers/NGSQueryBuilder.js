@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NGSQueryBuilder = void 0;
 const http = require("http");
+const https = require("https");
 const Globals_1 = require("../Globals");
 class NGSQueryBuilder {
     GetResponse(path) {
@@ -42,30 +43,33 @@ class NGSQueryBuilder {
         const postData = JSON.stringify(objectToSerialize);
         return new Promise((resolver, rejector) => {
             const options = {
-                hostname: 'nexusgamingseries.org',
-                port: 80,
-                path: `api/${path}`,
+                hostname: 'www.nexusgamingseries.org',
+                path: `api${path}`,
+                port: 443,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Content-Length': postData.length
-                }
+                    'Content-Length': Buffer.byteLength(postData)
+                },
             };
-            const req = http.request(options, (result) => {
+            const req = https.request(options, (result) => {
                 result.setEncoding('utf8');
                 var chunks = "";
                 result.on('data', (chunk) => {
+                    console.log('data');
+                    console.log(chunk);
                     chunks += chunk;
-                });
-                result.on('end', () => {
+                }).on('end', () => {
                     try {
+                        console.error(chunks);
                         var parsedObject = JSON.parse(chunks);
                         var response = parsedObject.returnObject;
                         Globals_1.Globals.logAdvanced(`retrieved: ${path}`);
                         resolver(response);
                     }
                     catch (e) {
-                        rejector();
+                        Globals_1.Globals.logAdvanced(`problem with request: ${path}`, e);
+                        rejector(e);
                     }
                 });
             });

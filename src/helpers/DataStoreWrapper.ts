@@ -30,6 +30,11 @@ export class DataStoreWrapper
         return this._dataStore.GetDivisions();
     }
 
+    // public GetMatches(round: number)
+    // {
+    //     return this._dataStore.GetMatches(round);
+    // }
+
     public Clear()
     {
         this._dataStore.Clear();

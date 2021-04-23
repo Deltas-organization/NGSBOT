@@ -23,8 +23,7 @@ import { GamesCommand } from "./translators/GamesCommand";
 import { NonCastedGamesCommand } from "./translators/NonCastedGamesCommand";
 import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
 import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
-
-var fs = require('fs');
+import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand";
 
 @injectable()
 export class Bot {
@@ -33,7 +32,7 @@ export class Bot {
     private dependencies: CommandDependencies;
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
-
+    private captainsListCommand: UpdateCaptainsListCommand;
 
     constructor(
         @inject(TYPES.Client) public client: Client,
@@ -44,6 +43,7 @@ export class Bot {
         this.historyDisplay = new HistoryDisplay(this.dependencies);
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
+        this.captainsListCommand = new UpdateCaptainsListCommand(this.dependencies);
         this.translators.push(this.scheduleLister);
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
@@ -133,5 +133,11 @@ export class Bot {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHistory);
             }
         }
+    }
+
+    public async CreateCaptainList() {
+        await this.dependencies.client.login(this.token);
+        let message = await this.captainsListCommand.UpdateDivisionList(NGSDivisions.BSouthEast, DiscordChannels.DeltaServer);
+        await this.messageSender.OverwriteMessage(message, "835238360288067644", DiscordChannels.DeltaServer, true);
     }
 }

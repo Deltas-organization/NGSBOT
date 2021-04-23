@@ -8,5 +8,5 @@ export interface INGSSchedule
     casterUrl: string;
     scheduledTime: { startTime: number }
     divisionDisplayName: string;
-    divisionConcat: string;
+    divisionConcat: string;    
 }

@@ -36,6 +36,10 @@ export class LiveDataStore {
         return this.cachedTeams.TryGetFromCache(() => this.GetFreshTeams());
     }
 
+    // public async GetMatches(round: number): Promise<INGSSchedule[]> {
+    //     return new NGSQueryBuilder().PostResponse<INGSSchedule[]>('/schedule/fetch/matches', {season: 11, round: round});
+    // }
+
     private async GetRegisteredTeams(): Promise<INGSTeam[]> {
         return this.cachedRegisteredTeams.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSTeam[]>('/team/get/registered'));
     }

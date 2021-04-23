@@ -13,6 +13,7 @@ exports.StandingsLister = void 0;
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
 const deltaTranslatorBase_1 = require("./bases/deltaTranslatorBase");
 const NGSQueryBuilder_1 = require("../helpers/NGSQueryBuilder");
+//Not in use atm
 class StandingsLister extends deltaTranslatorBase_1.DeltaTranslatorBase {
     constructor(translatorDependencies) {
         super(translatorDependencies);

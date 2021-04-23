@@ -24,7 +24,7 @@ export class AssignNewUserCommand {
         this.dateStore = dependencies.dataStore;
     }
 
-    public async AssignUser(guildMember: GuildMember | PartialGuildMember) {
+    public async AssignUser(guildMember: GuildMember | PartialGuildMember) : Promise<string> {
         await this.Setup(guildMember);
         const messageOptions = new MessageHelper<AssignNewUserOptions>("NewUsers");
         messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);

@@ -15,16 +15,36 @@ class SendChannelMessage {
         this.client = client;
         this.messageStore = messageStore;
     }
-    SendMessageToChannel(message, channelToSendTo) {
+    SendMessageToChannel(message, channelToSendTo, basic = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            var myChannel = this.client.channels.cache.find(channel => channel.id == channelToSendTo);
+            const myChannel = this.client.channels.cache.find(channel => channel.id == channelToSendTo);
+            let sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendMessage(channel, message); });
+            if (basic)
+                sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendBasicMessage(channel, message); });
             if (myChannel != null) {
                 while (message.length > 2048) {
                     let newMessage = message.slice(0, 2048);
                     message = message.substr(2048);
-                    yield this.SendMessage(myChannel, newMessage);
+                    yield sendMessage(myChannel, newMessage);
                 }
-                yield this.SendMessage(myChannel, message);
+                yield sendMessage(myChannel, message);
+            }
+        });
+    }
+    OverwriteMessage(newMessageText, messageId, messageChannel, basic = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const myChannel = this.client.channels.cache.find(channel => channel.id == messageChannel);
+            const message = yield myChannel.messages.fetch(messageId);
+            if (basic) {
+                yield message.edit(newMessageText);
+            }
+            else {
+                yield message.edit({
+                    embed: {
+                        color: 0,
+                        description: newMessageText
+                    }
+                });
             }
         });
     }
@@ -36,6 +56,13 @@ class SendChannelMessage {
                     description: message
                 }
             });
+            this.messageStore.AddMessage(sentMessage);
+            return sentMessage;
+        });
+    }
+    SendBasicMessage(myChannel, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var sentMessage = yield myChannel.send(message);
             this.messageStore.AddMessage(sentMessage);
             return sentMessage;
         });
