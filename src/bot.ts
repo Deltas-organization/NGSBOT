@@ -68,11 +68,11 @@ export class Bot {
     }
 
     public watchForUserJoin() {
-        this.client.on('guildMemberAdd', async member => {
-            let newUserCommand = new AssignNewUserCommand(this.dependencies);
-            let message = await newUserCommand.AssignUser(member);
-            await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
-        });
+        // this.client.on('guildMemberAdd', async member => {
+        //     let newUserCommand = new AssignNewUserCommand(this.dependencies);
+        //     let message = await newUserCommand.AssignUser(member);
+        //     await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
+        // });
     }
 
     private OnMessageReceived(message: Message) {

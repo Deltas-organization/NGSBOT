@@ -44,7 +44,6 @@ const Reload_1 = require("./translators/Reload");
 const NGSDivisions_1 = require("./enums/NGSDivisions");
 const GamesCommand_1 = require("./translators/GamesCommand");
 const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
-const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
 let Bot = /** @class */ (() => {
@@ -78,11 +77,11 @@ let Bot = /** @class */ (() => {
             return this.client.login(this.token);
         }
         watchForUserJoin() {
-            this.client.on('guildMemberAdd', (member) => __awaiter(this, void 0, void 0, function* () {
-                let newUserCommand = new AssignNewUserCommand_1.AssignNewUserCommand(this.dependencies);
-                let message = yield newUserCommand.AssignUser(member);
-                yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.DeltaServer);
-            }));
+            // this.client.on('guildMemberAdd', async member => {
+            //     let newUserCommand = new AssignNewUserCommand(this.dependencies);
+            //     let message = await newUserCommand.AssignUser(member);
+            //     await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
+            // });
         }
         OnMessageReceived(message) {
             this.checkTranslators(message);
