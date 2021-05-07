@@ -20,8 +20,11 @@ class MessageSender {
     get TextChannel() {
         return this.originalMessage.channel;
     }
+    get GuildMember() {
+        return this.originalMessage.member;
+    }
     get Requester() {
-        return this.originalMessage.member.user;
+        return this.GuildMember.user;
     }
     SendMessage(message, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -127,11 +130,10 @@ class MessageSender {
                 this.messageStore.AddMessage(sentMessage);
             yield sentMessage.react('✅');
             yield sentMessage.react('❌');
-            yield sentMessage.react('🛑');
             const members = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
             const filter = (reaction, user) => {
                 let member = members.find(mem => mem.id == user.id);
-                return ['✅', '❌', '🛑'].includes(reaction.emoji.name) && authentication(member);
+                return ['✅', '❌'].includes(reaction.emoji.name) && authentication(member);
             };
             let response = null;
             try {
@@ -143,9 +145,6 @@ class MessageSender {
                 if (collectedReactions.first().emoji.name === '❌') {
                     yield noReaction();
                     response = false;
-                }
-                if (collectedReactions.first().emoji.name === '🛑') {
-                    response = null;
                 }
             }
             catch (err) {

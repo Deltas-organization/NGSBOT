@@ -17,15 +17,15 @@ const RoleHelper_1 = require("../helpers/RoleHelper");
 class AssignNewUserCommand {
     constructor(dependencies) {
         this.client = dependencies.client;
-        this.dateStore = dependencies.dataStore;
+        this.dataStore = dependencies.dataStore;
     }
     AssignUser(guildMember) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.Setup(guildMember);
             const messageOptions = new MessageHelper_1.MessageHelper("NewUsers");
             messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
-            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dateStore.GetUsers());
-            const team = yield this.dateStore.LookForTeam(ngsUser);
+            const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dataStore.GetUsers());
+            const team = yield this.dataStore.LookForTeam(ngsUser);
             if (team) {
                 messageOptions.Options.FoundTeam = true;
                 messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);

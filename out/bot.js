@@ -46,6 +46,7 @@ const GamesCommand_1 = require("./translators/GamesCommand");
 const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
+const Leave_1 = require("./translators/Leave");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token) {
@@ -68,6 +69,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new Reload_1.Reload(this.dependencies));
             this.translators.push(new GamesCommand_1.GamesCommand(this.dependencies));
             this.translators.push(new NonCastedGamesCommand_1.NonCastedGamesCommand(this.dependencies));
+            this.translators.push(new Leave_1.Leave(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
         }
         listen() {

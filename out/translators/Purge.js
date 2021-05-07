@@ -173,7 +173,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
             for (var role of rolesOfUser) {
                 if (!this._reserveredRoles.find(serverRole => serverRole == role)) {
-                    if (this._myRole.comparePositionTo(role) > 0)
+                    if (this._myRole.comparePositionTo(role) > 0) {
                         try {
                             yield this.RemoveRole(guildMember, role);
                             messageHelper.Options.rolesRemovedCount++;
@@ -182,6 +182,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
                         catch (e) {
                             Globals_1.Globals.log("Error removing roles", e);
                         }
+                    }
                 }
             }
         });

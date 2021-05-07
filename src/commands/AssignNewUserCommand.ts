@@ -14,22 +14,22 @@ import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class AssignNewUserCommand {
     private client: Client;
-    private dateStore: DataStoreWrapper;
+    private dataStore: DataStoreWrapper;
 
     private _captainRole: Role;
     private _serverRoleHelper: RoleHelper;
 
     constructor(dependencies: CommandDependencies) {
         this.client = dependencies.client;
-        this.dateStore = dependencies.dataStore;
+        this.dataStore = dependencies.dataStore;
     }
 
     public async AssignUser(guildMember: GuildMember | PartialGuildMember) : Promise<string> {
         await this.Setup(guildMember);
         const messageOptions = new MessageHelper<AssignNewUserOptions>("NewUsers");
         messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
-        const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.dateStore.GetUsers());
-        const team = await this.dateStore.LookForTeam(ngsUser);
+        const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.dataStore.GetUsers());
+        const team = await this.dataStore.LookForTeam(ngsUser);
         if (team) {
             messageOptions.Options.FoundTeam = true;
             messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);

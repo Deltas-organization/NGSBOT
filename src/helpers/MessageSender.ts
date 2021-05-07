@@ -12,9 +12,14 @@ export class MessageSender
         return this.originalMessage.channel;
     }
 
+    public get GuildMember()
+    {
+        return this.originalMessage.member;
+    }
+
     public get Requester()
     {
-        return this.originalMessage.member.user;
+        return this.GuildMember.user;
     }
 
     constructor(private client: Client, public readonly originalMessage: Message, private messageStore: MessageStore)
@@ -133,12 +138,11 @@ export class MessageSender
 
         await sentMessage.react('✅');
         await sentMessage.react('❌');
-        await sentMessage.react('🛑');
         const members = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
         const filter = (reaction, user: User) =>
         {
             let member = members.find(mem => mem.id == user.id);
-            return ['✅', '❌', '🛑'].includes(reaction.emoji.name) && authentication(member);
+            return ['✅', '❌'].includes(reaction.emoji.name) && authentication(member);
         };
         let response = null;
         try
@@ -153,11 +157,6 @@ export class MessageSender
             {
                 await noReaction();
                 response = false;
-            }
-
-            if (collectedReactions.first().emoji.name === '🛑')
-            {
-                response = null;
             }
         }
         catch (err)

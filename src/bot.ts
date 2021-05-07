@@ -24,6 +24,7 @@ import { NonCastedGamesCommand } from "./translators/NonCastedGamesCommand";
 import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
 import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
 import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand";
+import { Leave } from "./translators/Leave";
 
 @injectable()
 export class Bot {
@@ -55,6 +56,7 @@ export class Bot {
         this.translators.push(new Reload(this.dependencies));
         this.translators.push(new GamesCommand(this.dependencies));
         this.translators.push(new NonCastedGamesCommand(this.dependencies));
+        this.translators.push(new Leave(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
     }
