@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NonCastedGamesCommand = void 0;
-const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
+const NonCastedWorker_1 = require("../workers/NonCastedWorker");
 const translatorBase_1 = require("./bases/translatorBase");
 class NonCastedGamesCommand extends translatorBase_1.TranslatorBase {
     get commandBangs() {
@@ -21,35 +21,8 @@ class NonCastedGamesCommand extends translatorBase_1.TranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._multiMessageCommand = (messages, _) => messageSender.DMMessages(messages);
-            if (detailed) {
-                this._multiMessageCommand = (messages, storeMessage) => messageSender.SendMessages(messages, storeMessage);
-            }
-            let futureDays = 99;
-            if (commands.length > 0) {
-                let parsedNumber = parseInt(commands[0]);
-                if (isNaN(parsedNumber)) {
-                    yield messageSender.SendMessage(`The parameter ${commands[0]} is not a valid number`);
-                    return;
-                }
-                futureDays = parsedNumber - 1;
-            }
-            let nonCastedGames = yield this.GetNonCastedGames(futureDays);
-            if (nonCastedGames.length <= 0) {
-                yield messageSender.SendMessage("All games have a caster");
-            }
-            else {
-                let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(nonCastedGames);
-                yield this._multiMessageCommand(messages);
-            }
-            messageSender.originalMessage.delete();
-        });
-    }
-    GetNonCastedGames(futureDays) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let futureGames = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule());
-            futureGames = futureGames.filter(game => ScheduleHelper_1.ScheduleHelper.GetGamesBetweenDates(game, futureDays));
-            return futureGames.filter(game => !game.casterName);
+            const worker = new NonCastedWorker_1.NonCastedWorker(this.translatorDependencies, detailed, messageSender);
+            yield worker.Begin(commands);
         });
     }
 }

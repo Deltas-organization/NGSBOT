@@ -2,11 +2,11 @@ import { Message } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
 import { MessageSender } from "../helpers/MessageSender";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
+import { NonCastedWorker } from "../workers/NonCastedWorker";
 import { SpecificChannelBase } from "./bases/SpecificChannelBase";
 import { TranslatorBase } from "./bases/translatorBase";
 
 export class NonCastedGamesCommand extends TranslatorBase {
-    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<Message[]>;
 
     public get commandBangs(): string[] {
         return ["noncasted"];
@@ -17,34 +17,7 @@ export class NonCastedGamesCommand extends TranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
-        this._multiMessageCommand = (messages: string[], _?: boolean) => messageSender.DMMessages(messages);
-        if (detailed) {
-            this._multiMessageCommand = (messages: string[], storeMessage?: boolean) => messageSender.SendMessages(messages, storeMessage);
-        }
-
-        let futureDays = 99;
-        if (commands.length > 0) {
-            let parsedNumber = parseInt(commands[0])
-            if (isNaN(parsedNumber)) {
-                await messageSender.SendMessage(`The parameter ${commands[0]} is not a valid number`)
-                return;
-            }
-            futureDays = parsedNumber - 1;
-        }
-        let nonCastedGames = await this.GetNonCastedGames(futureDays);
-        if (nonCastedGames.length <= 0) {
-            await messageSender.SendMessage("All games have a caster");
-        }
-        else {
-            let messages = await ScheduleHelper.GetMessages(nonCastedGames);
-            await this._multiMessageCommand(messages);
-        }
-        messageSender.originalMessage.delete();
-    }
-
-    protected async GetNonCastedGames(futureDays: number) {
-        let futureGames = ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule());
-        futureGames = futureGames.filter(game => ScheduleHelper.GetGamesBetweenDates(game, futureDays));
-        return futureGames.filter(game => !game.casterName);
+        const worker = new NonCastedWorker(this.translatorDependencies, detailed, messageSender);
+        await worker.Begin(commands);
     }
 }

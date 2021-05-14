@@ -14,6 +14,7 @@ const MessageSender_1 = require("../../helpers/MessageSender");
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
 class TranslatorBase {
     constructor(translatorDependencies) {
+        this.translatorDependencies = translatorDependencies;
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;

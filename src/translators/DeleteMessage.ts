@@ -7,6 +7,7 @@ import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
+import { DeleteMessageWorker } from "../workers/DeleteMessageWorker";
 
 export class DeleteMessage extends AdminTranslatorBase {
 
@@ -23,26 +24,7 @@ export class DeleteMessage extends AdminTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
-
-        let amountToDelete = 1;
-        if (commands.length > 0) {
-            let parsedNumber = parseInt(commands[0])
-            if (!isNaN(parsedNumber)) {
-                amountToDelete = parsedNumber;
-            }
-        }
-
-        var message = await messageSender.SendMessage(`would you like me to delete my last ${amountToDelete} message${(amountToDelete > 1 && 's?') || '?'}`, false);
-        message.react('✅');
-        const filter = (reaction, user) => {
-            return ['✅'].includes(reaction.emoji.name) && user.id === messageSender.originalMessage.author.id;
-        };
-
-        var collectedReactions = await message.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-        if (collectedReactions.first().emoji.name === '✅') {
-            this.messageStore.DeleteMessage(amountToDelete);
-        }
-        message.delete();
-        messageSender.originalMessage.delete();
+        const worker = new DeleteMessageWorker(this.translatorDependencies, detailed, messageSender);
+        await worker.Begin(commands);
     }
 }

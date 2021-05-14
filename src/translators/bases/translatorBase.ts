@@ -15,7 +15,7 @@ export abstract class TranslatorBase implements ITranslate {
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
 
-    constructor(translatorDependencies: CommandDependencies) {
+    constructor(protected translatorDependencies: CommandDependencies) {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;

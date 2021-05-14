@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleHelper = void 0;
-const ScheduleLister_1 = require("../translators/ScheduleLister");
 const MessageHelper_1 = require("./MessageHelper");
 const moment = require("moment-timezone");
 const DateHelper_1 = require("./DateHelper");
 const TeamSorter_1 = require("./TeamSorter");
+const ScehduleContainer_1 = require("../models/ScehduleContainer");
 class ScheduleHelper {
-    static GetFutureGamesSorted(scheduledGames) {
+    static GetFutureGamesSorted(scheduledGames, daysInFuture = 0) {
         let futureGames = [];
         const todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
         for (var schedule of scheduledGames) {
@@ -29,6 +29,7 @@ class ScheduleHelper {
             else
                 return TeamSorter_1.TeamSorter.SortByDivision(s1.divisionDisplayName, s2.divisionDisplayName);
         });
+        futureGames = futureGames.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
         return futureGames;
     }
     static GetMessages(scheduledMatches) {
@@ -48,7 +49,7 @@ class ScheduleHelper {
                 let formattedDate = centralDate.format('MM/DD');
                 let formattedTime = centralDate.format('h:mma');
                 if (currentDay != formattedDate) {
-                    scheduleContainer = new ScheduleLister_1.ScheduleContainer(`**__${formattedDate}__**`);
+                    scheduleContainer = new ScehduleContainer_1.ScheduleContainer(`**__${formattedDate}__**`);
                     schedulesByDay.push(scheduleContainer);
                     currentDay = formattedDate;
                     currentTime = '';

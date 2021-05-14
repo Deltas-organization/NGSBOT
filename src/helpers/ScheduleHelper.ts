@@ -1,12 +1,12 @@
 import { INGSSchedule } from "../interfaces";
-import { ScheduleContainer } from "../translators/ScheduleLister";
 import { MessageHelper } from "./MessageHelper";
 import moment = require("moment-timezone");
 import { DateHelper } from "./DateHelper";
 import { TeamSorter } from "./TeamSorter";
+import { ScheduleContainer } from "../models/ScehduleContainer";
 
 export class ScheduleHelper {
-    public static GetFutureGamesSorted(scheduledGames: INGSSchedule[]) {
+    public static GetFutureGamesSorted(scheduledGames: INGSSchedule[], daysInFuture: number = 0) {
         let futureGames: INGSSchedule[] = [];
         const todaysUTC = DateHelper.ConvertDateToUTC(new Date());
         for (var schedule of scheduledGames) {
@@ -30,6 +30,8 @@ export class ScheduleHelper {
                 return TeamSorter.SortByDivision(s1.divisionDisplayName, s2.divisionDisplayName);
         });
 
+        
+        futureGames = futureGames.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
         return futureGames;
     }
 

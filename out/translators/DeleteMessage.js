@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteMessage = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
+const DeleteMessageWorker_1 = require("../workers/DeleteMessageWorker");
 class DeleteMessage extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["delete", "del"];
@@ -23,24 +24,8 @@ class DeleteMessage extends adminTranslatorBase_1.AdminTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            let amountToDelete = 1;
-            if (commands.length > 0) {
-                let parsedNumber = parseInt(commands[0]);
-                if (!isNaN(parsedNumber)) {
-                    amountToDelete = parsedNumber;
-                }
-            }
-            var message = yield messageSender.SendMessage(`would you like me to delete my last ${amountToDelete} message${(amountToDelete > 1 && 's?') || '?'}`, false);
-            message.react('✅');
-            const filter = (reaction, user) => {
-                return ['✅'].includes(reaction.emoji.name) && user.id === messageSender.originalMessage.author.id;
-            };
-            var collectedReactions = yield message.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-            if (collectedReactions.first().emoji.name === '✅') {
-                this.messageStore.DeleteMessage(amountToDelete);
-            }
-            message.delete();
-            messageSender.originalMessage.delete();
+            const worker = new DeleteMessageWorker_1.DeleteMessageWorker(this.translatorDependencies, detailed, messageSender);
+            yield worker.Begin(commands);
         });
     }
 }
