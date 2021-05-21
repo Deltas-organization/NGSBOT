@@ -47,6 +47,7 @@ const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
 const Leave_1 = require("./translators/Leave");
+const MessageDictionary_1 = require("./helpers/MessageDictionary");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token) {
@@ -152,8 +153,26 @@ let Bot = /** @class */ (() => {
         CreateCaptainList() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);
-                let message = yield this.captainsListCommand.UpdateDivisionList(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DeltaServer);
-                yield this.messageSender.OverwriteMessage(message, "835238360288067644", DiscordChannels_1.DiscordChannels.DeltaServer, true);
+                //        for (var value in NGSDivisions)
+                {
+                    const division = NGSDivisions_1.NGSDivisions.DEast; //[value];
+                    try {
+                        yield this.AttemptToUpdateCaptainMessage(division);
+                    }
+                    catch (_a) {
+                        yield this.AttemptToUpdateCaptainMessage(division);
+                    }
+                }
+            });
+        }
+        AttemptToUpdateCaptainMessage(division) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const messageId = MessageDictionary_1.MessageDictionary.GetSavedMessage(division);
+                const message = yield this.captainsListCommand.CreateDivisionList(division, DiscordChannels_1.DiscordChannels.NGSDiscord);
+                if (messageId)
+                    yield this.messageSender.OverwriteMessage(message, messageId, DiscordChannels_1.DiscordChannels.DeltaServer, true);
+                else
+                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.DeltaServer, true);
             });
         }
     };

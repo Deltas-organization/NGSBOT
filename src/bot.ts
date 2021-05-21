@@ -25,6 +25,7 @@ import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
 import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
 import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand";
 import { Leave } from "./translators/Leave";
+import { MessageDictionary } from "./helpers/MessageDictionary";
 
 @injectable()
 export class Bot {
@@ -139,7 +140,24 @@ export class Bot {
 
     public async CreateCaptainList() {
         await this.dependencies.client.login(this.token);
-        let message = await this.captainsListCommand.UpdateDivisionList(NGSDivisions.BSouthEast, DiscordChannels.DeltaServer);
-        await this.messageSender.OverwriteMessage(message, "835238360288067644", DiscordChannels.DeltaServer, true);
+        //        for (var value in NGSDivisions)
+        {
+            const division = NGSDivisions.DEast;//[value];
+            try {
+                await this.AttemptToUpdateCaptainMessage(division);
+            }
+            catch {
+                await this.AttemptToUpdateCaptainMessage(division)
+            }
+        }
+    }
+
+    private async AttemptToUpdateCaptainMessage(division: NGSDivisions) {
+        const messageId = MessageDictionary.GetSavedMessage(division);
+        const message = await this.captainsListCommand.CreateDivisionList(division, DiscordChannels.NGSDiscord);
+        if (messageId)
+            await this.messageSender.OverwriteMessage(message, messageId, DiscordChannels.DeltaServer, true);
+        else
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer, true);
     }
 }

@@ -17,44 +17,50 @@ export class UpdateCaptainsListCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async UpdateDivisionList(division: NGSDivisions, channelId: string)  : Promise<string> {
-        const guild = await this.GetGuild(channelId);
-        const roleHelper = await this.CreateRoleHelper(guild);
-        const teams = await this.GetTeamsInDivision(division);
-        const divisionInformaiton = await (await this.dataStore.GetDivisions()).find(d => d.displayName == division);
-        const guildMembers = (await guild.members.fetch()).map((mem, _, __) => mem);
-        const divMod = guildMembers.find(member => DiscordFuzzySearch.GetDiscordId(member.user) == divisionInformaiton.moderator.toLowerCase());
-        const messageHelper = new MessageHelper<unknown>('captainList');
-        messageHelper.AddNewLine(`**${division}** Moderator: ${divMod}`);
-        for (let team of teams) {
-            const teamRole = roleHelper.lookForRole(team.teamName);
-            messageHelper.AddNewLine(teamRole.toString());
-            const users = await this.dataStore.GetUsersOnTeam(team);
-            let hasAssistant = false;
-            for (let user of users.sort((user1, user2) => this.userSort(user1, user2))) {
-                if (user.IsCaptain)
-                {                    
-                    let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers); 
-                    messageHelper.AddNew(` - captain ${guildMember ?? user.displayName}`)
-                }
-                if(user.IsAssistantCaptain)
-                {
-                    let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers); 
-                    if(hasAssistant)
-                    {
-                        messageHelper.AddNew(` and ${guildMember ?? user.displayName}`)
+    public async CreateDivisionList(division: NGSDivisions, channelIdToSearch: string): Promise<string> {
+        try {
+            const guild = await this.GetGuild(channelIdToSearch);
+            const roleHelper = await this.CreateRoleHelper(guild);
+            const teams = await this.GetTeamsInDivision(division);
+            const divisions = await this.dataStore.GetDivisions();
+            const divisionInformation = divisions.find(d => d.displayName == division);
+            if (!divisionInformation)
+                return `Unable to find division: ${division}`;
+
+            const guildMembers = (await guild.members.fetch()).map((mem, _, __) => mem);
+            const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
+            const divMods = guildMembers.filter(member => modsToLookFor.indexOf(DiscordFuzzySearch.GetDiscordId(member.user)) != -1);
+            const messageHelper = new MessageHelper<unknown>('captainList');
+            messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
+            for (let team of teams) {
+                const teamRole = roleHelper.lookForRole(team.teamName);
+                messageHelper.AddNewLine(teamRole?.toString() ?? team.teamName);
+                const users = await this.dataStore.GetUsersOnTeam(team);
+                let hasAssistant = false;
+                for (let user of users.sort((user1, user2) => this.userSort(user1, user2))) {
+                    if (user.IsCaptain) {
+                        let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                        messageHelper.AddNew(` - captain ${guildMember ?? user.displayName}`)
                     }
-                    else
-                    {
-                        messageHelper.AddNew(` / ${guildMember ?? user.displayName}`);
-                        hasAssistant = true;
+                    if (user.IsAssistantCaptain) {
+                        let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                        if (hasAssistant) {
+                            messageHelper.AddNew(` and ${guildMember ?? user.displayName}`)
+                        }
+                        else {
+                            messageHelper.AddNew(` / ${guildMember ?? user.displayName}`);
+                            hasAssistant = true;
+                        }
                     }
                 }
             }
+            return messageHelper.CreateStringMessage();
         }
-        return messageHelper.CreateStringMessage();
+        catch (e) {
+            console.log(e);
+        }
     }
-    
+
     private async GetTeamsInDivision(division: NGSDivisions) {
         const teams = await this.dataStore.GetTeams();
         const divisionTeams = teams.filter(team => team.divisionDisplayName == division).sort((t1, t2) => TeamSorter.SortByTeamName(t1, t2));
@@ -68,7 +74,7 @@ export class UpdateCaptainsListCommand {
         return roleHelper;
     }
 
-    private async GetGuild(channelId: string) {        
+    private async GetGuild(channelId: string) {
         const channel = (await this.client.channels.fetch(channelId, false)) as GuildChannel;
         return channel.guild;
     }
