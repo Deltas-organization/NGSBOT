@@ -30,7 +30,7 @@ export class ScheduleHelper {
                 return TeamSorter.SortByDivision(s1.divisionDisplayName, s2.divisionDisplayName);
         });
 
-        
+
         futureGames = futureGames.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
         return futureGames;
     }
@@ -67,7 +67,11 @@ export class ScheduleHelper {
                 }
 
                 let scheduleMessage = new MessageHelper<any>('scheduleMessage');
-                scheduleMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+                if (m.divisionDisplayName)
+                    scheduleMessage.AddNew(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+                else
+                    scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
+
                 if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
                     if (m.casterUrl.indexOf("www") == -1) {
                         m.casterUrl = "https://www." + m.casterUrl;

@@ -3,7 +3,7 @@ import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class ScheduleWorker extends WorkerBase {
-    protected async Start(commands: string[]) {        
+    protected async Start(commands: string[]) {    
         let duration = 0;
         if (commands.length == 1) {
             let parsedNumber = parseInt(commands[0])

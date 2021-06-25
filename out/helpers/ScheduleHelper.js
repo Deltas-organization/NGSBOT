@@ -60,7 +60,10 @@ class ScheduleHelper {
                     scheduleContainer.AddNewTimeSection(timeSection);
                 }
                 let scheduleMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
-                scheduleMessage.AddNewLine(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+                if (m.divisionDisplayName)
+                    scheduleMessage.AddNew(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+                else
+                    scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
                 if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
                     if (m.casterUrl.indexOf("www") == -1) {
                         m.casterUrl = "https://www." + m.casterUrl;
