@@ -5,11 +5,20 @@ import { WorkerBase } from "./Bases/WorkerBase";
 export class TeamCheckerWorker extends WorkerBase {
     protected async Start(commands: string[]) {
         const foundTeams = [];
+        var number = parseInt(commands[0]);
+        var searchMethod = (term: string) => this.SearchForRegisteredTeams(term);
+        if(!isNaN(number))
+        {
+            searchMethod = (term: string) => this.SearchForTeamBySeason(number, term);
+            commands.shift();
+            if(commands.length < 1)
+                await this.messageSender.SendMessage("invalid search");
+        }
         for (var i = 0; i < commands.length; i++)
         {
             const fields = [];
             const searchTerm = commands[i];
-            const teams = await this.SearchforTeams(searchTerm);
+            const teams = await searchMethod(searchTerm);
             if (teams.length <= 0)
             {
                 fields.push({ name: `No teams found for  \n`, value: searchTerm });

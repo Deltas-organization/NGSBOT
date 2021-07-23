@@ -7,6 +7,7 @@ import { LiveDataStore } from "../../LiveDataStore";
 import { INGSTeam, INGSUser } from "../../interfaces";
 import { DiscordMembers } from "../../enums/DiscordMembers";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
+import { Globals } from "../../Globals";
 
 export abstract class TranslatorBase implements ITranslate {
     public abstract get commandBangs(): string[];
@@ -41,7 +42,7 @@ export abstract class TranslatorBase implements ITranslate {
             const regularCommand = new RegExp(`^${bang}$`, 'i').test(command);
             const detailedCommand = new RegExp(`^${bang}-d$`, 'i').test(command);
             if (regularCommand || detailedCommand) {
-                console.log("Running", this.constructor.name);
+                Globals.log("Running", this.constructor.name);
                 foundBang = true;
                 if (!detailed && detailedCommand) {
                     detailed = true;
@@ -82,11 +83,6 @@ export abstract class TranslatorBase implements ITranslate {
     }
 
     protected abstract Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
-
-
-    protected async SearchforTeams(searchTerm: string): Promise<INGSTeam[]> {
-        return this.dataStore.SearchForTeams(searchTerm);
-    }
 
     protected async SearchForPlayers(searchTerm: string): Promise<INGSUser[]> {
         const users = await this.dataStore.GetUsers();

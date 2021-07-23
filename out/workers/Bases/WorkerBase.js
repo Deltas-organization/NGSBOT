@@ -21,9 +21,14 @@ class WorkerBase {
     Begin(commands) {
         this.Start(commands);
     }
-    SearchforTeams(searchTerm) {
+    SearchForRegisteredTeams(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.dataStore.SearchForTeams(searchTerm);
+            return this.dataStore.SearchForRegisteredTeams(searchTerm);
+        });
+    }
+    SearchForTeamBySeason(season, searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.dataStore.SearchForTeamBySeason(season, searchTerm);
         });
     }
     SearchForPlayers(searchTerm) {

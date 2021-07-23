@@ -25,7 +25,7 @@ class AssignNewUserCommand {
             const messageOptions = new MessageHelper_1.MessageHelper("NewUsers");
             messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
             const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dataStore.GetUsers());
-            const team = yield this.dataStore.LookForTeam(ngsUser);
+            const team = yield this.dataStore.LookForRegisteredTeam(ngsUser);
             if (team) {
                 messageOptions.Options.FoundTeam = true;
                 messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);

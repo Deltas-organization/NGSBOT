@@ -17,7 +17,7 @@ class DataStoreWrapper {
     }
     GetTeams() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this._dataStore.GetTeams();
+            return this._dataStore.GetRegisteredTeams();
         });
     }
     GetSchedule() {
@@ -35,6 +35,11 @@ class DataStoreWrapper {
             return this._dataStore.GetDivisions();
         });
     }
+    GetTeamsBySeason(season) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this._dataStore.GetTeamsBySeason(season);
+        });
+    }
     // public GetMatches(round: number)
     // {
     //     return this._dataStore.GetMatches(round);
@@ -42,12 +47,10 @@ class DataStoreWrapper {
     Clear() {
         this._dataStore.Clear();
     }
-    LookForTeam(ngsUser) {
+    LookForRegisteredTeam(ngsUser) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const searchRegex = new RegExp(ngsUser.teamName, 'i');
-                const allTeams = yield this.GetTeams();
-                let validTeams = allTeams.filter(team => searchRegex.test(team.teamName));
+                let validTeams = yield this.SearchForRegisteredTeams(ngsUser.teamName);
                 if (validTeams.length == 1) {
                     return validTeams[0];
                 }
@@ -57,7 +60,7 @@ class DataStoreWrapper {
             }
         });
     }
-    SearchForTeams(searchTerm) {
+    SearchForRegisteredTeams(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const allTeams = yield this.GetTeams();
@@ -65,7 +68,19 @@ class DataStoreWrapper {
                 return allTeams.filter(team => searchRegex.test(team.teamName));
             }
             catch (ex) {
-                console.log(ex);
+                Globals_1.Globals.log(ex);
+            }
+        });
+    }
+    SearchForTeamBySeason(season, searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const allTeams = yield this.GetTeamsBySeason(season);
+                const searchRegex = new RegExp(searchTerm, 'i');
+                return allTeams.filter(team => searchRegex.test(team.teamName));
+            }
+            catch (ex) {
+                Globals_1.Globals.log(ex);
             }
         });
     }

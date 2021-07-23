@@ -16,10 +16,18 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundTeams = [];
+            var number = parseInt(commands[0]);
+            var searchMethod = (term) => this.SearchForRegisteredTeams(term);
+            if (!isNaN(number)) {
+                searchMethod = (term) => this.SearchForTeamBySeason(number, term);
+                commands.shift();
+                if (commands.length < 1)
+                    yield this.messageSender.SendMessage("invalid search");
+            }
             for (var i = 0; i < commands.length; i++) {
                 const fields = [];
                 const searchTerm = commands[i];
-                const teams = yield this.SearchforTeams(searchTerm);
+                const teams = yield searchMethod(searchTerm);
                 if (teams.length <= 0) {
                     fields.push({ name: `No teams found for  \n`, value: searchTerm });
                     yield this.messageSender.SendFields(``, fields);

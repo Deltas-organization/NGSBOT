@@ -12,7 +12,7 @@ export class DataStoreWrapper
 
     public async GetTeams()
     {
-        return this._dataStore.GetTeams();
+        return this._dataStore.GetRegisteredTeams();
     }
 
     public async GetSchedule()
@@ -30,6 +30,11 @@ export class DataStoreWrapper
         return this._dataStore.GetDivisions();
     }
 
+    public async GetTeamsBySeason(season: number)
+    {
+        return this._dataStore.GetTeamsBySeason(season);
+    }
+
     // public GetMatches(round: number)
     // {
     //     return this._dataStore.GetMatches(round);
@@ -40,13 +45,11 @@ export class DataStoreWrapper
         this._dataStore.Clear();
     }
 
-    public async LookForTeam(ngsUser: AugmentedNGSUser)
+    public async LookForRegisteredTeam(ngsUser: AugmentedNGSUser):Promise<INGSTeam>
     {
         try
         {
-            const searchRegex = new RegExp(ngsUser.teamName, 'i');
-            const allTeams = await this.GetTeams();
-            let validTeams = allTeams.filter(team => searchRegex.test(team.teamName));
+            let validTeams = await this.SearchForRegisteredTeams(ngsUser.teamName);
             if (validTeams.length == 1)
             {
                 return validTeams[0];
@@ -58,7 +61,7 @@ export class DataStoreWrapper
         }
     }
 
-    public async SearchForTeams(searchTerm: string)
+    public async SearchForRegisteredTeams(searchTerm: string) :Promise<INGSTeam[]>
     {
         try
         {
@@ -68,7 +71,21 @@ export class DataStoreWrapper
         }
         catch (ex)
         {
-            console.log(ex);
+            Globals.log(ex);
+        }
+    }
+
+    public async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[]>
+    {
+        try
+        {
+            const allTeams = await this.GetTeamsBySeason(season);
+            const searchRegex = new RegExp(searchTerm, 'i');
+            return allTeams.filter(team => searchRegex.test(team.teamName));
+        }
+        catch (ex)
+        {
+            Globals.log(ex);
         }
     }
 

@@ -1,5 +1,6 @@
 import { Channel, Client, Guild, GuildChannel, TextChannel } from "discord.js";
 import { NGSDivisions } from "../enums/NGSDivisions";
+import { Globals } from "../Globals";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
@@ -57,7 +58,7 @@ export class UpdateCaptainsListCommand {
             return messageHelper.CreateStringMessage();
         }
         catch (e) {
-            console.log(e);
+            Globals.log(e);
         }
     }
 

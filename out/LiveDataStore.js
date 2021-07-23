@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LiveDataStore = void 0;
 const Globals_1 = require("./Globals");
 const Cacher_1 = require("./helpers/Cacher");
+const ListCacher_1 = require("./helpers/ListCacher");
 const NGSQueryBuilder_1 = require("./helpers/NGSQueryBuilder");
 const AugmentedNGSUser_1 = require("./models/AugmentedNGSUser");
 class LiveDataStore {
@@ -21,6 +22,7 @@ class LiveDataStore {
         this.cachedUsers = new Cacher_1.Cacher(60 * 24);
         this.cachedTeams = new Cacher_1.Cacher(60 * 24);
         this.cachedRegisteredTeams = new Cacher_1.Cacher(60 * 24);
+        this.cachedSeasonTeams = new ListCacher_1.ListCacher(60 * 24);
     }
     Clear() {
         this.cachedDivisions.Clear();
@@ -44,15 +46,20 @@ class LiveDataStore {
             return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
         });
     }
-    GetTeams() {
+    GetRegisteredTeams() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.cachedTeams.TryGetFromCache(() => this.GetFreshTeams());
         });
     }
-    // public async GetMatches(round: number): Promise<INGSSchedule[]> {
-    //     return new NGSQueryBuilder().PostResponse<INGSSchedule[]>('/schedule/fetch/matches', {season: 11, round: round});
-    // }
-    GetRegisteredTeams() {
+    GetTeamsBySeason(season) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.cachedSeasonTeams.TryGetFromCache(season, () => __awaiter(this, void 0, void 0, function* () {
+                const teamResponse = yield new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse(`/history/season/teams`, { "season": season });
+                return teamResponse.map(response => response.object);
+            }));
+        });
+    }
+    RetrieveRegisteredTeams() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.cachedRegisteredTeams.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/team/get/registered'));
         });
@@ -61,7 +68,7 @@ class LiveDataStore {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             let allUsers = [];
-            const teams = yield this.GetTeams();
+            const teams = yield this.RetrieveRegisteredTeams();
             for (let team of teams) {
                 try {
                     const encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
@@ -93,7 +100,7 @@ class LiveDataStore {
     }
     GetFreshTeams() {
         return __awaiter(this, void 0, void 0, function* () {
-            const registeredTeams = yield this.GetRegisteredTeams();
+            const registeredTeams = yield this.RetrieveRegisteredTeams();
             if (registeredTeams.length >= 0)
                 return registeredTeams;
             else
@@ -110,7 +117,7 @@ class LiveDataStore {
                 teamnames = teamsByDivions.reduce((a, b) => a.concat(b), []);
             }
             else {
-                return yield this.GetRegisteredTeams();
+                return [];
             }
             for (let teamName of teamnames) {
                 try {

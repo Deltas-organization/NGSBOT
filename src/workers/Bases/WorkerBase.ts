@@ -24,8 +24,12 @@ export abstract class WorkerBase {
     protected abstract Start(commands: string[]);
 
 
-    protected async SearchforTeams(searchTerm: string): Promise<INGSTeam[]> {
-        return this.dataStore.SearchForTeams(searchTerm);
+    protected async SearchForRegisteredTeams(searchTerm: string): Promise<INGSTeam[]> {
+        return this.dataStore.SearchForRegisteredTeams(searchTerm);
+    }
+
+    protected async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[]> {
+        return this.dataStore.SearchForTeamBySeason(season, searchTerm);
     }
 
     protected async SearchForPlayers(searchTerm: string): Promise<INGSUser[]> {

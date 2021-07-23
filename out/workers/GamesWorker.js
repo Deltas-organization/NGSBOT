@@ -34,13 +34,13 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
                 if (messages.length > 0)
                     yield this._multiMessageCommand(messages);
                 else {
-                    var random1 = Math.round(Math.random() * 99) + 1;
-                    if (random1 == 65) {
-                        yield this._messageCommand("Borntoshine has been notified of your failings.");
-                    }
-                    else {
-                        yield this._messageCommand("Nothing scheduled yet.");
-                    }
+                    // var random1 = Math.round(Math.random() * 99) + 1;
+                    // if (random1 == 65) {
+                    //     await this._messageCommand("Borntoshine has been notified of your failings.");
+                    // }
+                    // else {
+                    yield this._messageCommand("Nothing scheduled yet.");
+                    //}
                 }
                 if (!this.detailed) {
                     this.messageSender.originalMessage.delete();
@@ -55,7 +55,7 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
                 yield this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.");
                 return;
             }
-            const team = yield this.dataStore.LookForTeam(ngsUser);
+            const team = yield this.dataStore.LookForRegisteredTeam(ngsUser);
             if (!team) {
                 yield this._messageCommand("Unable to find your ngsTeam");
                 return;
@@ -69,7 +69,7 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
     }
     GetMessagesForTeam(teamSearchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            let teams = yield this.SearchforTeams(teamSearchTerm);
+            let teams = yield this.SearchForRegisteredTeams(teamSearchTerm);
             if (teams.length < 1)
                 return ["No team found"];
             else if (teams.length > 1)

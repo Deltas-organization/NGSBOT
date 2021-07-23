@@ -41,17 +41,18 @@ export class NGSQueryBuilder {
     }
 
     public PostResponse<T>(path: string, objectToSerialize: any): Promise<T> {
-        Globals.logAdvanced(`Posting To: ${path}`);
-
         const postData = JSON.stringify(objectToSerialize);
+
+        Globals.logAdvanced(`Posting To: ${path} with: ${postData}`);
+
         return new Promise<T>((resolver, rejector) => {
             const options = {
-                hostname: 'www.nexusgamingseries.org',
-                path: `api${path}`,
+                hostname: 'nexusgamingseries.org',
+                path: `/api${path}`,
                 port: 443,
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json; charset=utf-8',
                     'Content-Length': Buffer.byteLength(postData)
                 },
             };
@@ -60,8 +61,6 @@ export class NGSQueryBuilder {
                 result.setEncoding('utf8');
                 var chunks = "";
                 result.on('data', (chunk) => {
-                    console.log('data');
-                    console.log(chunk);
                     chunks += chunk;
                 }).on('end', () => {
                     try {

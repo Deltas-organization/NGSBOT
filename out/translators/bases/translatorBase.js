@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslatorBase = void 0;
 const MessageSender_1 = require("../../helpers/MessageSender");
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
+const Globals_1 = require("../../Globals");
 class TranslatorBase {
     constructor(translatorDependencies) {
         this.translatorDependencies = translatorDependencies;
@@ -36,7 +37,7 @@ class TranslatorBase {
                 const regularCommand = new RegExp(`^${bang}$`, 'i').test(command);
                 const detailedCommand = new RegExp(`^${bang}-d$`, 'i').test(command);
                 if (regularCommand || detailedCommand) {
-                    console.log("Running", this.constructor.name);
+                    Globals_1.Globals.log("Running", this.constructor.name);
                     foundBang = true;
                     if (!detailed && detailedCommand) {
                         detailed = true;
@@ -71,11 +72,6 @@ class TranslatorBase {
     Verify(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             return true;
-        });
-    }
-    SearchforTeams(searchTerm) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.dataStore.SearchForTeams(searchTerm);
         });
     }
     SearchForPlayers(searchTerm) {

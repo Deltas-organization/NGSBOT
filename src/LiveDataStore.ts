@@ -1,6 +1,7 @@
 
 import { Globals } from './Globals';
 import { Cacher } from './helpers/Cacher';
+import { ListCacher } from './helpers/ListCacher';
 import { NGSQueryBuilder } from './helpers/NGSQueryBuilder';
 import { INGSDivision, INGSSchedule, INGSTeam, INGSUser } from './interfaces';
 import { AugmentedNGSUser } from './models/AugmentedNGSUser';
@@ -10,7 +11,8 @@ export class LiveDataStore {
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
     private cachedUsers = new Cacher<AugmentedNGSUser[]>(60 * 24);
     private cachedTeams = new Cacher<INGSTeam[]>(60 * 24);
-    private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);
+    private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);    
+    private cachedSeasonTeams = new ListCacher<number, INGSTeam[]>(60 * 24);
 
     public Clear() {
         this.cachedDivisions.Clear();
@@ -32,21 +34,24 @@ export class LiveDataStore {
         return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
     }
 
-    public async GetTeams(): Promise<INGSTeam[]> {
+    public async GetRegisteredTeams(): Promise<INGSTeam[]> {
         return this.cachedTeams.TryGetFromCache(() => this.GetFreshTeams());
     }
 
-    // public async GetMatches(round: number): Promise<INGSSchedule[]> {
-    //     return new NGSQueryBuilder().PostResponse<INGSSchedule[]>('/schedule/fetch/matches', {season: 11, round: round});
-    // }
+    public async GetTeamsBySeason(season: number): Promise<INGSTeam[]> {
+        return await this.cachedSeasonTeams.TryGetFromCache(season, async () => {
+            const teamResponse = await new NGSQueryBuilder().PostResponse<{ object: INGSTeam}[]>(`/history/season/teams`, {"season": season});
+            return teamResponse.map(response =>response.object);
+        });
+    }
 
-    private async GetRegisteredTeams(): Promise<INGSTeam[]> {
+    private async RetrieveRegisteredTeams(): Promise<INGSTeam[]> {
         return this.cachedRegisteredTeams.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSTeam[]>('/team/get/registered'));
     }
 
     private async GetFreshUsers(): Promise<AugmentedNGSUser[]> {
         let allUsers: AugmentedNGSUser[] = [];
-        const teams = await this.GetTeams();
+        const teams = await this.RetrieveRegisteredTeams();
         for (let team of teams) {
             try {
                 const encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
@@ -61,8 +66,8 @@ export class LiveDataStore {
 
         return allUsers;
     }
-    
-    private AugmentNgsUsers(ngsMembers: INGSUser[], team: INGSTeam) {        
+
+    private AugmentNgsUsers(ngsMembers: INGSUser[], team: INGSTeam) {
         const captainName = team.captain.toLowerCase();
         const assistantCaptains = team.assistantCaptain.map(ac => ac.toLowerCase());
         const teamMembers = ngsMembers.map(member => new AugmentedNGSUser(member));
@@ -79,7 +84,7 @@ export class LiveDataStore {
     }
 
     private async GetFreshTeams(): Promise<INGSTeam[]> {
-        const registeredTeams = await this.GetRegisteredTeams();
+        const registeredTeams = await this.RetrieveRegisteredTeams();
         if (registeredTeams.length >= 0)
             return registeredTeams;
         else
@@ -95,7 +100,7 @@ export class LiveDataStore {
             teamnames = teamsByDivions.reduce((a, b) => a.concat(b), []);
         }
         else {
-            return await this.GetRegisteredTeams();
+            return [];
         }
         for (let teamName of teamnames) {
             try {
@@ -108,4 +113,5 @@ export class LiveDataStore {
         }
         return allTeams;
     }
+
 }

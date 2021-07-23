@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateCaptainsListCommand = void 0;
+const Globals_1 = require("../Globals");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
 const RoleHelper_1 = require("../helpers/RoleHelper");
@@ -60,7 +61,7 @@ class UpdateCaptainsListCommand {
                 return messageHelper.CreateStringMessage();
             }
             catch (e) {
-                console.log(e);
+                Globals_1.Globals.log(e);
             }
         });
     }

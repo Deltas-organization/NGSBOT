@@ -29,13 +29,13 @@ export class GamesWorker extends WorkerBase {
             if (messages.length > 0)
                 await this._multiMessageCommand(messages);
             else {
-                var random1 = Math.round(Math.random() * 99) + 1;
-                if (random1 == 65) {
-                    await this._messageCommand("Borntoshine has been notified of your failings.");
-                }
-                else {
+                // var random1 = Math.round(Math.random() * 99) + 1;
+                // if (random1 == 65) {
+                //     await this._messageCommand("Borntoshine has been notified of your failings.");
+                // }
+                // else {
                     await this._messageCommand("Nothing scheduled yet.");
-                }
+                //}
             }
             if (!this.detailed) {
                 this.messageSender.originalMessage.delete();
@@ -51,7 +51,7 @@ export class GamesWorker extends WorkerBase {
             return;
         }
 
-        const team = await this.dataStore.LookForTeam(ngsUser);
+        const team = await this.dataStore.LookForRegisteredTeam(ngsUser);
         if (!team) {
             await this._messageCommand("Unable to find your ngsTeam");
             return;
@@ -65,7 +65,7 @@ export class GamesWorker extends WorkerBase {
     }
 
     private async GetMessagesForTeam(teamSearchTerm: string): Promise<string[]> {
-        let teams = await this.SearchforTeams(teamSearchTerm);
+        let teams = await this.SearchForRegisteredTeams(teamSearchTerm);
         if (teams.length < 1)
             return ["No team found"];
         else if (teams.length > 1)
