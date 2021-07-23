@@ -88,7 +88,7 @@ export class Bot {
 
     private checkTranslators(message: Message) {
         let originalContent = message.content;
-        if (/^\</.test(originalContent)) {
+        if (/^\>/.test(originalContent)) {
             var trimmedValue = originalContent.substr(1);
             this.translators.forEach(translator => {
                 translator.Translate(trimmedValue, message);
