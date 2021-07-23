@@ -31,7 +31,7 @@ class WorkerBase {
             return this.dataStore.SearchForTeamBySeason(season, searchTerm);
         });
     }
-    SearchForPlayers(searchTerm) {
+    SearchForPlayersInCurrentSeason(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             const users = yield this.dataStore.GetUsers();
             const searchRegex = new RegExp(searchTerm, 'i');

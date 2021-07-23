@@ -39,8 +39,9 @@ export class Bot {
     constructor(
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
+        @inject(TYPES.ApiToken) apiToken: string
     ) {
-        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore()));
+        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)));
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
         this.historyDisplay = new HistoryDisplay(this.dependencies);
 

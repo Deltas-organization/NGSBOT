@@ -50,11 +50,11 @@ const Leave_1 = require("./translators/Leave");
 const MessageDictionary_1 = require("./helpers/MessageDictionary");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
-        constructor(client, token) {
+        constructor(client, token, apiToken) {
             this.client = client;
             this.token = token;
             this.translators = [];
-            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore()));
+            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)));
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
@@ -180,7 +180,8 @@ let Bot = /** @class */ (() => {
         inversify_1.injectable(),
         __param(0, inversify_1.inject(types_1.TYPES.Client)),
         __param(1, inversify_1.inject(types_1.TYPES.Token)),
-        __metadata("design:paramtypes", [discord_js_1.Client, String])
+        __param(2, inversify_1.inject(types_1.TYPES.ApiToken)),
+        __metadata("design:paramtypes", [discord_js_1.Client, String, String])
     ], Bot);
     return Bot;
 })();

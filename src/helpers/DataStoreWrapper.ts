@@ -25,6 +25,11 @@ export class DataStoreWrapper
         return this._dataStore.GetUsers();
     }
 
+    public async GetUsersByApi(searchTerm: string)
+    {
+        return (await this._dataStore.GetUsersByApi(searchTerm)).filter(user => (<any>user).bNetId);
+    }
+
     public async GetDivisions()
     {
         return this._dataStore.GetDivisions();

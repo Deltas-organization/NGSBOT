@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchPlayersWorker = void 0;
+const MessageHelper_1 = require("../helpers/MessageHelper");
 const WorkerBase_1 = require("./Bases/WorkerBase");
 class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
@@ -17,7 +18,10 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
             var message = "";
             for (var i = 0; i < commands.length; i++) {
                 var playerName = commands[i];
-                var players = yield this.SearchForPlayers(playerName);
+                if (this.detailed)
+                    var players = yield this.SearchForPlayersByAPI(playerName);
+                else
+                    var players = yield this.SearchForPlayersInCurrentSeason(playerName);
                 if (players.length <= 0)
                     message += `No players found for: ${playerName} \n`;
                 else
@@ -27,18 +31,36 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
             yield this.messageSender.SendMessage(message);
         });
     }
-    CreatePlayerMessage(players) {
-        let result = [];
-        players.forEach(p => {
-            let playerResult = '';
-            playerResult += `**Name**: ${p.displayName}, \n**TeamName**: ${p.teamName} \n`;
-            for (var rank of p.verifiedRankHistory) {
-                if (rank.status == 'verified')
-                    playerResult += `${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}** \n`;
-            }
-            result.push(playerResult);
+    SearchForPlayersByAPI(searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.dataStore.GetUsersByApi(searchTerm);
         });
-        return result.join("\n");
+    }
+    CreatePlayerMessage(players) {
+        let message = new MessageHelper_1.MessageHelper();
+        players.forEach(p => {
+            message.AddNewLine(`**Name**: ${p.displayName}`);
+            if (p.teamName)
+                message.AddNewLine(`**TeamName**: ${p.teamName}`);
+            else
+                message.AddNewLine("**No Team Found**");
+            for (var rank of p.verifiedRankHistory.sort(this.RankHistorySort)) {
+                if (rank.status == 'verified')
+                    message.AddNewLine(`${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}**`);
+            }
+            message.AddEmptyLine();
+        });
+        return message.CreateStringMessage();
+    }
+    RankHistorySort(history1, history2) {
+        if (history1.year > history2.year)
+            return -1;
+        else if (history1.year < history2.year)
+            return 1;
+        if (history1.season > history2.season)
+            return -1;
+        else
+            return 1;
     }
 }
 exports.SearchPlayersWorker = SearchPlayersWorker;

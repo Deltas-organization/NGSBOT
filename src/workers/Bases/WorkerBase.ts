@@ -32,7 +32,7 @@ export abstract class WorkerBase {
         return this.dataStore.SearchForTeamBySeason(season, searchTerm);
     }
 
-    protected async SearchForPlayers(searchTerm: string): Promise<INGSUser[]> {
+    protected async SearchForPlayersInCurrentSeason(searchTerm: string): Promise<INGSUser[]> {
         const users = await this.dataStore.GetUsers();
         const searchRegex = new RegExp(searchTerm, 'i');
         return users.filter(p => searchRegex.test(p.displayName));

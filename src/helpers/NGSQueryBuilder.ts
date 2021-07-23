@@ -4,6 +4,9 @@ import { Globals } from '../Globals';
 
 export class NGSQueryBuilder {
     public GetResponse<T>(path: string): Promise<T> {
+        if(path[0] != '/')
+            path = "/" + path;
+            
         Globals.logAdvanced(`retrieving: ${path}`);
         return new Promise<T>((resolver, rejector) => {
             const options = {
@@ -42,6 +45,8 @@ export class NGSQueryBuilder {
 
     public PostResponse<T>(path: string, objectToSerialize: any): Promise<T> {
         const postData = JSON.stringify(objectToSerialize);
+        if(path[0] != '/')
+            path = "/" + path;
 
         Globals.logAdvanced(`Posting To: ${path} with: ${postData}`);
 

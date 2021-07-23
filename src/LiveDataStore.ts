@@ -7,6 +7,10 @@ import { INGSDivision, INGSSchedule, INGSTeam, INGSUser } from './interfaces';
 import { AugmentedNGSUser } from './models/AugmentedNGSUser';
 
 export class LiveDataStore {
+
+    constructor(private _apiKey: string) {
+
+    }
     private cachedDivisions = new Cacher<INGSDivision[]>(60 * 24);
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
     private cachedUsers = new Cacher<AugmentedNGSUser[]>(60 * 24);
@@ -32,6 +36,14 @@ export class LiveDataStore {
 
     public async GetUsers(): Promise<AugmentedNGSUser[]> {
         return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
+    }
+
+    public async GetUsersByApi(searchTerm: string): Promise<INGSUser[]> {
+        return new NGSQueryBuilder().PostResponse<INGSUser[]>('search/user', {
+            userName: searchTerm,
+            apiKey: this._apiKey,
+            fullProfile: true
+         });
     }
 
     public async GetRegisteredTeams(): Promise<INGSTeam[]> {

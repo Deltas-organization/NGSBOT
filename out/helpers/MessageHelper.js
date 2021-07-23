@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageHelper = void 0;
 class MessageHelper {
-    constructor(JsonPropertyName) {
+    constructor(JsonPropertyName = "message") {
         this.JsonPropertyName = JsonPropertyName;
         this._lines = [];
         this.Options = {};

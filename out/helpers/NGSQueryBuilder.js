@@ -6,6 +6,8 @@ const https = require("https");
 const Globals_1 = require("../Globals");
 class NGSQueryBuilder {
     GetResponse(path) {
+        if (path[0] != '/')
+            path = "/" + path;
         Globals_1.Globals.logAdvanced(`retrieving: ${path}`);
         return new Promise((resolver, rejector) => {
             const options = {
@@ -40,6 +42,8 @@ class NGSQueryBuilder {
     }
     PostResponse(path, objectToSerialize) {
         const postData = JSON.stringify(objectToSerialize);
+        if (path[0] != '/')
+            path = "/" + path;
         Globals_1.Globals.logAdvanced(`Posting To: ${path} with: ${postData}`);
         return new Promise((resolver, rejector) => {
             const options = {

@@ -16,7 +16,8 @@ const ListCacher_1 = require("./helpers/ListCacher");
 const NGSQueryBuilder_1 = require("./helpers/NGSQueryBuilder");
 const AugmentedNGSUser_1 = require("./models/AugmentedNGSUser");
 class LiveDataStore {
-    constructor() {
+    constructor(_apiKey) {
+        this._apiKey = _apiKey;
         this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
         this.cachedSchedule = new Cacher_1.Cacher(60);
         this.cachedUsers = new Cacher_1.Cacher(60 * 24);
@@ -44,6 +45,15 @@ class LiveDataStore {
     GetUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.cachedUsers.TryGetFromCache(() => this.GetFreshUsers());
+        });
+    }
+    GetUsersByApi(searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('search/user', {
+                userName: searchTerm,
+                apiKey: this._apiKey,
+                fullProfile: true
+            });
         });
     }
     GetRegisteredTeams() {

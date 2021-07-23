@@ -30,6 +30,11 @@ class DataStoreWrapper {
             return this._dataStore.GetUsers();
         });
     }
+    GetUsersByApi(searchTerm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (yield this._dataStore.GetUsersByApi(searchTerm)).filter(user => user.bNetId);
+        });
+    }
     GetDivisions() {
         return __awaiter(this, void 0, void 0, function* () {
             return this._dataStore.GetDivisions();
