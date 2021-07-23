@@ -37,22 +37,22 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 count++;
                 let messageHelper = await this.AssignValidRoles(team, guildMembers);
                 if (messageHelper) {
-                    messagesLog.push(messageHelper);                    
+                    messagesLog.push(messageHelper);
                 }
                 if (count > (teams.length / steps) * progressCount) {
                     await this.messageSender.Edit(progressMessage, `Assignment Continuing \n Progress: ${progressCount * (100 / steps)}%`);
                     progressCount++;
                 }
             }
-                fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
-                    detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
-                }));
-                await this.messageSender.TextChannel.send({
-                    files: [{
-                        attachment: './files/assignedRoles.json',
-                        name: 'AssignRolesReport.json'
-                    }]
-                }).catch(console.error);
+            fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
+                detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
+            }));
+            await this.messageSender.TextChannel.send({
+                files: [{
+                    attachment: './files/assignedRoles.json',
+                    name: 'AssignRolesReport.json'
+                }]
+            }).catch(console.error);
         }
         catch (e) {
             Globals.log(e);
@@ -95,9 +95,18 @@ export class AssignRolesWorker extends RoleWorkerBase {
         const teamName = team.teamName;
         let result = new MessageHelper<AssignRolesOptions>(team.teamName);
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(result, teamName);
-        const roleRsponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
-        const divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
-        await this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+        try {
+            if(team.divisionDisplayName)
+            {
+                const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
+                var divRoleOnDiscord = roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
+            }
+            await this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+        }
+        catch (e) {
+            result.AddNewLine(`There was a problem assigning team: ${teamName}`);
+            result.AddJSONLine(e);
+        }
         return result;
     }
 

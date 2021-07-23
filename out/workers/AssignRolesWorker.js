@@ -100,9 +100,17 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             const teamName = team.teamName;
             let result = new MessageHelper_1.MessageHelper(team.teamName);
             const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(result, teamName);
-            const roleRsponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
-            const divRoleOnDiscord = roleRsponse.div == NGSRoles_1.NGSRoles.Storm ? null : roleRsponse.role;
-            yield this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+            try {
+                if (team.divisionDisplayName) {
+                    const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
+                    var divRoleOnDiscord = roleResponse.div == NGSRoles_1.NGSRoles.Storm ? null : roleResponse.role;
+                }
+                yield this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+            }
+            catch (e) {
+                result.AddNewLine(`There was a problem assigning team: ${teamName}`);
+                result.AddJSONLine(e);
+            }
             return result;
         });
     }

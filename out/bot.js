@@ -48,6 +48,7 @@ const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
 const Leave_1 = require("./translators/Leave");
 const MessageDictionary_1 = require("./helpers/MessageDictionary");
+const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken) {
@@ -72,6 +73,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new NonCastedGamesCommand_1.NonCastedGamesCommand(this.dependencies));
             this.translators.push(new Leave_1.Leave(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
+            this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
         }
         listen() {
             this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
@@ -91,11 +93,15 @@ let Bot = /** @class */ (() => {
         }
         checkTranslators(message) {
             let originalContent = message.content;
-            if (/^\>/.test(originalContent)) {
+            if (/^\</.test(originalContent)) {
                 var trimmedValue = originalContent.substr(1);
                 this.translators.forEach(translator => {
                     translator.Translate(trimmedValue, message);
                 });
+            }
+            else if (/^\!/.test(originalContent)) {
+                var trimmedValue = originalContent.substr(1);
+                this.assignFreeAgentTranslator.Translate(trimmedValue, message);
             }
         }
         sendSchedule() {

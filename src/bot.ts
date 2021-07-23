@@ -26,6 +26,7 @@ import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
 import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand";
 import { Leave } from "./translators/Leave";
 import { MessageDictionary } from "./helpers/MessageDictionary";
+import { ToggleFreeAgentRole } from "./translators/ToggleFreeAgentRole";
 
 @injectable()
 export class Bot {
@@ -35,6 +36,7 @@ export class Bot {
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
     private captainsListCommand: UpdateCaptainsListCommand;
+    private assignFreeAgentTranslator: ToggleFreeAgentRole;
 
     constructor(
         @inject(TYPES.Client) public client: Client,
@@ -61,6 +63,7 @@ export class Bot {
         this.translators.push(new Leave(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
+        this.assignFreeAgentTranslator = new ToggleFreeAgentRole(this.dependencies);
     }
 
     public listen(): Promise<string> {
@@ -85,11 +88,15 @@ export class Bot {
 
     private checkTranslators(message: Message) {
         let originalContent = message.content;
-        if (/^\>/.test(originalContent)) {
+        if (/^\</.test(originalContent)) {
             var trimmedValue = originalContent.substr(1);
             this.translators.forEach(translator => {
                 translator.Translate(trimmedValue, message);
             });
+        }
+        else if(/^\!/.test(originalContent)) {
+            var trimmedValue = originalContent.substr(1);
+            this.assignFreeAgentTranslator.Translate(trimmedValue, message);
         }
     }
 
