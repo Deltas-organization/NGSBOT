@@ -2,8 +2,10 @@ import { MessageSender } from "../helpers/MessageSender";
 import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
 import { AssignRolesWorker } from "../workers/AssignRolesWorker";
 import { AssignFreeAgentRoleWorker } from "../workers/AssignFreeAgentRoleWorker";
+import { TranslatorBase } from "./bases/translatorBase";
+import { NGSOnlyTranslatorBase } from "./bases/ngsOnlyTranslatorBase";
 
-export class ToggleFreeAgentRole extends ngsTranslatorBase {
+export class ToggleFreeAgentRole extends NGSOnlyTranslatorBase {
     public get commandBangs(): string[] {
         return ["assign", "unassign"];
     }

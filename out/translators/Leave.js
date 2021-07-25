@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Leave = void 0;
-const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const LeaveWorker_1 = require("../workers/LeaveWorker");
+const ngsOnlyTranslatorBase_1 = require("./bases/ngsOnlyTranslatorBase");
 const fs = require('fs');
-class Leave extends ngsTranslatorBase_1.ngsTranslatorBase {
+class Leave extends ngsOnlyTranslatorBase_1.NGSOnlyTranslatorBase {
     get commandBangs() {
         return ["leave"];
     }

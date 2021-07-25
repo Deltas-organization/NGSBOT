@@ -11,18 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ngsTranslatorBase = void 0;
 const translatorBase_1 = require("./translatorBase");
+const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 class ngsTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.user.id == "163779571060178955" || (message.member.permissions.has('ADMINISTRATOR') && message.guild.id == "325846370730901504"))
+            if ((message.member.permissions.has('ADMINISTRATOR') && message.guild.id == DiscordGuilds_1.DiscordGuilds.NGS))
                 return true;
             return false;
         });
-    }
-    IsAuthenticated(memberToCheck) {
-        if (memberToCheck.user.id == "163779571060178955" || memberToCheck.permissions.has('ADMINISTRATOR'))
-            return true;
-        return false;
     }
 }
 exports.ngsTranslatorBase = ngsTranslatorBase;

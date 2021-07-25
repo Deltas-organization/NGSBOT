@@ -9,16 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminTranslatorBase = void 0;
+exports.NGSOnlyTranslatorBase = void 0;
 const translatorBase_1 = require("./translatorBase");
-class AdminTranslatorBase extends translatorBase_1.TranslatorBase {
+const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
+class NGSOnlyTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.permissions.has('ADMINISTRATOR'))
-                return true;
+            switch (message.guild.id) {
+                case DiscordGuilds_1.DiscordGuilds.NGS:
+                    return true;
+            }
             return false;
         });
     }
 }
-exports.AdminTranslatorBase = AdminTranslatorBase;
-//# sourceMappingURL=adminTranslatorBase.js.map
+exports.NGSOnlyTranslatorBase = NGSOnlyTranslatorBase;
+//# sourceMappingURL=ngsOnlyTranslatorBase.js.map

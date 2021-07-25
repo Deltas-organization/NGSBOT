@@ -1,19 +1,11 @@
-import { Guild, GuildMember, Role, User } from "discord.js";
 import { MessageSender } from "../helpers/MessageSender";
-import { INGSTeam, INGSUser } from "../interfaces";
-import { Globals } from "../Globals";
-import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
-import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
-import { MessageHelper } from "../helpers/MessageHelper";
-import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
-import { NGSRoles } from "../enums/NGSRoles";
-import { RoleHelper } from "../helpers/RoleHelper";
 import { LeaveWorker } from "../workers/LeaveWorker";
+import { NGSOnlyTranslatorBase } from "./bases/ngsOnlyTranslatorBase";
 
 
 const fs = require('fs');
 
-export class Leave extends ngsTranslatorBase {
+export class Leave extends NGSOnlyTranslatorBase {
 
     public get commandBangs(): string[] {
         return ["leave"];

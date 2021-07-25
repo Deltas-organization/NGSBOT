@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ToggleFreeAgentRole = void 0;
-const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const AssignFreeAgentRoleWorker_1 = require("../workers/AssignFreeAgentRoleWorker");
-class ToggleFreeAgentRole extends ngsTranslatorBase_1.ngsTranslatorBase {
+const ngsOnlyTranslatorBase_1 = require("./bases/ngsOnlyTranslatorBase");
+class ToggleFreeAgentRole extends ngsOnlyTranslatorBase_1.NGSOnlyTranslatorBase {
     get commandBangs() {
         return ["assign", "unassign"];
     }
