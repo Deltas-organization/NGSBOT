@@ -33,6 +33,7 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             'Has Cooties',
             'PoGo Raider',
             'Cupid Captain',
+            'HCI Player',
             'Trait Value',
             NGSRoles_1.NGSRoles.Storm,
             '@everyone'

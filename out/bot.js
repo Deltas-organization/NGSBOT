@@ -49,6 +49,8 @@ const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListComman
 const Leave_1 = require("./translators/Leave");
 const MessageDictionary_1 = require("./helpers/MessageDictionary");
 const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
+const CheckFreeAgentsCommand_1 = require("./commands/CheckFreeAgentsCommand");
+const Globals_1 = require("./Globals");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken) {
@@ -60,6 +62,7 @@ let Bot = /** @class */ (() => {
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.captainsListCommand = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.dependencies);
+            this.checkFreeAgentsCommand = new CheckFreeAgentsCommand_1.CheckFreeAgentsCommand(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
@@ -153,6 +156,17 @@ let Bot = /** @class */ (() => {
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHistory);
                     }
+                }
+            });
+        }
+        CheckFreeAgents() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.dependencies.client.login(this.token);
+                try {
+                    yield this.checkFreeAgentsCommand.MessageFreeAgents(30);
+                }
+                catch (e) {
+                    Globals_1.Globals.log(e);
                 }
             });
         }

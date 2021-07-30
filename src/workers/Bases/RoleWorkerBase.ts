@@ -22,6 +22,7 @@ export abstract class RoleWorkerBase extends WorkerBase {
         'Has Cooties',
         'PoGo Raider',
         'Cupid Captain',
+        'HCI Player',
         'Trait Value',
         NGSRoles.Storm,
         '@everyone'];

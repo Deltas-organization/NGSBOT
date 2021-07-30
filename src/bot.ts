@@ -27,6 +27,8 @@ import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand"
 import { Leave } from "./translators/Leave";
 import { MessageDictionary } from "./helpers/MessageDictionary";
 import { ToggleFreeAgentRole } from "./translators/ToggleFreeAgentRole";
+import { CheckFreeAgentsCommand } from "./commands/CheckFreeAgentsCommand";
+import { Globals } from "./Globals";
 
 @injectable()
 export class Bot {
@@ -36,6 +38,7 @@ export class Bot {
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
     private captainsListCommand: UpdateCaptainsListCommand;
+    private checkFreeAgentsCommand: CheckFreeAgentsCommand;
     private assignFreeAgentTranslator: ToggleFreeAgentRole;
 
     constructor(
@@ -49,6 +52,7 @@ export class Bot {
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.captainsListCommand = new UpdateCaptainsListCommand(this.dependencies);
+        this.checkFreeAgentsCommand = new CheckFreeAgentsCommand(this.dependencies);
         this.translators.push(this.scheduleLister);
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
@@ -143,6 +147,16 @@ export class Bot {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHistory);
             }
+        }
+    }
+
+    public async CheckFreeAgents() {
+        await this.dependencies.client.login(this.token);
+        try {
+            await this.checkFreeAgentsCommand.MessageFreeAgents(30);
+        }
+        catch (e) {
+            Globals.log(e);
         }
     }
 
