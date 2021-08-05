@@ -18,9 +18,9 @@ export class UpdateCaptainsListCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async CreateDivisionList(division: NGSDivisions, channelIdToSearch: string): Promise<string> {
+    public async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string> {
         try {
-            const guild = await this.GetGuild(channelIdToSearch);
+            const guild = await this.GetGuild(channelToUserForGuildRetrieval);
             const roleHelper = await this.CreateRoleHelper(guild);
             const teams = await this.GetTeamsInDivision(division);
             const divisions = await this.dataStore.GetDivisions();
@@ -55,6 +55,7 @@ export class UpdateCaptainsListCommand {
                     }
                 }
             }
+            messageHelper.AddNewLine(`-----------------------------------`);
             return messageHelper.CreateStringMessage();
         }
         catch (e) {

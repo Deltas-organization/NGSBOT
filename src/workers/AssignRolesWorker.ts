@@ -182,9 +182,9 @@ export class AssignRolesWorker extends RoleWorkerBase {
         return messageTracker;
     }
 
-    private async AssignRole(guildMember: GuildMember, divRole: Role) {
+    private async AssignRole(guildMember: GuildMember, roleToAssign: Role) {
         if (!this._testing)
-            await guildMember.roles.add(divRole);
+            await guildMember.roles.add(roleToAssign);
     }
 
     private HasRole(rolesOfUser: Role[], roleToLookFor: Role) {

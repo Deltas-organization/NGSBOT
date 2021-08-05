@@ -51,6 +51,7 @@ const MessageDictionary_1 = require("./helpers/MessageDictionary");
 const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
 const CheckFreeAgentsCommand_1 = require("./commands/CheckFreeAgentsCommand");
 const Globals_1 = require("./Globals");
+const UnusedRoles_1 = require("./translators/UnusedRoles");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken) {
@@ -75,6 +76,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new GamesCommand_1.GamesCommand(this.dependencies));
             this.translators.push(new NonCastedGamesCommand_1.NonCastedGamesCommand(this.dependencies));
             this.translators.push(new Leave_1.Leave(this.dependencies));
+            this.translators.push(new UnusedRoles_1.UnUsedRoles(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
             this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
         }
@@ -137,11 +139,6 @@ let Bot = /** @class */ (() => {
                 yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DadSchedule);
             });
         }
-        sendScheduleForMom() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.DEast, DiscordChannels_1.DiscordChannels.MomSchedule);
-            });
-        }
         sendScheduleForSis() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.SisSchedule);
@@ -173,9 +170,8 @@ let Bot = /** @class */ (() => {
         CreateCaptainList() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);
-                //        for (var value in NGSDivisions)
-                {
-                    const division = NGSDivisions_1.NGSDivisions.DEast; //[value];
+                for (var value in NGSDivisions_1.NGSDivisions) {
+                    const division = NGSDivisions_1.NGSDivisions[value];
                     try {
                         yield this.AttemptToUpdateCaptainMessage(division);
                     }
@@ -190,9 +186,9 @@ let Bot = /** @class */ (() => {
                 const messageId = MessageDictionary_1.MessageDictionary.GetSavedMessage(division);
                 const message = yield this.captainsListCommand.CreateDivisionList(division, DiscordChannels_1.DiscordChannels.NGSDiscord);
                 if (messageId)
-                    yield this.messageSender.OverwriteMessage(message, messageId, DiscordChannels_1.DiscordChannels.DeltaServer, true);
+                    yield this.messageSender.OverwriteMessage(message, messageId, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
                 else
-                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.DeltaServer, true);
+                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
             });
         }
     };

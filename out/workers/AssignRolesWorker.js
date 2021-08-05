@@ -183,10 +183,10 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             return messageTracker;
         });
     }
-    AssignRole(guildMember, divRole) {
+    AssignRole(guildMember, roleToAssign) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this._testing)
-                yield guildMember.roles.add(divRole);
+                yield guildMember.roles.add(roleToAssign);
         });
     }
     HasRole(rolesOfUser, roleToLookFor) {

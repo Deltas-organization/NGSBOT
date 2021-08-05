@@ -6,15 +6,13 @@ class MessageDictionary {
     static GetSavedMessage(ngsDivisions) {
         switch (ngsDivisions) {
             case NGSDivisions_1.NGSDivisions.Storm:
-                return "845377087271469066";
+                return "872980581397458974";
             case NGSDivisions_1.NGSDivisions.Heroic:
                 return "845377088986677248";
             case NGSDivisions_1.NGSDivisions.Nexus:
                 return "845377090941485116";
-            case NGSDivisions_1.NGSDivisions.AEast:
+            case NGSDivisions_1.NGSDivisions.A:
                 return "845377092539252757";
-            case NGSDivisions_1.NGSDivisions.AWest:
-                return "845377093801345035";
             case NGSDivisions_1.NGSDivisions.BSouthEast:
                 return "845377113547604019";
             case NGSDivisions_1.NGSDivisions.BNorthEast:
@@ -25,7 +23,9 @@ class MessageDictionary {
                 return "845377119696584754";
             case NGSDivisions_1.NGSDivisions.CWest:
                 return "845377121030242345";
-            case NGSDivisions_1.NGSDivisions.DEast:
+            case NGSDivisions_1.NGSDivisions.DNorthEast:
+                return "845377140669284392";
+            case NGSDivisions_1.NGSDivisions.DSouthEast:
                 return "845377140669284392";
             case NGSDivisions_1.NGSDivisions.DWest:
                 return "845377142434955334";

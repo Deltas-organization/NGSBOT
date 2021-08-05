@@ -13,6 +13,7 @@ class RoleHelper {
         switch (divisionDisplayName.toLowerCase()) {
             case "a west":
             case "a east":
+            case "a":
                 divRoleName = NGSRoles_1.NGSRoles.DivA;
                 break;
             case "b west":
@@ -26,6 +27,8 @@ class RoleHelper {
                 break;
             case "d west":
             case "d east":
+            case "d southeast":
+            case "d northeast":
                 divRoleName = NGSRoles_1.NGSRoles.DivD;
                 break;
             case "e west":

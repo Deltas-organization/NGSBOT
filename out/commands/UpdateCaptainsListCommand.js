@@ -20,11 +20,11 @@ class UpdateCaptainsListCommand {
         this.client = dependencies.client;
         this.dataStore = dependencies.dataStore;
     }
-    CreateDivisionList(division, channelIdToSearch) {
+    CreateDivisionList(division, channelToUserForGuildRetrieval) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const guild = yield this.GetGuild(channelIdToSearch);
+                const guild = yield this.GetGuild(channelToUserForGuildRetrieval);
                 const roleHelper = yield this.CreateRoleHelper(guild);
                 const teams = yield this.GetTeamsInDivision(division);
                 const divisions = yield this.dataStore.GetDivisions();
@@ -58,6 +58,7 @@ class UpdateCaptainsListCommand {
                         }
                     }
                 }
+                messageHelper.AddNewLine(`-----------------------------------`);
                 return messageHelper.CreateStringMessage();
             }
             catch (e) {
