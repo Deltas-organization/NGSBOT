@@ -12,33 +12,57 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckFreeAgentsCommand = void 0;
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const moment = require("moment-timezone");
-const Globals_1 = require("../Globals");
 class CheckFreeAgentsCommand {
     constructor(dependencies) {
         this.client = dependencies.client;
         this.dataStore = dependencies.dataStore;
     }
-    MessageFreeAgents(pastDayCount) {
+    DeleteOldMessages(pastDayCount) {
         return __awaiter(this, void 0, void 0, function* () {
             const guildChannel = yield this.GetChannel(DiscordChannels_1.DiscordChannels.DeltaServer);
-            let messages = (yield guildChannel.messages.fetch({ limit: 10 })).map((message, _, __) => message);
-            const currentDate = moment();
-            console.log(currentDate);
-            let messagesToDelete = [];
-            for (var message of messages) {
-                let momentDate = moment(message.createdTimestamp);
-                console.log(currentDate.diff(momentDate, 'days'));
+            let messagesToDelete = yield this.GetMessagesToDelete(pastDayCount, guildChannel);
+            for (var message of messagesToDelete) {
+                console.log("deleting");
+                yield message.delete();
+            }
+            // while (messagesToDelete.length == 100) {
+            //     try {
+            //         await guildChannel.bulkDelete(messagesToDelete);
+            //     }
+            //     catch (e) {
+            //         Globals.log(e);
+            //     }
+            //     messagesToDelete = await this.GetMessagesToDelete(pastDayCount, guildChannel);
+            // }
+        });
+    }
+    GetMessagesToDelete(pastDayCount, guildChannel) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let limit = 100;
+            let messages = (yield guildChannel.messages.fetch({ limit })).map((message, _, __) => message);
+            let messagesToDelete = this.GetMessageOlderThen(pastDayCount, messages);
+            while (messagesToDelete.length < limit) {
+                messages = (yield guildChannel.messages.fetch({ limit, before: messages[messages.length - 1].id })).map((message, _, __) => message);
+                messagesToDelete = messagesToDelete.concat(this.GetMessageOlderThen(pastDayCount, messages));
+                if (messages.length < limit)
+                    break;
+            }
+            return messagesToDelete;
+        });
+    }
+    GetMessageOlderThen(days, messages) {
+        const currentDate = moment();
+        let messagesToDelete = [];
+        for (var message of messages) {
+            let momentDate = moment(message.createdTimestamp);
+            const dateDifference = currentDate.diff(momentDate, 'days');
+            if (dateDifference > days) {
                 if (!message.pinned) {
                     messagesToDelete.push(message);
                 }
             }
-            try {
-                yield guildChannel.bulkDelete(messagesToDelete);
-            }
-            catch (e) {
-                Globals_1.Globals.log(e);
-            }
-        });
+        }
+        return messagesToDelete;
     }
     GetChannel(channelId) {
         return __awaiter(this, void 0, void 0, function* () {

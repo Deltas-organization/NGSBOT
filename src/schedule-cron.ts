@@ -9,6 +9,7 @@ async function sendSchedule() {
     try {
     await bot.sendSchedule();
     await bot.sendScheduleForDad();
+    await bot.sendScheduleForSis();
     }
     catch (e)
     {

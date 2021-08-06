@@ -148,10 +148,10 @@ export class Bot {
         }
     }
 
-    public async CheckFreeAgents() {
+    public async DeleteOldMessages() {
         await this.dependencies.client.login(this.token);
         try {
-            await this.checkFreeAgentsCommand.MessageFreeAgents(30);
+            await this.checkFreeAgentsCommand.DeleteOldMessages(30);
         }
         catch (e) {
             Globals.log(e);

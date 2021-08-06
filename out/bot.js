@@ -157,11 +157,11 @@ let Bot = /** @class */ (() => {
                 }
             });
         }
-        CheckFreeAgents() {
+        DeleteOldMessages() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);
                 try {
-                    yield this.checkFreeAgentsCommand.MessageFreeAgents(30);
+                    yield this.checkFreeAgentsCommand.DeleteOldMessages(30);
                 }
                 catch (e) {
                     Globals_1.Globals.log(e);
