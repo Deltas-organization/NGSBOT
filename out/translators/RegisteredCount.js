@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisteredCount = void 0;
 const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
-var fs = require('fs');
 class RegisteredCount extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["registered"];
