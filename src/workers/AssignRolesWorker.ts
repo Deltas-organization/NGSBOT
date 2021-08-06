@@ -1,10 +1,13 @@
-import { Guild, GuildMember, Role } from "discord.js";
+import { Guild, GuildMember, Message, Role } from "discord.js";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
+import { MessageSender } from "../helpers/MessageSender";
+import { NGSQueryBuilder } from "../helpers/NGSQueryBuilder";
 import { RoleHelper } from "../helpers/RoleHelper";
-import { INGSTeam } from "../interfaces";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
+import { INGSTeam, INGSUser } from "../interfaces";
 import { AssignRolesOptions } from "../message-helpers/AssignRolesOptions";
 import { RoleWorkerBase } from "./Bases/RoleWorkerBase";
 import { WorkerBase } from "./Bases/WorkerBase";
@@ -14,6 +17,10 @@ const fs = require('fs');
 export class AssignRolesWorker extends RoleWorkerBase {
 
     private _testing = false;
+
+    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender, private apiKey: string) {
+        super(workerDependencies, detailed, messageSender);
+    }
 
     protected async Start(commands: string[]) {
         if (commands.length > 0)
@@ -96,8 +103,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
         let result = new MessageHelper<AssignRolesOptions>(team.teamName);
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(result, teamName);
         try {
-            if(team.divisionDisplayName)
-            {
+            if (team.divisionDisplayName) {
                 const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
                 var divRoleOnDiscord = roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
             }
@@ -146,6 +152,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
             const guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
             messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
             if (guildMember) {
+                await this.AttemptToUpdateDiscordID(user, guildMember);
                 messageTracker.Options.PlayersInDiscord++;
                 var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                 messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
@@ -180,6 +187,24 @@ export class AssignRolesWorker extends RoleWorkerBase {
         }
 
         return messageTracker;
+    }
+
+    private async AttemptToUpdateDiscordID(user: INGSUser, guildMember: GuildMember): Promise<void> {
+        if (user.discordId)
+            return;
+
+        try {
+            await new NGSQueryBuilder().PostResponse('user/save/discordid', {
+                displayName: user.displayName,
+                apiKey: this.apiKey,
+                discordId: guildMember.id
+            });            
+            Globals.log(`saved discord id for user: ${user.displayName}`)
+        }
+        catch (e) {
+            Globals.log(e);
+            Globals.log(`Unable to save discord id for user: ${user.displayName}`);
+        }
     }
 
     private async AssignRole(guildMember: GuildMember, roleToAssign: Role) {

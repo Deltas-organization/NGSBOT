@@ -19,6 +19,7 @@ class TranslatorBase {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;
+        this.apiKey = translatorDependencies.apiKey;
         this.Init();
     }
     Init() {

@@ -14,12 +14,16 @@ const NGSRoles_1 = require("../enums/NGSRoles");
 const Globals_1 = require("../Globals");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
+const NGSQueryBuilder_1 = require("../helpers/NGSQueryBuilder");
 const AssignRolesOptions_1 = require("../message-helpers/AssignRolesOptions");
 const RoleWorkerBase_1 = require("./Bases/RoleWorkerBase");
 const fs = require('fs');
 class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
-    constructor() {
-        super(...arguments);
+    constructor(workerDependencies, detailed, messageSender, apiKey) {
+        super(workerDependencies, detailed, messageSender);
+        this.detailed = detailed;
+        this.messageSender = messageSender;
+        this.apiKey = apiKey;
         this._testing = false;
     }
     Start(commands) {
@@ -149,6 +153,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
                 messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
                 if (guildMember) {
+                    yield this.AttemptToUpdateDiscordID(user, guildMember);
                     messageTracker.Options.PlayersInDiscord++;
                     var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                     messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
@@ -181,6 +186,24 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 }
             }
             return messageTracker;
+        });
+    }
+    AttemptToUpdateDiscordID(user, guildMember) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (user.discordId)
+                return;
+            try {
+                yield new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('user/save/discordid', {
+                    displayName: user.displayName,
+                    apiKey: this.apiKey,
+                    discordId: guildMember.id
+                });
+                Globals_1.Globals.log(`saved discord id for user: ${user.displayName}`);
+            }
+            catch (e) {
+                Globals_1.Globals.log(e);
+                Globals_1.Globals.log(`Unable to save discord id for user: ${user.displayName}`);
+            }
         });
     }
     AssignRole(guildMember, roleToAssign) {

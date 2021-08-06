@@ -7,6 +7,7 @@ class AugmentedNGSUser {
         this.teamName = ngsUser.teamName;
         this.discordTag = ngsUser.discordTag;
         this.verifiedRankHistory = ngsUser.verifiedRankHistory;
+        this.discordId = ngsUser.discordId;
     }
 }
 exports.AugmentedNGSUser = AugmentedNGSUser;

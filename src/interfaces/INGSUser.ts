@@ -5,5 +5,6 @@ export interface INGSUser
     displayName: string;
     teamName: string;
     discordTag: string;
+    discordId: string;
     verifiedRankHistory: INGSRank[]
 }

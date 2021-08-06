@@ -47,7 +47,7 @@ export class Bot {
         @inject(TYPES.Token) public token: string,
         @inject(TYPES.ApiToken) apiToken: string
     ) {
-        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)));
+        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken);
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
         this.historyDisplay = new HistoryDisplay(this.dependencies);
 
@@ -81,11 +81,11 @@ export class Bot {
     }
 
     public watchForUserJoin() {
-        // this.client.on('guildMemberAdd', async member => {
-        //     let newUserCommand = new AssignNewUserCommand(this.dependencies);
-        //     let message = await newUserCommand.AssignUser(member);
-        //     await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
-        // });
+        this.client.on('guildMemberAdd', async member => {
+            let newUserCommand = new AssignNewUserCommand(this.dependencies);
+            let message = await newUserCommand.AssignUser(member);
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
+        });
     }
 
     private OnMessageReceived(message: Message) {

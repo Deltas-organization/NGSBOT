@@ -22,7 +22,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const assignRolesWorker = new AssignRolesWorker_1.AssignRolesWorker(this.translatorDependencies, detailed, messageSender);
+            const assignRolesWorker = new AssignRolesWorker_1.AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey);
             yield assignRolesWorker.Begin(commands);
         });
     }

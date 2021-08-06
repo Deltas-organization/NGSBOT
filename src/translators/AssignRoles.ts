@@ -26,7 +26,7 @@ export class AssignRoles extends ngsTranslatorBase
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
     {
-        const assignRolesWorker = new AssignRolesWorker(this.translatorDependencies, detailed, messageSender);
+        const assignRolesWorker = new AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey);
         await assignRolesWorker.Begin(commands);
     }
 }

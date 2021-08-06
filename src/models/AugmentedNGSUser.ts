@@ -5,6 +5,7 @@ export class AugmentedNGSUser implements INGSUser
     public displayName: string;
     public teamName: string;
     public discordTag: string;
+    public discordId: string;
     public verifiedRankHistory: INGSRank[];
     public IsCaptain: boolean;
     public IsAssistantCaptain: boolean;
@@ -15,5 +16,6 @@ export class AugmentedNGSUser implements INGSUser
         this.teamName = ngsUser.teamName;
         this.discordTag = ngsUser.discordTag;
         this.verifiedRankHistory = ngsUser.verifiedRankHistory;
+        this.discordId = ngsUser.discordId;
     }    
 }

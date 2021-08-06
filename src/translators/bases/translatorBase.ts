@@ -15,11 +15,13 @@ export abstract class TranslatorBase implements ITranslate {
     protected readonly dataStore: DataStoreWrapper;
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
+    protected readonly apiKey: string;
 
     constructor(protected translatorDependencies: CommandDependencies) {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;
+        this.apiKey = translatorDependencies.apiKey;
 
         this.Init();
     }
