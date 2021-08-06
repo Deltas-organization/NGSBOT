@@ -23,9 +23,12 @@ export class DiscordFuzzySearch {
 
     private static FindByDiscordTag(ngsDiscordTag: string, guildMembers: GuildMember[]): GuildMember {
 
-        const { name, discriminator } = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
-        if (!discriminator)
-            return null;
+        const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
+        if (!information || !information.discriminator || !information.name)
+            return;
+
+        const discriminator = information.discriminator;
+        const name = information.name;
 
         const filteredByDiscriminator = guildMembers.filter(member => member.user.discriminator == discriminator);
         const possibleMembers = [];
@@ -63,9 +66,12 @@ export class DiscordFuzzySearch {
         if (!ngsDiscordTag)
             return false;
 
-        const { name, discriminator } = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
-        if (!discriminator)
+        const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
+        if (!information || !information.discriminator || !information.name)
             return false;
+
+        const discriminator = information.discriminator;
+        const name = information.name;
 
         if (guildUser.discriminator != discriminator)
             return false;

@@ -27,9 +27,11 @@ class DiscordFuzzySearch {
         return DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
     }
     static FindByDiscordTag(ngsDiscordTag, guildMembers) {
-        const { name, discriminator } = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
-        if (!discriminator)
-            return null;
+        const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
+        if (!information || !information.discriminator || !information.name)
+            return;
+        const discriminator = information.discriminator;
+        const name = information.name;
         const filteredByDiscriminator = guildMembers.filter(member => member.user.discriminator == discriminator);
         const possibleMembers = [];
         for (let member of filteredByDiscriminator) {
@@ -62,9 +64,11 @@ class DiscordFuzzySearch {
         const ngsDiscordTag = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
         if (!ngsDiscordTag)
             return false;
-        const { name, discriminator } = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
-        if (!discriminator)
+        const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
+        if (!information || !information.discriminator || !information.name)
             return false;
+        const discriminator = information.discriminator;
+        const name = information.name;
         if (guildUser.discriminator != discriminator)
             return false;
         const discordName = DiscordFuzzySearch.GetDiscordId(guildUser);
