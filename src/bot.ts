@@ -30,6 +30,7 @@ import { ToggleFreeAgentRole } from "./translators/ToggleFreeAgentRole";
 import { CheckFreeAgentsCommand } from "./commands/CheckFreeAgentsCommand";
 import { Globals } from "./Globals";
 import { UnUsedRoles } from "./translators/UnusedRoles";
+import { UpdateCaptainsList } from "./translators/UpdateCaptainsList";
 
 @injectable()
 export class Bot {
@@ -67,6 +68,7 @@ export class Bot {
         this.translators.push(new NonCastedGamesCommand(this.dependencies));
         this.translators.push(new Leave(this.dependencies));
         this.translators.push(new UnUsedRoles(this.dependencies));
+        this.translators.push(new UpdateCaptainsList(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
         this.assignFreeAgentTranslator = new ToggleFreeAgentRole(this.dependencies);

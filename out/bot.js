@@ -53,6 +53,7 @@ const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
 const CheckFreeAgentsCommand_1 = require("./commands/CheckFreeAgentsCommand");
 const Globals_1 = require("./Globals");
 const UnusedRoles_1 = require("./translators/UnusedRoles");
+const UpdateCaptainsList_1 = require("./translators/UpdateCaptainsList");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken) {
@@ -78,6 +79,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new NonCastedGamesCommand_1.NonCastedGamesCommand(this.dependencies));
             this.translators.push(new Leave_1.Leave(this.dependencies));
             this.translators.push(new UnusedRoles_1.UnUsedRoles(this.dependencies));
+            this.translators.push(new UpdateCaptainsList_1.UpdateCaptainsList(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
             this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
         }
