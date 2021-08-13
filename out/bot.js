@@ -86,9 +86,9 @@ let Bot = /** @class */ (() => {
             this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
         }
         listen() {
-            // this.client.on('message', async (message: Message) => {
-            //     this.OnMessageReceived(message);
-            // });
+            this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
+                this.OnMessageReceived(message);
+            }));
             return this.client.login(this.token);
         }
         OnInitialize() {

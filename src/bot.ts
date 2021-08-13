@@ -77,9 +77,9 @@ export class Bot {
     }
 
     public listen(): Promise<string> {
-        // this.client.on('message', async (message: Message) => {
-        //     this.OnMessageReceived(message);
-        // });
+        this.client.on('message', async (message: Message) => {
+            this.OnMessageReceived(message);
+        });
 
         return this.client.login(this.token);
     }
