@@ -24,7 +24,7 @@ export class AssignNewUserCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async AssignUser(guildMember: GuildMember | PartialGuildMember) : Promise<string> {
+    public async AssignUser(guildMember: GuildMember | PartialGuildMember) : Promise<MessageHelper<AssignNewUserOptions>> {
         await this.Setup(guildMember);
         const messageOptions = new MessageHelper<AssignNewUserOptions>("NewUsers");
         messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
@@ -42,18 +42,12 @@ export class AssignNewUserCommand {
         else {
             messageOptions.AddNewLine(`did not find a team for user.`);
         }
-        return messageOptions.CreateStringMessage();
+        return messageOptions;
     }
 
     private async Setup(guildMember: GuildMember | PartialGuildMember) {
-        await this.InitializeRoleHelper(guildMember.guild);
+        this. _serverRoleHelper =  await RoleHelper.CreateFrom(guildMember.guild);
         this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
-    }
-
-    private async InitializeRoleHelper(guild: Guild) {
-        const roleInformation = await guild.roles.fetch();
-        const roles = roleInformation.cache.map((role, _, __) => role);
-        this._serverRoleHelper = new RoleHelper(roles);
     }
 
     private async AssignValidRoles(team: INGSTeam, guildMember: GuildMember | PartialGuildMember, ngsUser: AugmentedNGSUser) {

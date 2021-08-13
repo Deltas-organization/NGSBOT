@@ -49,18 +49,11 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
     Setup() {
         return __awaiter(this, void 0, void 0, function* () {
             this.dataStore.Clear();
-            yield this.InitializeRoleHelper(this.messageSender.originalMessage.guild);
+            this.roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(this.messageSender.originalMessage.guild);
             this.captainRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
             this.myBotRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.NGSBot);
             this.stormRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Storm);
             this.reserveredRoles = this.GetReservedRoles();
-        });
-    }
-    InitializeRoleHelper(guild) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const roleInformation = yield guild.roles.fetch();
-            const roles = roleInformation.cache.map((role, _, __) => role);
-            this.roleHelper = new RoleHelper_1.RoleHelper(roles);
         });
     }
     GetReservedRoles() {

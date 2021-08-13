@@ -21,7 +21,7 @@ export class UpdateCaptainsListCommand {
     public async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string> {
         try {
             const guild = await this.GetGuild(channelToUserForGuildRetrieval);
-            const roleHelper = await this.CreateRoleHelper(guild);
+            const roleHelper = await RoleHelper.CreateFrom(guild);
             const teams = await this.GetTeamsInDivision(division);
             const divisions = await this.dataStore.GetDivisions();
             const divisionInformation = divisions.find(d => d.displayName == division);
@@ -68,14 +68,7 @@ export class UpdateCaptainsListCommand {
         const divisionTeams = teams.filter(team => team.divisionDisplayName == division).sort((t1, t2) => TeamSorter.SortByTeamName(t1, t2));
         return divisionTeams;
     }
-
-    private async CreateRoleHelper(guild: Guild) {
-        const roleInformation = await guild.roles.fetch();
-        const roles = roleInformation.cache.map((role, _, __) => role);
-        const roleHelper = new RoleHelper(roles);
-        return roleHelper;
-    }
-
+    
     private async GetGuild(channelId: string) {
         const channel = (await this.client.channels.fetch(channelId, false)) as GuildChannel;
         return channel.guild;

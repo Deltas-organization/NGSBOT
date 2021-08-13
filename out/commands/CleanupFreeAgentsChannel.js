@@ -9,41 +9,60 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CheckFreeAgentsCommand = void 0;
+exports.CleanupFreeAgentsChannel = void 0;
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const moment = require("moment-timezone");
-class CheckFreeAgentsCommand {
+const DiscordMembers_1 = require("../enums/DiscordMembers");
+class CleanupFreeAgentsChannel {
     constructor(dependencies) {
         this.client = dependencies.client;
         this.dataStore = dependencies.dataStore;
     }
-    DeleteOldMessages(pastDayCount) {
+    NotifyUsersOfDelete(pastDayCount) {
         return __awaiter(this, void 0, void 0, function* () {
             const guildChannel = yield this.GetChannel(DiscordChannels_1.DiscordChannels.DeltaServer);
-            let messagesToDelete = yield this.GetMessagesToDelete(pastDayCount, guildChannel);
+            let messagesToDelete = yield this.GetMessagesOlderThen(pastDayCount, guildChannel);
             for (var message of messagesToDelete) {
-                console.log("deleting");
-                yield message.delete();
+                if (message.member.id != DiscordMembers_1.DiscordMembers.Delta)
+                    continue;
+                yield message.member.send({
+                    embed: {
+                        color: 0,
+                        description: "In 5 days your free agent posting on the website will be deleted, you will need to repost it. Here is the original message: "
+                    }
+                });
+                yield message.member.send({
+                    embed: {
+                        color: 0,
+                        description: message.content
+                    }
+                });
+                break;
             }
-            // while (messagesToDelete.length == 100) {
-            //     try {
-            //         await guildChannel.bulkDelete(messagesToDelete);
-            //     }
-            //     catch (e) {
-            //         Globals.log(e);
-            //     }
-            //     messagesToDelete = await this.GetMessagesToDelete(pastDayCount, guildChannel);
+        });
+    }
+    DeleteOldMessages(pastDayCount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const guildChannel = yield this.GetChannel(DiscordChannels_1.DiscordChannels.NGSFreeAgents);
+            let messagesToDelete = yield this.GetMessagesOlderThen(pastDayCount, guildChannel);
+            console.log(messagesToDelete.length);
+            // for(var message of messagesToDelete)
+            // {
+            //     console.log("deleting");
+            //     await message.delete();
             // }
         });
     }
-    GetMessagesToDelete(pastDayCount, guildChannel) {
+    GetMessagesOlderThen(pastDayCount, guildChannel) {
         return __awaiter(this, void 0, void 0, function* () {
             let fetchLimit = 100;
             let messages = (yield guildChannel.messages.fetch({ limit: fetchLimit })).map((message, _, __) => message);
             let messagesToDelete = this.GetMessageOlderThen(pastDayCount, messages);
-            while (messagesToDelete.length >= 0) {
+            while (messages.length > 0) {
                 messages = (yield guildChannel.messages.fetch({ limit: fetchLimit, before: messages[messages.length - 1].id })).map((message, _, __) => message);
                 messagesToDelete = messagesToDelete.concat(this.GetMessageOlderThen(pastDayCount, messages));
+                if (messagesToDelete.length >= 100)
+                    break;
             }
             return messagesToDelete;
         });
@@ -69,5 +88,5 @@ class CheckFreeAgentsCommand {
         });
     }
 }
-exports.CheckFreeAgentsCommand = CheckFreeAgentsCommand;
-//# sourceMappingURL=CheckFreeAgentsCommand.js.map
+exports.CleanupFreeAgentsChannel = CleanupFreeAgentsChannel;
+//# sourceMappingURL=CleanupFreeAgentsChannel.js.map

@@ -50,10 +50,12 @@ const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListComman
 const Leave_1 = require("./translators/Leave");
 const MessageDictionary_1 = require("./helpers/MessageDictionary");
 const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
-const CheckFreeAgentsCommand_1 = require("./commands/CheckFreeAgentsCommand");
+const CleanupFreeAgentsChannel_1 = require("./commands/CleanupFreeAgentsChannel");
 const Globals_1 = require("./Globals");
 const UnusedRoles_1 = require("./translators/UnusedRoles");
 const UpdateCaptainsList_1 = require("./translators/UpdateCaptainsList");
+const NGSRoles_1 = require("./enums/NGSRoles");
+const RoleHelper_1 = require("./helpers/RoleHelper");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken) {
@@ -65,7 +67,7 @@ let Bot = /** @class */ (() => {
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.captainsListCommand = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.dependencies);
-            this.checkFreeAgentsCommand = new CheckFreeAgentsCommand_1.CheckFreeAgentsCommand(this.dependencies);
+            this.checkFreeAgentsCommand = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
@@ -84,16 +86,36 @@ let Bot = /** @class */ (() => {
             this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
         }
         listen() {
-            this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
-                this.OnMessageReceived(message);
-            }));
+            // this.client.on('message', async (message: Message) => {
+            //     this.OnMessageReceived(message);
+            // });
             return this.client.login(this.token);
         }
-        watchForUserJoin() {
+        OnInitialize() {
+            this.WatchForUserJoin();
+            this.WatchForUserFreeAgent();
+        }
+        WatchForUserJoin() {
             this.client.on('guildMemberAdd', (member) => __awaiter(this, void 0, void 0, function* () {
                 let newUserCommand = new AssignNewUserCommand_1.AssignNewUserCommand(this.dependencies);
                 let message = yield newUserCommand.AssignUser(member);
-                yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.DeltaServer);
+                const stringMessage = message.CreateStringMessage();
+                if (message.Options.FoundTeam) {
+                    yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
+                }
+                yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
+            }));
+        }
+        WatchForUserFreeAgent() {
+            let freeAgentRole;
+            this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
+                if (message.channel.id == DiscordChannels_1.DiscordChannels.NGSFreeAgents) {
+                    if (freeAgentRole == null) {
+                        const roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(message.guild);
+                        freeAgentRole = roleHelper.lookForRole(NGSRoles_1.NGSRoles.FreeAgents);
+                    }
+                    message.member.roles.add(freeAgentRole);
+                }
             }));
         }
         OnMessageReceived(message) {
@@ -163,7 +185,7 @@ let Bot = /** @class */ (() => {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);
                 try {
-                    yield this.checkFreeAgentsCommand.DeleteOldMessages(30);
+                    yield this.checkFreeAgentsCommand.NotifyUsersOfDelete(65);
                 }
                 catch (e) {
                     Globals_1.Globals.log(e);

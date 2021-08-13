@@ -41,17 +41,11 @@ export abstract class RoleWorkerBase extends WorkerBase {
 
     private async Setup() {
         this.dataStore.Clear();
-        await this.InitializeRoleHelper(this.messageSender.originalMessage.guild);
+        this.roleHelper = await RoleHelper.CreateFrom(this.messageSender.originalMessage.guild);
         this.captainRole = this.roleHelper.lookForRole(NGSRoles.Captain);
         this.myBotRole = this.roleHelper.lookForRole(NGSRoles.NGSBot);
         this.stormRole = this.roleHelper.lookForRole(NGSRoles.Storm);
         this.reserveredRoles = this.GetReservedRoles();
-    }
-
-    private async InitializeRoleHelper(guild: Guild) {
-        const roleInformation = await guild.roles.fetch();
-        const roles = roleInformation.cache.map((role, _, __) => role);
-        this.roleHelper = new RoleHelper(roles);
     }
 
     private GetReservedRoles(): Role[] {
