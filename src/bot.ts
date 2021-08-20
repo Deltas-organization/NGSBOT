@@ -139,6 +139,10 @@ export class Bot {
         await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.SisSchedule);
     }
 
+    public async sendScheduleForMom() {
+        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.MomSchedule);
+    }
+
     public async CheckHistory() {
         await this.dependencies.client.login(this.token);
         let messages = await this.historyDisplay.GetRecentHistory(1);

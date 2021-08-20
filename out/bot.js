@@ -147,6 +147,11 @@ let Bot = /** @class */ (() => {
                 yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.SisSchedule);
             });
         }
+        sendScheduleForMom() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.MomSchedule);
+            });
+        }
         CheckHistory() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);

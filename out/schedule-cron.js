@@ -19,6 +19,7 @@ function sendSchedule() {
         try {
             yield bot.sendSchedule();
             yield bot.sendScheduleForDad();
+            yield bot.sendScheduleForMom();
             yield bot.sendScheduleForSis();
         }
         catch (e) {
