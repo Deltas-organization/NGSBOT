@@ -27,10 +27,12 @@ import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand"
 import { Leave } from "./translators/Leave";
 import { MessageDictionary } from "./helpers/MessageDictionary";
 import { ToggleFreeAgentRole } from "./translators/ToggleFreeAgentRole";
-import { CheckFreeAgentsCommand } from "./commands/CheckFreeAgentsCommand";
+import { CleanupFreeAgentsChannel } from "./commands/CleanupFreeAgentsChannel";
 import { Globals } from "./Globals";
 import { UnUsedRoles } from "./translators/UnusedRoles";
 import { UpdateCaptainsList } from "./translators/UpdateCaptainsList";
+import { NGSRoles } from "./enums/NGSRoles";
+import { RoleHelper } from "./helpers/RoleHelper";
 
 @injectable()
 export class Bot {
@@ -40,7 +42,7 @@ export class Bot {
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
     private captainsListCommand: UpdateCaptainsListCommand;
-    private checkFreeAgentsCommand: CheckFreeAgentsCommand;
+    private checkFreeAgentsCommand: CleanupFreeAgentsChannel;
     private assignFreeAgentTranslator: ToggleFreeAgentRole;
 
     constructor(
@@ -54,7 +56,7 @@ export class Bot {
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.captainsListCommand = new UpdateCaptainsListCommand(this.dependencies);
-        this.checkFreeAgentsCommand = new CheckFreeAgentsCommand(this.dependencies);
+        this.checkFreeAgentsCommand = new CleanupFreeAgentsChannel(this.dependencies);
         this.translators.push(this.scheduleLister);
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
@@ -82,11 +84,34 @@ export class Bot {
         return this.client.login(this.token);
     }
 
-    public watchForUserJoin() {
+    public OnInitialize() {
+        this.WatchForUserJoin();
+        this.WatchForUserFreeAgent();
+    }
+
+    public WatchForUserJoin() {
         this.client.on('guildMemberAdd', async member => {
             let newUserCommand = new AssignNewUserCommand(this.dependencies);
             let message = await newUserCommand.AssignUser(member);
-            await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
+            const stringMessage = message.CreateStringMessage();
+            if (message.Options.FoundTeam)
+            {
+                await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.NGSDiscord);
+            }
+            await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.DeltaServer);
+        });
+    }
+
+    public WatchForUserFreeAgent() {
+        let freeAgentRole;
+        this.client.on('message', async (message: Message) => {
+            if (message.channel.id == DiscordChannels.NGSFreeAgents) {
+                if (freeAgentRole == null) {
+                    const roleHelper = await RoleHelper.CreateFrom(message.guild);
+                    freeAgentRole = roleHelper.lookForRole(NGSRoles.FreeAgents);
+                }
+                message.member.roles.add(freeAgentRole);
+            }
         });
     }
 
@@ -157,7 +182,7 @@ export class Bot {
     public async DeleteOldMessages() {
         await this.dependencies.client.login(this.token);
         try {
-            await this.checkFreeAgentsCommand.DeleteOldMessages(30);
+            await this.checkFreeAgentsCommand.NotifyUsersOfDelete(65);
         }
         catch (e) {
             Globals.log(e);
@@ -166,8 +191,7 @@ export class Bot {
 
     public async CreateCaptainList() {
         await this.dependencies.client.login(this.token);
-        for (var value in NGSDivisions)
-        {
+        for (var value in NGSDivisions) {
             const division = NGSDivisions[value];
             try {
                 await this.AttemptToUpdateCaptainMessage(division);

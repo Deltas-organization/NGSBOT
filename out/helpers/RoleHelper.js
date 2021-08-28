@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoleHelper = void 0;
 const NGSRoles_1 = require("../enums/NGSRoles");
@@ -7,6 +16,14 @@ class RoleHelper {
     constructor(roles) {
         this.roles = roles;
         Globals_1.Globals.logAdvanced(`helping with Roles: ${roles.map(role => role.name)}`);
+    }
+    static CreateFrom(guild) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const roleInformation = yield guild.roles.fetch();
+            const roles = roleInformation.cache.map((role, _, __) => role);
+            const roleHelper = new RoleHelper(roles);
+            return roleHelper;
+        });
     }
     FindDivRole(divisionDisplayName) {
         let divRoleName;

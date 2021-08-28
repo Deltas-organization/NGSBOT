@@ -33,6 +33,7 @@ export class UpdateCaptainsList extends ngsTranslatorBase
     {
         const updateCaptainsList = new UpdateCaptainsListCommand(this.translatorDependencies);
         const channelSender = new SendChannelMessage(this.client, this.messageStore);
+        const message = await messageSender.SendMessage("Updating captains list now");
         for (var value in NGSDivisions)
         {
             const division = NGSDivisions[value];
@@ -44,6 +45,7 @@ export class UpdateCaptainsList extends ngsTranslatorBase
                 await this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, division)
             }
         }
+        messageSender.Edit(message, "Captains list has been updated");
     }
     private async AttemptToUpdateCaptainMessage(captainsListCommand: UpdateCaptainsListCommand, channelSender: SendChannelMessage, division: NGSDivisions)
     {

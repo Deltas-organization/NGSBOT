@@ -25,7 +25,7 @@ class UpdateCaptainsListCommand {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const guild = yield this.GetGuild(channelToUserForGuildRetrieval);
-                const roleHelper = yield this.CreateRoleHelper(guild);
+                const roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(guild);
                 const teams = yield this.GetTeamsInDivision(division);
                 const divisions = yield this.dataStore.GetDivisions();
                 const divisionInformation = divisions.find(d => d.displayName == division);
@@ -71,14 +71,6 @@ class UpdateCaptainsListCommand {
             const teams = yield this.dataStore.GetTeams();
             const divisionTeams = teams.filter(team => team.divisionDisplayName == division).sort((t1, t2) => TeamSorter_1.TeamSorter.SortByTeamName(t1, t2));
             return divisionTeams;
-        });
-    }
-    CreateRoleHelper(guild) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const roleInformation = yield guild.roles.fetch();
-            const roles = roleInformation.cache.map((role, _, __) => role);
-            const roleHelper = new RoleHelper_1.RoleHelper(roles);
-            return roleHelper;
         });
     }
     GetGuild(channelId) {

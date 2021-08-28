@@ -37,20 +37,13 @@ class AssignNewUserCommand {
             else {
                 messageOptions.AddNewLine(`did not find a team for user.`);
             }
-            return messageOptions.CreateStringMessage();
+            return messageOptions;
         });
     }
     Setup(guildMember) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.InitializeRoleHelper(guildMember.guild);
+            this._serverRoleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(guildMember.guild);
             this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
-        });
-    }
-    InitializeRoleHelper(guild) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const roleInformation = yield guild.roles.fetch();
-            const roles = roleInformation.cache.map((role, _, __) => role);
-            this._serverRoleHelper = new RoleHelper_1.RoleHelper(roles);
         });
     }
     AssignValidRoles(team, guildMember, ngsUser) {

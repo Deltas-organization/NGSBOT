@@ -1,10 +1,17 @@
-import { Role } from "discord.js";
+import { Guild, Role } from "discord.js";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
 
 export class RoleHelper {
     constructor(private roles: Role[]) {
         Globals.logAdvanced(`helping with Roles: ${roles.map(role => role.name)}`);
+    }
+
+    public static async CreateFrom(guild: Guild) {
+        const roleInformation = await guild.roles.fetch();
+        const roles = roleInformation.cache.map((role, _, __) => role);
+        const roleHelper = new RoleHelper(roles);
+        return roleHelper;
     }
 
     public FindDivRole(divisionDisplayName: string): { div: NGSRoles, role: Role } {

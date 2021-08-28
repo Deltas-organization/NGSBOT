@@ -6,8 +6,8 @@ const types_1 = require("./inversify/types");
 let bot = inversify_config_1.default.get(types_1.TYPES.Bot);
 bot.listen().then(() => {
     console.log('Logged in!');
+    bot.OnInitialize();
 }).catch((error) => {
     console.log('Oh no! ', error);
 });
-bot.watchForUserJoin();
 //# sourceMappingURL=index.js.map
