@@ -11,12 +11,12 @@ export class NGSQueryBuilder {
         return new Promise<T>((resolver, rejector) => {
             const options = {
                 hostname: 'nexusgamingseries.org',
-                port: 80,
+                port: 443,
                 path: `/api${path}`,
                 method: 'GET'
             };
 
-            const req = http.request(options, (result) => {
+            const req = https.request(options, (result) => {
                 result.setEncoding('utf8');
                 var chunks = "";
                 result.on('data', (chunk) => {
