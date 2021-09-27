@@ -1,4 +1,5 @@
 import { INGSRank, INGSUser } from "../interfaces";
+import { INGSHistory } from "../interfaces/INGSHistory";
 
 export class AugmentedNGSUser implements INGSUser
 {
@@ -9,6 +10,7 @@ export class AugmentedNGSUser implements INGSUser
     public verifiedRankHistory: INGSRank[];
     public IsCaptain: boolean;
     public IsAssistantCaptain: boolean;
+    public history: INGSHistory[];
 
     constructor(ngsUser: INGSUser)
     {

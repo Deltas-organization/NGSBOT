@@ -1,6 +1,7 @@
 import { tagged } from "inversify";
 import { stringify } from "querystring";
 import { NGSDivisions } from "../enums/NGSDivisions";
+import { HistoryActions } from "../enums/NGSHistoryActions";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { TeamSorter } from "../helpers/TeamSorter";
@@ -110,11 +111,6 @@ export class HistoryDisplay {
    
 }
 
-enum HistoryActions {
-    JoinedTeam = "Joined team",
-    AddedDivision = "Added to division",
-    CreatedTeam = "Team Created"
-}
 
 class HistoryContainer {
     private Information: Map<number, HistoryInformation[]>;

@@ -1,3 +1,4 @@
+import { INGSHistory } from "./INGSHistory";
 import { INGSRank } from "./INGSRank";
 
 export interface INGSUser
@@ -6,5 +7,6 @@ export interface INGSUser
     teamName: string;
     discordTag: string;
     discordId: string;
-    verifiedRankHistory: INGSRank[]
+    verifiedRankHistory: INGSRank[],
+    history: INGSHistory[]
 }

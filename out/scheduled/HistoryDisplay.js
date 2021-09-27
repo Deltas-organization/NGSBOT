@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryDisplay = void 0;
+const NGSHistoryActions_1 = require("../enums/NGSHistoryActions");
 const MessageHelper_1 = require("../helpers/MessageHelper");
 const TeamSorter_1 = require("../helpers/TeamSorter");
 class HistoryDisplay {
@@ -33,7 +34,7 @@ class HistoryDisplay {
                     const dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
                     if (dayDifference < days) {
                         const historyInformation = new HistoryInformation(history);
-                        if (history.action == HistoryActions.JoinedTeam) {
+                        if (history.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
                             var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
                             if (numberOfRosterAdd > 0) {
                                 historyInformation.RosterAddNumber = numberOfRosterAdd;
@@ -57,7 +58,7 @@ class HistoryDisplay {
             let messages = [];
             for (let team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
                 for (let history of team.history) {
-                    if (history.action == HistoryActions.CreatedTeam) {
+                    if (history.action == NGSHistoryActions_1.HistoryActions.CreatedTeam) {
                         if (history.season == season) {
                             let teamMessage = `\u200B \u200B ${team.teamName} \n`;
                             if (teamMessage.length + message.length > 2048) {
@@ -77,10 +78,10 @@ class HistoryDisplay {
         var addsSoFar = 0;
         var currentHistoryIndex = sortedHistory.indexOf(history);
         for (var indexedHistory of sortedHistory) {
-            if (indexedHistory.action == HistoryActions.JoinedTeam) {
+            if (indexedHistory.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
                 addsSoFar++;
             }
-            if (indexedHistory.action == HistoryActions.AddedDivision) {
+            if (indexedHistory.action == NGSHistoryActions_1.HistoryActions.AddedDivision) {
                 if (currentHistoryIndex > addsSoFar)
                     return 0;
                 else
@@ -108,12 +109,6 @@ class HistoryDisplay {
     }
 }
 exports.HistoryDisplay = HistoryDisplay;
-var HistoryActions;
-(function (HistoryActions) {
-    HistoryActions["JoinedTeam"] = "Joined team";
-    HistoryActions["AddedDivision"] = "Added to division";
-    HistoryActions["CreatedTeam"] = "Team Created";
-})(HistoryActions || (HistoryActions = {}));
 class HistoryContainer {
     constructor(Team) {
         this.Team = Team;

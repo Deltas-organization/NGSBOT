@@ -76,7 +76,7 @@ export class NGSQueryBuilder {
                         resolver(response);
                     }
                     catch (e) {
-                        Globals.logAdvanced(`problem with request: ${path}`, e);
+                        Globals.logAdvanced(`problem with request: ${path}, response: ${chunks}`, e);
                         rejector(e);
                     }
                 });
