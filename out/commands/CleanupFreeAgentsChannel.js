@@ -12,45 +12,73 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CleanupFreeAgentsChannel = void 0;
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const moment = require("moment-timezone");
-const DiscordMembers_1 = require("../enums/DiscordMembers");
+const Globals_1 = require("../Globals");
 class CleanupFreeAgentsChannel {
     constructor(dependencies) {
         this.client = dependencies.client;
         this.dataStore = dependencies.dataStore;
     }
-    NotifyUsersOfDelete(pastDayCount) {
+    NotifyUsersOfDelete(exactDayCount) {
         return __awaiter(this, void 0, void 0, function* () {
-            const guildChannel = yield this.GetChannel(DiscordChannels_1.DiscordChannels.DeltaServer);
-            let messagesToDelete = yield this.GetMessagesOlderThen(pastDayCount, guildChannel);
-            for (var message of messagesToDelete) {
-                if (message.member.id != DiscordMembers_1.DiscordMembers.Delta)
-                    continue;
-                yield message.member.send({
-                    embed: {
-                        color: 0,
-                        description: "In 5 days your free agent posting on the website will be deleted, you will need to repost it. Here is the original message: "
+            const guildChannel = yield this.GetChannel(DiscordChannels_1.DiscordChannels.NGSFreeAgents);
+            const messagesToDelete = yield this.GetMessagesOlderThen(exactDayCount - 1, guildChannel);
+            if (messagesToDelete.length <= 0)
+                return;
+            Globals_1.Globals.log("notifying users of messages about to be deleted");
+            for (let container of messagesToDelete) {
+                try {
+                    const message = container.Message;
+                    if (container.DaysOld != exactDayCount)
+                        continue;
+                    if (!message.author) {
+                        continue;
                     }
-                });
-                yield message.member.send({
-                    embed: {
-                        color: 0,
-                        description: message.content
-                    }
-                });
-                break;
+                    if (!message.deletable)
+                        continue;
+                    yield message.author.send({
+                        embed: {
+                            color: 0,
+                            description: "In 5 days your free agent posting on the NGS Discord Server will be deleted, you will need to repost it if you are still looking for a team. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.  \n \n **I cannot read, relay, or reply to any message you send to me in this chat.**"
+                        }
+                    });
+                }
+                catch (e) {
+                    Globals_1.Globals.log("there was a problem notifying user about a message being deleted soon", e);
+                }
             }
         });
     }
     DeleteOldMessages(pastDayCount) {
         return __awaiter(this, void 0, void 0, function* () {
             const guildChannel = yield this.GetChannel(DiscordChannels_1.DiscordChannels.NGSFreeAgents);
-            let messagesToDelete = yield this.GetMessagesOlderThen(pastDayCount, guildChannel);
-            console.log(messagesToDelete.length);
-            // for(var message of messagesToDelete)
-            // {
-            //     console.log("deleting");
-            //     await message.delete();
-            // }
+            const messagesToDelete = yield this.GetMessagesOlderThen(pastDayCount - 1, guildChannel);
+            if (messagesToDelete.length <= 0)
+                return;
+            Globals_1.Globals.log("deleteing old free agent messages");
+            for (var message of messagesToDelete.map(m => m.Message)) {
+                try {
+                    if (!message.deletable) {
+                        Globals_1.Globals.log("unable to delete message.");
+                        continue;
+                    }
+                    yield message.author.send({
+                        embed: {
+                            color: 0,
+                            description: "Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.  \n \n **I cannot read, relay, or reply to any message you send to me in this chat.**"
+                        }
+                    });
+                    yield message.author.send({
+                        embed: {
+                            color: 0,
+                            description: message.content
+                        }
+                    });
+                    yield message.delete();
+                }
+                catch (e) {
+                    Globals_1.Globals.log("there was a problem deleting a message", e);
+                }
+            }
         });
     }
     GetMessagesOlderThen(pastDayCount, guildChannel) {
@@ -61,8 +89,6 @@ class CleanupFreeAgentsChannel {
             while (messages.length > 0) {
                 messages = (yield guildChannel.messages.fetch({ limit: fetchLimit, before: messages[messages.length - 1].id })).map((message, _, __) => message);
                 messagesToDelete = messagesToDelete.concat(this.GetMessageOlderThen(pastDayCount, messages));
-                if (messagesToDelete.length >= 100)
-                    break;
             }
             return messagesToDelete;
         });
@@ -75,7 +101,7 @@ class CleanupFreeAgentsChannel {
             const dateDifference = currentDate.diff(momentDate, 'days');
             if (dateDifference > days) {
                 if (!message.pinned) {
-                    messagesToDelete.push(message);
+                    messagesToDelete.push(new MessageDeleteContainer(message, dateDifference));
                 }
             }
         }
@@ -83,10 +109,15 @@ class CleanupFreeAgentsChannel {
     }
     GetChannel(channelId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const channel = (yield this.client.channels.fetch(channelId, false));
-            return channel;
+            return (yield this.client.channels.fetch(channelId, false));
         });
     }
 }
 exports.CleanupFreeAgentsChannel = CleanupFreeAgentsChannel;
+class MessageDeleteContainer {
+    constructor(Message, DaysOld) {
+        this.Message = Message;
+        this.DaysOld = DaysOld;
+    }
+}
 //# sourceMappingURL=CleanupFreeAgentsChannel.js.map

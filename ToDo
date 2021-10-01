@@ -1,0 +1,10 @@
+Store the schedule commands message in the database
+Allow the schedule to be updated when new casts are picked updated
+
+Get free agents to remove posts older then 65 days
+Get Coaching Request to remove posts older then 65 days
+
+Allow the bot to listen to a command and post the schedule in the channel without me having to hard code the list.
+
+Get the bot to check his permissions so he can tell people he doesn't have permissions to do things.
+Stop the bot from removing div roles once a team has withdrawn so they can still party in the div chat for the season.

@@ -182,7 +182,8 @@ export class Bot {
     public async DeleteOldMessages() {
         await this.dependencies.client.login(this.token);
         try {
-            await this.checkFreeAgentsCommand.NotifyUsersOfDelete(65);
+            await this.checkFreeAgentsCommand.NotifyUsersOfDelete(60);
+            await this.checkFreeAgentsCommand.DeleteOldMessages(65);
         }
         catch (e) {
             Globals.log(e);

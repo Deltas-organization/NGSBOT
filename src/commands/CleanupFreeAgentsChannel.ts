@@ -16,41 +16,70 @@ export class CleanupFreeAgentsChannel {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async NotifyUsersOfDelete(pastDayCount: number) {
-        const guildChannel = await this.GetChannel(DiscordChannels.DeltaServer);
-        let messagesToDelete: Message[] = await this.GetMessagesOlderThen(pastDayCount, guildChannel);
-        for (var message of messagesToDelete) {
-            if(message.member.id != DiscordMembers.Delta)
-                continue;
+    public async NotifyUsersOfDelete(exactDayCount: number) {
+        const guildChannel = await this.GetChannel(DiscordChannels.NGSFreeAgents);
+        const messagesToDelete: MessageDeleteContainer[] = await this.GetMessagesOlderThen(exactDayCount - 1, guildChannel);
+        if (messagesToDelete.length <= 0)
+            return;
 
-            await message.member.send({
-                embed: {
-                    color: 0,
-                    description: "In 5 days your free agent posting on the website will be deleted, you will need to repost it. Here is the original message: "
+        Globals.log("notifying users of messages about to be deleted");
+        for (let container of messagesToDelete) {
+            try {
+                const message = container.Message;
+                if(container.DaysOld != exactDayCount)
+                    continue;
+                if (!message.author) {
+                    continue;
                 }
-            });
-            await message.member.send({
-                embed: {
-                    color: 0,
-                    description: message.content
-                }
-            });
-            break;
+                if (!message.deletable)
+                    continue;
+                await message.author.send({
+                    embed: {
+                        color: 0,
+                        description: "In 5 days your free agent posting on the NGS Discord Server will be deleted, you will need to repost it if you are still looking for a team. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.  \n \n **I cannot read, relay, or reply to any message you send to me in this chat.**"
+                    }
+                });
+            }
+            catch (e) {
+                Globals.log("there was a problem notifying user about a message being deleted soon", e);
+            }
         }
     }
 
     public async DeleteOldMessages(pastDayCount: number) {
         const guildChannel = await this.GetChannel(DiscordChannels.NGSFreeAgents);
-        let messagesToDelete: Message[] = await this.GetMessagesOlderThen(pastDayCount, guildChannel);
-        console.log(messagesToDelete.length);
-        // for(var message of messagesToDelete)
-        // {
-        //     console.log("deleting");
-        //     await message.delete();
-        // }
+        const messagesToDelete: MessageDeleteContainer[] = await this.GetMessagesOlderThen(pastDayCount - 1, guildChannel);
+        if (messagesToDelete.length <= 0)
+            return;
+
+        Globals.log("deleteing old free agent messages");
+        for (var message of messagesToDelete.map(m => m.Message)) {
+            try {
+                if (!message.deletable) {
+                    Globals.log("unable to delete message.");
+                    continue;
+                }
+                await message.author.send({
+                    embed: {
+                        color: 0,
+                        description: "Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.  \n \n **I cannot read, relay, or reply to any message you send to me in this chat.**"
+                    }
+                });
+                await message.author.send({
+                    embed: {
+                        color: 0,
+                        description: message.content
+                    }
+                });
+                await message.delete();
+            }
+            catch (e) {
+                Globals.log("there was a problem deleting a message", e);
+            }
+        }
     }
 
-    private async GetMessagesOlderThen(pastDayCount: number, guildChannel: TextChannel) {
+    private async GetMessagesOlderThen(pastDayCount: number, guildChannel: TextChannel): Promise<MessageDeleteContainer[]> {
         let fetchLimit = 100;
         let messages = (await guildChannel.messages.fetch({ limit: fetchLimit })).map((message, _, __) => message);
 
@@ -58,22 +87,20 @@ export class CleanupFreeAgentsChannel {
         while (messages.length > 0) {
             messages = (await guildChannel.messages.fetch({ limit: fetchLimit, before: messages[messages.length - 1].id })).map((message, _, __) => message);
             messagesToDelete = messagesToDelete.concat(this.GetMessageOlderThen(pastDayCount, messages));
-            if(messagesToDelete.length >= 100)
-                break;
         }
 
         return messagesToDelete;
     }
 
-    private GetMessageOlderThen(days: number, messages: Message[]) {
+    private GetMessageOlderThen(days: number, messages: Message[]): MessageDeleteContainer[] {
         const currentDate = moment();
-        let messagesToDelete: Message[] = [];
+        let messagesToDelete: MessageDeleteContainer[] = [];
         for (var message of messages) {
             let momentDate = moment(message.createdTimestamp);
             const dateDifference = currentDate.diff(momentDate, 'days');
             if (dateDifference > days) {
                 if (!message.pinned) {
-                    messagesToDelete.push(message);
+                    messagesToDelete.push(new MessageDeleteContainer(message, dateDifference));
                 }
             }
         }
@@ -81,7 +108,12 @@ export class CleanupFreeAgentsChannel {
     }
 
     private async GetChannel(channelId: string) {
-        const channel = (await this.client.channels.fetch(channelId, false)) as TextChannel;
-        return channel;
+        return (await this.client.channels.fetch(channelId, false)) as TextChannel;
+    }
+
+}
+
+class MessageDeleteContainer {
+    constructor(public Message: Message, public DaysOld: number) {
     }
 }

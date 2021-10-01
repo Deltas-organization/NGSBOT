@@ -190,7 +190,8 @@ let Bot = /** @class */ (() => {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.dependencies.client.login(this.token);
                 try {
-                    yield this.checkFreeAgentsCommand.NotifyUsersOfDelete(65);
+                    yield this.checkFreeAgentsCommand.NotifyUsersOfDelete(60);
+                    yield this.checkFreeAgentsCommand.DeleteOldMessages(65);
                 }
                 catch (e) {
                     Globals_1.Globals.log(e);
