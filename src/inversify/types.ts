@@ -3,5 +3,6 @@ export const TYPES = {
     Client: Symbol("Client"),
     Token: Symbol("Token"),
     ApiToken: Symbol("ApiToken"),
-    MongConection: Symbol("MongConection")
+    MongConection: Symbol("MongConection"),
+    CronHelper: Symbol("CronHelper")
   };

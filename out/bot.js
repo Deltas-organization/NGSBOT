@@ -39,19 +39,14 @@ const RegisteredCount_1 = require("./translators/RegisteredCount");
 const Purge_1 = require("./translators/Purge");
 const SendChannelMessage_1 = require("./helpers/SendChannelMessage");
 const DiscordChannels_1 = require("./enums/DiscordChannels");
-const HistoryDisplay_1 = require("./scheduled/HistoryDisplay");
 const Reload_1 = require("./translators/Reload");
-const NGSDivisions_1 = require("./enums/NGSDivisions");
 const GamesCommand_1 = require("./translators/GamesCommand");
 const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
 const Leave_1 = require("./translators/Leave");
-const MessageDictionary_1 = require("./helpers/MessageDictionary");
 const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
-const CleanupFreeAgentsChannel_1 = require("./commands/CleanupFreeAgentsChannel");
-const Globals_1 = require("./Globals");
 const UnusedRoles_1 = require("./translators/UnusedRoles");
 const UpdateCaptainsList_1 = require("./translators/UpdateCaptainsList");
 const NGSRoles_1 = require("./enums/NGSRoles");
@@ -64,10 +59,8 @@ let Bot = /** @class */ (() => {
             this.translators = [];
             this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken);
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
-            this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dependencies);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.captainsListCommand = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.dependencies);
-            this.checkFreeAgentsCommand = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
@@ -133,94 +126,6 @@ let Bot = /** @class */ (() => {
                 var trimmedValue = originalContent.substr(1);
                 this.assignFreeAgentTranslator.Translate(trimmedValue, message);
             }
-        }
-        sendSchedule() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.dependencies.client.login(this.token);
-                let messages = yield this.scheduleLister.getGameMessagesForToday();
-                if (messages) {
-                    for (var index = 0; index < messages.length; index++) {
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype);
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
-                    }
-                }
-            });
-        }
-        sendScheduleByDivision(division, ...channels) {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.dependencies.client.login(this.token);
-                let messages = yield this.scheduleLister.getGameMessagesForTodayByDivision(division);
-                if (messages) {
-                    for (var index = 0; index < messages.length; index++) {
-                        for (var channel of channels) {
-                            yield this.messageSender.SendMessageToChannel(messages[index], channel);
-                        }
-                    }
-                }
-            });
-        }
-        sendScheduleForDad() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DadSchedule);
-            });
-        }
-        sendScheduleForSis() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.SisSchedule);
-            });
-        }
-        sendScheduleForMom() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.MomSchedule);
-            });
-        }
-        CheckHistory() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.dependencies.client.login(this.token);
-                let messages = yield this.historyDisplay.GetRecentHistory(1);
-                if (messages) {
-                    for (var index = 0; index < messages.length; index++) {
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHistory);
-                    }
-                }
-            });
-        }
-        DeleteOldMessages() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.dependencies.client.login(this.token);
-                try {
-                    yield this.checkFreeAgentsCommand.NotifyUsersOfDelete(60);
-                    yield this.checkFreeAgentsCommand.DeleteOldMessages(65);
-                }
-                catch (e) {
-                    Globals_1.Globals.log(e);
-                }
-            });
-        }
-        CreateCaptainList() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.dependencies.client.login(this.token);
-                for (var value in NGSDivisions_1.NGSDivisions) {
-                    const division = NGSDivisions_1.NGSDivisions[value];
-                    try {
-                        yield this.AttemptToUpdateCaptainMessage(division);
-                    }
-                    catch (_a) {
-                        yield this.AttemptToUpdateCaptainMessage(division);
-                    }
-                }
-            });
-        }
-        AttemptToUpdateCaptainMessage(division) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const messageId = MessageDictionary_1.MessageDictionary.GetSavedMessage(division);
-                const message = yield this.captainsListCommand.CreateDivisionList(division, DiscordChannels_1.DiscordChannels.NGSDiscord);
-                if (messageId)
-                    yield this.messageSender.OverwriteMessage(message, messageId, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
-                else
-                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
-            });
         }
     };
     Bot = __decorate([

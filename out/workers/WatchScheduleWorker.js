@@ -9,22 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScheduleLister = void 0;
-const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
-const ScheduleWorker_1 = require("../workers/ScheduleWorker");
-class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
-    get commandBangs() {
-        return ["Schedule", "sch"];
-    }
-    get description() {
-        return "Displays the Schedule for Today or a future date if a number is also provided, detailed (-d) will return all days betwen now and the number provided, up to 10.";
-    }
-    Interpret(commands, detailed, messageSender) {
+exports.WatchScheduleWorker = void 0;
+const WorkerBase_1 = require("./Bases/WorkerBase");
+class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
+    Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
-            const worker = new ScheduleWorker_1.ScheduleWorker(this.translatorDependencies, detailed, messageSender);
-            yield worker.Begin(commands);
         });
     }
 }
-exports.ScheduleLister = ScheduleLister;
-//# sourceMappingURL=ScheduleLister.js.map
+exports.WatchScheduleWorker = WatchScheduleWorker;
+//# sourceMappingURL=WatchScheduleWorker.js.map

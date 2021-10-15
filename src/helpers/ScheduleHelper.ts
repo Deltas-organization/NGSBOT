@@ -4,8 +4,24 @@ import moment = require("moment-timezone");
 import { DateHelper } from "./DateHelper";
 import { TeamSorter } from "./TeamSorter";
 import { ScheduleContainer } from "../models/ScehduleContainer";
+import { DataStoreWrapper } from "./DataStoreWrapper";
+import { NGSDivisions } from "../enums/NGSDivisions";
 
 export class ScheduleHelper {
+
+    public static async GetTodaysGamesSorted(dataStore: DataStoreWrapper) {
+        return this.GetFutureGamesSorted(await dataStore.GetSchedule());
+    }
+
+    public static async GetTodaysGamesByDivision(dataStore, division: NGSDivisions) {        
+        var filteredGames = await ScheduleHelper.GetTodaysGamesSorted(dataStore);
+        filteredGames = filteredGames.filter(f => f.divisionDisplayName == division);
+        if (filteredGames.length <= 0) {
+            return;
+        }
+        return await ScheduleHelper.GetMessages(filteredGames);
+    }
+
     public static GetFutureGamesSorted(scheduledGames: INGSSchedule[], daysInFuture: number = 0) {
         let futureGames: INGSSchedule[] = [];
         const todaysUTC = DateHelper.ConvertDateToUTC(new Date());

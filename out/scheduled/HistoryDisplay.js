@@ -14,9 +14,8 @@ const NGSHistoryActions_1 = require("../enums/NGSHistoryActions");
 const MessageHelper_1 = require("../helpers/MessageHelper");
 const TeamSorter_1 = require("../helpers/TeamSorter");
 class HistoryDisplay {
-    constructor(dependencies) {
-        this.dependencies = dependencies;
-        this.dataStore = dependencies.dataStore;
+    constructor(dataStore) {
+        this.dataStore = dataStore;
     }
     GetRecentHistory(days) {
         return __awaiter(this, void 0, void 0, function* () {

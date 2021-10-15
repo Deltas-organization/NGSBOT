@@ -1,19 +1,17 @@
 require('dotenv').config(); // Recommended way of loading dotenv
 import container from "./inversify/inversify.config";
 import { TYPES } from "./inversify/types";
-import { Bot } from "./bot";
-import { NGSDivisions } from "./enums/NGSDivisions";
 import { Globals } from "./Globals";
-let bot = container.get<Bot>(TYPES.Bot);
+import { CronHelper } from "./crons/cron-helper";
+let cronHelper = container.get<CronHelper>(TYPES.CronHelper);
 async function sendSchedule() {
     try {
-    await bot.sendSchedule();
-    await bot.sendScheduleForDad();
-    await bot.sendScheduleForMom();
-    await bot.sendScheduleForSis();
+        await cronHelper.sendSchedule();
+        await cronHelper.sendScheduleForDad();
+        await cronHelper.sendScheduleForMom();
+        await cronHelper.sendScheduleForSis();
     }
-    catch (e)
-    {
+    catch (e) {
         Globals.log(e);
     }
     process.exit();

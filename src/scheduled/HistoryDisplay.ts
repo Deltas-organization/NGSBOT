@@ -12,10 +12,7 @@ import { INGSHistory } from "../interfaces/INGSHistory";
 import { LiveDataStore } from "../LiveDataStore";
 
 export class HistoryDisplay {
-    private dataStore: DataStoreWrapper;
-
-    constructor(public dependencies: CommandDependencies) {
-        this.dataStore = dependencies.dataStore;
+    constructor(private dataStore: DataStoreWrapper) {
     }
 
     public async GetRecentHistory(days: number): Promise<string[]> {

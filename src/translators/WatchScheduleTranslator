@@ -1,0 +1,24 @@
+import { MessageSender } from "../helpers/MessageSender";
+import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
+import { WatchScheduleWorker } from "../workers/WatchScheduleWorker";
+
+export class WatchScheduleTranslator extends AdminTranslatorBase {
+
+    public get commandBangs(): string[] {
+        return ["watch"];
+    }
+
+    public get description(): string {
+        return "Will watch the schedule for a division and post daily in the channel the command was envoked in.";
+    }
+
+    constructor(translatorDependencies: CommandDependencies) {
+        super(translatorDependencies);
+    }
+
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+        const worker = new WatchScheduleWorker(this.translatorDependencies, detailed, messageSender);
+        await worker.Begin(commands);
+    }
+}

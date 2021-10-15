@@ -40,9 +40,7 @@ export class Bot {
     private scheduleLister: ScheduleLister;
     private dependencies: CommandDependencies;
     private messageSender: SendChannelMessage;
-    private historyDisplay: HistoryDisplay;
     private captainsListCommand: UpdateCaptainsListCommand;
-    private checkFreeAgentsCommand: CleanupFreeAgentsChannel;
     private assignFreeAgentTranslator: ToggleFreeAgentRole;
 
     constructor(
@@ -52,11 +50,9 @@ export class Bot {
     ) {
         this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken);
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
-        this.historyDisplay = new HistoryDisplay(this.dependencies);
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.captainsListCommand = new UpdateCaptainsListCommand(this.dependencies);
-        this.checkFreeAgentsCommand = new CleanupFreeAgentsChannel(this.dependencies);
         this.translators.push(this.scheduleLister);
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
@@ -131,84 +127,5 @@ export class Bot {
             var trimmedValue = originalContent.substr(1);
             this.assignFreeAgentTranslator.Translate(trimmedValue, message);
         }
-    }
-
-    public async sendSchedule() {
-        await this.dependencies.client.login(this.token);
-        let messages = await this.scheduleLister.getGameMessagesForToday();
-        if (messages) {
-            for (var index = 0; index < messages.length; index++) {
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHype);
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
-            }
-        }
-    }
-
-    public async sendScheduleByDivision(division: NGSDivisions, ...channels: DiscordChannels[]) {
-        await this.dependencies.client.login(this.token);
-        let messages = await this.scheduleLister.getGameMessagesForTodayByDivision(division);
-        if (messages) {
-            for (var index = 0; index < messages.length; index++) {
-                for (var channel of channels) {
-                    await this.messageSender.SendMessageToChannel(messages[index], channel);
-                }
-            }
-        }
-    }
-
-    public async sendScheduleForDad() {
-        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.DadSchedule);
-    }
-
-    public async sendScheduleForSis() {
-        await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.SisSchedule);
-    }
-
-    public async sendScheduleForMom() {
-        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.MomSchedule);
-    }
-
-    public async CheckHistory() {
-        await this.dependencies.client.login(this.token);
-        let messages = await this.historyDisplay.GetRecentHistory(1);
-        if (messages) {
-            for (var index = 0; index < messages.length; index++) {
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHistory);
-            }
-        }
-    }
-
-    public async DeleteOldMessages() {
-        await this.dependencies.client.login(this.token);
-        try {
-            await this.checkFreeAgentsCommand.NotifyUsersOfDelete(60);
-            await this.checkFreeAgentsCommand.DeleteOldMessages(65);
-        }
-        catch (e) {
-            Globals.log(e);
-        }
-    }
-
-    public async CreateCaptainList() {
-        await this.dependencies.client.login(this.token);
-        for (var value in NGSDivisions) {
-            const division = NGSDivisions[value];
-            try {
-                await this.AttemptToUpdateCaptainMessage(division);
-            }
-            catch {
-                await this.AttemptToUpdateCaptainMessage(division)
-            }
-        }
-    }
-
-    private async AttemptToUpdateCaptainMessage(division: NGSDivisions) {
-        const messageId = MessageDictionary.GetSavedMessage(division);
-        const message = await this.captainsListCommand.CreateDivisionList(division, DiscordChannels.NGSDiscord);
-        if (messageId)
-            await this.messageSender.OverwriteMessage(message, messageId, DiscordChannels.NGSCaptainList, true);
-        else
-            await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSCaptainList, true);
     }
 }

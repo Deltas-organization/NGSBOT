@@ -14,9 +14,8 @@ const DiscordChannels_1 = require("../enums/DiscordChannels");
 const moment = require("moment-timezone");
 const Globals_1 = require("../Globals");
 class CleanupFreeAgentsChannel {
-    constructor(dependencies) {
-        this.client = dependencies.client;
-        this.dataStore = dependencies.dataStore;
+    constructor(client) {
+        this.client = client;
     }
     NotifyUsersOfDelete(exactDayCount) {
         return __awaiter(this, void 0, void 0, function* () {

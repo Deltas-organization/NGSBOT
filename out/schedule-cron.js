@@ -13,14 +13,14 @@ require('dotenv').config(); // Recommended way of loading dotenv
 const inversify_config_1 = require("./inversify/inversify.config");
 const types_1 = require("./inversify/types");
 const Globals_1 = require("./Globals");
-let bot = inversify_config_1.default.get(types_1.TYPES.Bot);
+let cronHelper = inversify_config_1.default.get(types_1.TYPES.CronHelper);
 function sendSchedule() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield bot.sendSchedule();
-            yield bot.sendScheduleForDad();
-            yield bot.sendScheduleForMom();
-            yield bot.sendScheduleForSis();
+            yield cronHelper.sendSchedule();
+            yield cronHelper.sendScheduleForDad();
+            yield cronHelper.sendScheduleForMom();
+            yield cronHelper.sendScheduleForSis();
         }
         catch (e) {
             Globals_1.Globals.log(e);

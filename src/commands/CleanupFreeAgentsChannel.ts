@@ -1,19 +1,10 @@
-import { Client, GuildChannel, Message, TextChannel } from "discord.js";
+import { Client, Message, TextChannel } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
-import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
-import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import moment = require("moment-timezone");
 import { Globals } from "../Globals";
-import { CLIENT_RENEG_LIMIT } from "tls";
-import { DiscordMembers } from "../enums/DiscordMembers";
 
 export class CleanupFreeAgentsChannel {
-    private client: Client;
-    private dataStore: DataStoreWrapper;
-
-    constructor(dependencies: CommandDependencies) {
-        this.client = dependencies.client;
-        this.dataStore = dependencies.dataStore;
+    constructor(private client: Client) {
     }
 
     public async NotifyUsersOfDelete(exactDayCount: number) {
@@ -26,7 +17,7 @@ export class CleanupFreeAgentsChannel {
         for (let container of messagesToDelete) {
             try {
                 const message = container.Message;
-                if(container.DaysOld != exactDayCount)
+                if (container.DaysOld != exactDayCount)
                     continue;
                 if (!message.author) {
                     continue;
