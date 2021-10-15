@@ -10,10 +10,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WatchScheduleWorker = void 0;
+const NGSDivisions_1 = require("../enums/NGSDivisions");
 const WorkerBase_1 = require("./Bases/WorkerBase");
 class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
+    constructor(mongoHelper, workerDependencies, detailed, messageSender) {
+        super(workerDependencies, detailed, messageSender);
+        this.mongoHelper = mongoHelper;
+        this.detailed = detailed;
+        this.messageSender = messageSender;
+        this.divisionsToWatch = [];
+    }
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
+            let unsupportedCommands = this.validateCommands(commands);
+            if (unsupportedCommands.length > 0) {
+                yield this.messageSender.SendMessage(`Some of the requested divisions were not found: \n ${unsupportedCommands.join(',')}`);
+            }
+            else {
+                yield this.createMongoRecord();
+                yield this.messageSender.SendMessage(`You are now watching divisions: ${this.divisionsToWatch.join(',')}`);
+            }
+        });
+    }
+    validateCommands(commands) {
+        const unsupportedCommands = [];
+        for (const command of commands) {
+            let found = false;
+            for (const division of Object.keys(NGSDivisions_1.NGSDivisions)) {
+                if (command.toLowerCase() == NGSDivisions_1.NGSDivisions[division].toLowerCase()) {
+                    this.divisionsToWatch.push(division);
+                    found = true;
+                }
+            }
+            if (!found) {
+                unsupportedCommands.push(command);
+            }
+        }
+        return unsupportedCommands;
+    }
+    createMongoRecord() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const scheduleRequest = {
+                channelId: this.messageSender.TextChannel.id,
+                divisions: this.divisionsToWatch,
+                requestType: 'divisions'
+            };
+            yield this.mongoHelper.addScheduleRequest(scheduleRequest);
         });
     }
 }

@@ -4,5 +4,5 @@ export interface IMongoScheduleRequest {
     channelId: string;
     requestType: 'teams' | 'divisions';
     divisions?: NGSDivisions[];
-    teams?: string[];
+    //teams?: string[];
 }

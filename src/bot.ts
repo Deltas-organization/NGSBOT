@@ -33,6 +33,7 @@ import { UnUsedRoles } from "./translators/UnusedRoles";
 import { UpdateCaptainsList } from "./translators/UpdateCaptainsList";
 import { NGSRoles } from "./enums/NGSRoles";
 import { RoleHelper } from "./helpers/RoleHelper";
+import { WatchSchedule } from "./translators/WatchSchedule";
 
 @injectable()
 export class Bot {
@@ -46,9 +47,10 @@ export class Bot {
     constructor(
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
-        @inject(TYPES.ApiToken) apiToken: string
+        @inject(TYPES.ApiToken) apiToken: string,
+        @inject(TYPES.MongConection) mongoConnection: string
     ) {
-        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken);
+        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken, mongoConnection);
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
@@ -67,6 +69,7 @@ export class Bot {
         this.translators.push(new Leave(this.dependencies));
         this.translators.push(new UnUsedRoles(this.dependencies));
         this.translators.push(new UpdateCaptainsList(this.dependencies));
+        this.translators.push(new WatchSchedule(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
         this.assignFreeAgentTranslator = new ToggleFreeAgentRole(this.dependencies);

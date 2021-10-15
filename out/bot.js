@@ -51,13 +51,14 @@ const UnusedRoles_1 = require("./translators/UnusedRoles");
 const UpdateCaptainsList_1 = require("./translators/UpdateCaptainsList");
 const NGSRoles_1 = require("./enums/NGSRoles");
 const RoleHelper_1 = require("./helpers/RoleHelper");
+const WatchSchedule_1 = require("./translators/WatchSchedule");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
-        constructor(client, token, apiToken) {
+        constructor(client, token, apiToken, mongoConnection) {
             this.client = client;
             this.token = token;
             this.translators = [];
-            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken);
+            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.captainsListCommand = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.dependencies);
@@ -75,6 +76,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new Leave_1.Leave(this.dependencies));
             this.translators.push(new UnusedRoles_1.UnUsedRoles(this.dependencies));
             this.translators.push(new UpdateCaptainsList_1.UpdateCaptainsList(this.dependencies));
+            this.translators.push(new WatchSchedule_1.WatchSchedule(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
             this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
         }
@@ -133,7 +135,8 @@ let Bot = /** @class */ (() => {
         __param(0, inversify_1.inject(types_1.TYPES.Client)),
         __param(1, inversify_1.inject(types_1.TYPES.Token)),
         __param(2, inversify_1.inject(types_1.TYPES.ApiToken)),
-        __metadata("design:paramtypes", [discord_js_1.Client, String, String])
+        __param(3, inversify_1.inject(types_1.TYPES.MongConection)),
+        __metadata("design:paramtypes", [discord_js_1.Client, String, String, String])
     ], Bot);
     return Bot;
 })();

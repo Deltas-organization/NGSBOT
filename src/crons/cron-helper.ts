@@ -5,6 +5,7 @@ import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { Globals } from "../Globals";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
+import { Mongohelper } from "../helpers/Mongohelper";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { SendChannelMessage } from "../helpers/SendChannelMessage";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
@@ -13,7 +14,6 @@ import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { HistoryDisplay } from "../scheduled/HistoryDisplay";
 import { ScheduleLister } from "../translators/ScheduleLister";
-import { MongoWorker } from "./workers/mongo-worker";
 
 @injectable()
 export class CronHelper {
@@ -21,7 +21,7 @@ export class CronHelper {
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
     private cleanupFreeAgentsChannel: CleanupFreeAgentsChannel;
-    private mongoWorker: MongoWorker;
+    private mongoHelper: Mongohelper;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -33,7 +33,7 @@ export class CronHelper {
         this.messageSender = new SendChannelMessage(this.client, new MessageStore());
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
-        this.mongoWorker = new MongoWorker(mongoConnection);
+        this.mongoHelper = new Mongohelper(mongoConnection);
     }
 
     public async sendSchedule() {
@@ -72,10 +72,15 @@ export class CronHelper {
 
     public async sendRequestedSchedules() {
         await this.client.login(this.token);
-        const requestedSchedules = await this.mongoWorker.getRequestedSchedules();
+        const requestedSchedules = await this.mongoHelper.getRequestedSchedules();
         for (var schedule of requestedSchedules) {
             if (schedule.requestType == "divisions") {
-                await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                try {
+                    await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                }
+                catch (e) {
+                    Globals.log(`unable to send schedule: ${e}`)
+                }
             }
         }
     }

@@ -13,6 +13,7 @@ exports.TranslatorBase = void 0;
 const MessageSender_1 = require("../../helpers/MessageSender");
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
 const Globals_1 = require("../../Globals");
+const Mongohelper_1 = require("../../helpers/Mongohelper");
 class TranslatorBase {
     constructor(translatorDependencies) {
         this.translatorDependencies = translatorDependencies;
@@ -20,7 +21,11 @@ class TranslatorBase {
         this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;
         this.apiKey = translatorDependencies.apiKey;
+        this.mongoConnectionUri = translatorDependencies.mongoConnectionString;
         this.Init();
+    }
+    get delimiter() {
+        return null;
     }
     Init() {
     }
@@ -57,18 +62,25 @@ class TranslatorBase {
         if (firstSpace == -1) {
             return [];
         }
-        //Get and remove quoted strings as one word
-        const myRegexp = /[^\s"]+|"([^"]*)"/gi;
-        const myResult = [];
-        do {
-            var match = myRegexp.exec(command);
-            if (match != null) {
-                //Index 1 in the array is the captured group if it exists
-                //Index 0 is the matched text, which we use if no captured group exists
-                myResult.push(match[1] ? match[1] : match[0]);
-            }
-        } while (match != null);
-        return myResult.slice(1);
+        if (this.delimiter) {
+            const splitCommand = command.split(this.delimiter).map(item => item.trim());
+            splitCommand[0] = splitCommand[0].split(' ').slice(1).join(' ');
+            return splitCommand;
+        }
+        else {
+            //Get and remove quoted strings as one word
+            const myRegexp = /[^\s"]+|"([^"]*)"/gi;
+            let myResult = [];
+            do {
+                var match = myRegexp.exec(command);
+                if (match != null) {
+                    //Index 1 in the array is the captured group if it exists
+                    //Index 0 is the matched text, which we use if no captured group exists
+                    myResult.push(match[1] ? match[1] : match[0]);
+                }
+            } while (match != null);
+            return myResult.slice(1);
+        }
     }
     Verify(messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -81,6 +93,9 @@ class TranslatorBase {
             const searchRegex = new RegExp(searchTerm, 'i');
             return users.filter(p => searchRegex.test(p.displayName));
         });
+    }
+    CreateMongoHelper() {
+        return new Mongohelper_1.Mongohelper(this.mongoConnectionUri);
     }
 }
 exports.TranslatorBase = TranslatorBase;

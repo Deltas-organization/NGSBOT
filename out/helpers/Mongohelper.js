@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MongoWorker = void 0;
+exports.Mongohelper = void 0;
 const mongoDB = require("mongodb");
-class MongoWorker {
+class Mongohelper {
     constructor(connectionUri) {
         this.client = new mongoDB.MongoClient(connectionUri, { useUnifiedTopology: true });
         this.setup();
@@ -34,6 +34,13 @@ class MongoWorker {
             return result;
         });
     }
+    addScheduleRequest(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("ScheduleRequest");
+            yield collection.insertOne(request);
+        });
+    }
 }
-exports.MongoWorker = MongoWorker;
-//# sourceMappingURL=mongo-worker.js.map
+exports.Mongohelper = Mongohelper;
+//# sourceMappingURL=Mongohelper.js.map

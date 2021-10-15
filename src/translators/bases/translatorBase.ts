@@ -8,20 +8,27 @@ import { INGSTeam, INGSUser } from "../../interfaces";
 import { DiscordMembers } from "../../enums/DiscordMembers";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { Globals } from "../../Globals";
+import { Mongohelper } from "../../helpers/Mongohelper";
 
 export abstract class TranslatorBase implements ITranslate {
     public abstract get commandBangs(): string[];
     public abstract get description(): string;
+    public get delimiter() {
+        return null;
+    }
+
     protected readonly dataStore: DataStoreWrapper;
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
     protected readonly apiKey: string;
+    private readonly mongoConnectionUri: string;
 
     constructor(protected translatorDependencies: CommandDependencies) {
         this.client = translatorDependencies.client;
         this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;
         this.apiKey = translatorDependencies.apiKey;
+        this.mongoConnectionUri = translatorDependencies.mongoConnectionString;
 
         this.Init();
     }
@@ -64,19 +71,25 @@ export abstract class TranslatorBase implements ITranslate {
         if (firstSpace == -1) {
             return [];
         }
-        //Get and remove quoted strings as one word
-        const myRegexp = /[^\s"]+|"([^"]*)"/gi;
-        const myResult = [];
-        do {
-            var match = myRegexp.exec(command);
-            if (match != null) {
-                //Index 1 in the array is the captured group if it exists
-                //Index 0 is the matched text, which we use if no captured group exists
-                myResult.push(match[1] ? match[1] : match[0]);
-            }
-        } while (match != null);
-
-        return myResult.slice(1)
+        if (this.delimiter) {
+            const splitCommand = command.split(this.delimiter).map(item => item.trim());
+            splitCommand[0] = splitCommand[0].split(' ').slice(1).join(' ');
+            return splitCommand;
+        }
+        else {
+            //Get and remove quoted strings as one word
+            const myRegexp = /[^\s"]+|"([^"]*)"/gi;
+            let myResult = [];
+            do {
+                var match = myRegexp.exec(command);
+                if (match != null) {
+                    //Index 1 in the array is the captured group if it exists
+                    //Index 0 is the matched text, which we use if no captured group exists
+                    myResult.push(match[1] ? match[1] : match[0]);
+                }
+            } while (match != null);
+            return myResult.slice(1)
+        }
     }
 
 
@@ -90,5 +103,9 @@ export abstract class TranslatorBase implements ITranslate {
         const users = await this.dataStore.GetUsers();
         const searchRegex = new RegExp(searchTerm, 'i');
         return users.filter(p => searchRegex.test(p.displayName));
+    }
+
+    protected CreateMongoHelper() {
+        return new Mongohelper(this.mongoConnectionUri);
     }
 }

@@ -1,8 +1,8 @@
 
 import * as mongoDB from "mongodb";
-import { IMongoScheduleRequest } from "../../mongo/models/schedule-request";
+import { IMongoScheduleRequest } from "../mongo/models/schedule-request";
 
-export class MongoWorker {
+export class Mongohelper {
     private client: mongoDB.MongoClient;
     private ngsDatabase: mongoDB.Db;
     private connectedPromise: Promise<void>;
@@ -29,5 +29,11 @@ export class MongoWorker {
             result.push(item);
         });
         return result;
+    }
+
+    public async addScheduleRequest(request: IMongoScheduleRequest) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<IMongoScheduleRequest>("ScheduleRequest");
+        await collection.insertOne(request);
     }
 }

@@ -9,27 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WorkerBase = void 0;
-class WorkerBase {
-    constructor(workerDependencies, detailed, messageSender) {
-        this.detailed = detailed;
-        this.messageSender = messageSender;
-        this.client = workerDependencies.client;
-        this.messageStore = workerDependencies.messageStore;
-        this.dataStore = workerDependencies.dataStore;
+exports.WatchSchedule = void 0;
+const WatchScheduleWorker_1 = require("../workers/WatchScheduleWorker");
+const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
+class WatchSchedule extends adminTranslatorBase_1.AdminTranslatorBase {
+    get commandBangs() {
+        return ["watch"];
     }
-    SearchforTeams(searchTerm) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.dataStore.SearchForTeams(searchTerm);
-        });
+    get description() {
+        return "Will watch for schedules games daily and post in the channel";
     }
-    SearchForPlayers(searchTerm) {
+    get delimiter() {
+        return ',';
+    }
+    Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const users = yield this.dataStore.GetUsers();
-            const searchRegex = new RegExp(searchTerm, 'i');
-            return users.filter(p => searchRegex.test(p.displayName));
+            const watchWorker = new WatchScheduleWorker_1.WatchScheduleWorker(this.CreateMongoHelper(), this.translatorDependencies, detailed, messageSender);
+            yield watchWorker.Begin(commands);
         });
     }
 }
-exports.WorkerBase = WorkerBase;
-//# sourceMappingURL=WorkerBase.js.map
+exports.WatchSchedule = WatchSchedule;
+//# sourceMappingURL=WatchSchedule.js.map

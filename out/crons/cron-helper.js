@@ -29,13 +29,13 @@ const DiscordChannels_1 = require("../enums/DiscordChannels");
 const NGSDivisions_1 = require("../enums/NGSDivisions");
 const Globals_1 = require("../Globals");
 const DataStoreWrapper_1 = require("../helpers/DataStoreWrapper");
+const Mongohelper_1 = require("../helpers/Mongohelper");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
 const SendChannelMessage_1 = require("../helpers/SendChannelMessage");
 const types_1 = require("../inversify/types");
 const LiveDataStore_1 = require("../LiveDataStore");
 const MessageStore_1 = require("../MessageStore");
 const HistoryDisplay_1 = require("../scheduled/HistoryDisplay");
-const mongo_worker_1 = require("./workers/mongo-worker");
 let CronHelper = /** @class */ (() => {
     let CronHelper = class CronHelper {
         constructor(client, token, apiToken, mongoConnection) {
@@ -45,7 +45,7 @@ let CronHelper = /** @class */ (() => {
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(this.client, new MessageStore_1.MessageStore());
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dataStore);
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
-            this.mongoWorker = new mongo_worker_1.MongoWorker(mongoConnection);
+            this.mongoHelper = new Mongohelper_1.Mongohelper(mongoConnection);
         }
         sendSchedule() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -89,10 +89,15 @@ let CronHelper = /** @class */ (() => {
         sendRequestedSchedules() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
-                const requestedSchedules = yield this.mongoWorker.getRequestedSchedules();
+                const requestedSchedules = yield this.mongoHelper.getRequestedSchedules();
                 for (var schedule of requestedSchedules) {
                     if (schedule.requestType == "divisions") {
-                        yield this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                        try {
+                            yield this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                        }
+                        catch (e) {
+                            Globals_1.Globals.log(`unable to send schedule: ${e}`);
+                        }
                     }
                 }
             });
