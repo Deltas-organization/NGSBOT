@@ -21,6 +21,7 @@ function sendSchedule() {
             yield cronHelper.sendScheduleForDad();
             yield cronHelper.sendScheduleForMom();
             yield cronHelper.sendScheduleForSis();
+            yield cronHelper.sendRequestedSchedules();
         }
         catch (e) {
             Globals_1.Globals.log(e);

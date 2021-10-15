@@ -21,10 +21,16 @@ class ScheduleHelper {
             return this.GetFutureGamesSorted(yield dataStore.GetSchedule());
         });
     }
-    static GetTodaysGamesByDivision(dataStore, division) {
+    static GetTodaysGamesByDivisions(dataStore, ...divisions) {
         return __awaiter(this, void 0, void 0, function* () {
             var filteredGames = yield ScheduleHelper.GetTodaysGamesSorted(dataStore);
-            filteredGames = filteredGames.filter(f => f.divisionDisplayName == division);
+            filteredGames = filteredGames.filter(f => {
+                for (var division of divisions) {
+                    if (f.divisionDisplayName == division)
+                        return true;
+                }
+                return false;
+            });
             if (filteredGames.length <= 0) {
                 return;
             }

@@ -35,15 +35,17 @@ const types_1 = require("../inversify/types");
 const LiveDataStore_1 = require("../LiveDataStore");
 const MessageStore_1 = require("../MessageStore");
 const HistoryDisplay_1 = require("../scheduled/HistoryDisplay");
+const mongo_worker_1 = require("./workers/mongo-worker");
 let CronHelper = /** @class */ (() => {
     let CronHelper = class CronHelper {
-        constructor(client, token, apiToken) {
+        constructor(client, token, apiToken, mongoConnection) {
             this.client = client;
             this.token = token;
             this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(this.client, new MessageStore_1.MessageStore());
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dataStore);
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
+            this.mongoWorker = new mongo_worker_1.MongoWorker(mongoConnection);
         }
         sendSchedule() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -60,28 +62,37 @@ let CronHelper = /** @class */ (() => {
         }
         sendScheduleForDad() {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.DeltaServer);
+                yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.DeltaServer, NGSDivisions_1.NGSDivisions.BSouthEast);
             });
         }
         sendScheduleForSis() {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.EEast, DiscordChannels_1.DiscordChannels.SisSchedule);
+                yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.SisSchedule, NGSDivisions_1.NGSDivisions.EEast);
             });
         }
         sendScheduleForMom() {
             return __awaiter(this, void 0, void 0, function* () {
-                yield this.sendScheduleByDivision(NGSDivisions_1.NGSDivisions.BSouthEast, DiscordChannels_1.DiscordChannels.MomSchedule);
+                yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.MomSchedule, NGSDivisions_1.NGSDivisions.BSouthEast);
             });
         }
-        sendScheduleByDivision(division, ...channels) {
+        sendScheduleByDivision(channel, ...divisions) {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
-                let messages = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesByDivision(this.dataStore, division);
+                let messages = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
-                        for (var channel of channels) {
-                            yield this.messageSender.SendMessageToChannel(messages[index], channel);
-                        }
+                        yield this.messageSender.SendMessageToChannel(messages[index], channel);
+                    }
+                }
+            });
+        }
+        sendRequestedSchedules() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.client.login(this.token);
+                const requestedSchedules = yield this.mongoWorker.getRequestedSchedules();
+                for (var schedule of requestedSchedules) {
+                    if (schedule.requestType == "divisions") {
+                        yield this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
                     }
                 }
             });
@@ -116,7 +127,8 @@ let CronHelper = /** @class */ (() => {
         __param(0, inversify_1.inject(types_1.TYPES.Client)),
         __param(1, inversify_1.inject(types_1.TYPES.Token)),
         __param(2, inversify_1.inject(types_1.TYPES.ApiToken)),
-        __metadata("design:paramtypes", [discord_js_1.Client, String, String])
+        __param(3, inversify_1.inject(types_1.TYPES.MongConection)),
+        __metadata("design:paramtypes", [discord_js_1.Client, String, String, String])
     ], CronHelper);
     return CronHelper;
 })();

@@ -13,9 +13,15 @@ export class ScheduleHelper {
         return this.GetFutureGamesSorted(await dataStore.GetSchedule());
     }
 
-    public static async GetTodaysGamesByDivision(dataStore, division: NGSDivisions) {        
+    public static async GetTodaysGamesByDivisions(dataStore, ...divisions: NGSDivisions[]) {
         var filteredGames = await ScheduleHelper.GetTodaysGamesSorted(dataStore);
-        filteredGames = filteredGames.filter(f => f.divisionDisplayName == division);
+        filteredGames = filteredGames.filter(f => {
+            for (var division of divisions) {
+                if (f.divisionDisplayName == division)
+                    return true
+            }
+            return false;
+        });
         if (filteredGames.length <= 0) {
             return;
         }

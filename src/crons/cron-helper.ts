@@ -13,23 +13,27 @@ import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { HistoryDisplay } from "../scheduled/HistoryDisplay";
 import { ScheduleLister } from "../translators/ScheduleLister";
+import { MongoWorker } from "./workers/mongo-worker";
 
 @injectable()
-export class CronHelper { 
+export class CronHelper {
     private dataStore: DataStoreWrapper;
     private messageSender: SendChannelMessage;
     private historyDisplay: HistoryDisplay;
     private cleanupFreeAgentsChannel: CleanupFreeAgentsChannel;
-    
+    private mongoWorker: MongoWorker;
+
     constructor(
         @inject(TYPES.Client) private client: Client,
         @inject(TYPES.Token) private token: string,
-        @inject(TYPES.ApiToken) apiToken: string
+        @inject(TYPES.ApiToken) apiToken: string,
+        @inject(TYPES.MongConection) mongoConnection: string
     ) {
-        this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));        
+        this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
         this.messageSender = new SendChannelMessage(this.client, new MessageStore());
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
+        this.mongoWorker = new MongoWorker(mongoConnection);
     }
 
     public async sendSchedule() {
@@ -45,29 +49,37 @@ export class CronHelper {
     }
 
     public async sendScheduleForDad() {
-        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.DeltaServer);
+        await this.sendScheduleByDivision(DiscordChannels.DeltaServer, NGSDivisions.BSouthEast);
     }
 
     public async sendScheduleForSis() {
-        await this.sendScheduleByDivision(NGSDivisions.EEast, DiscordChannels.SisSchedule);
+        await this.sendScheduleByDivision(DiscordChannels.SisSchedule, NGSDivisions.EEast);
     }
 
     public async sendScheduleForMom() {
-        await this.sendScheduleByDivision(NGSDivisions.BSouthEast, DiscordChannels.MomSchedule);
-    }    
+        await this.sendScheduleByDivision(DiscordChannels.MomSchedule, NGSDivisions.BSouthEast);
+    }
 
-    public async sendScheduleByDivision(division: NGSDivisions, ...channels: DiscordChannels[]) {
+    public async sendScheduleByDivision(channel: DiscordChannels | string, ...divisions: NGSDivisions[]) {
         await this.client.login(this.token);
-        let messages = await ScheduleHelper.GetTodaysGamesByDivision(this.dataStore, division);
+        let messages = await ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
         if (messages) {
             for (var index = 0; index < messages.length; index++) {
-                for (var channel of channels) {
-                    await this.messageSender.SendMessageToChannel(messages[index], channel);
-                }
+                await this.messageSender.SendMessageToChannel(messages[index], channel);
             }
         }
     }
-    
+
+    public async sendRequestedSchedules() {
+        await this.client.login(this.token);
+        const requestedSchedules = await this.mongoWorker.getRequestedSchedules();
+        for (var schedule of requestedSchedules) {
+            if (schedule.requestType == "divisions") {
+                await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+            }
+        }
+    }
+
     public async CheckHistory() {
         await this.client.login(this.token);
         let messages = await this.historyDisplay.GetRecentHistory(1);
@@ -78,7 +90,7 @@ export class CronHelper {
             }
         }
     }
-    
+
     public async DeleteOldMessages() {
         await this.client.login(this.token);
         try {

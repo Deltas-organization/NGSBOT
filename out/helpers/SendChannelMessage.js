@@ -17,7 +17,7 @@ class SendChannelMessage {
     }
     SendMessageToChannel(message, channelToSendTo, basic = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            const myChannel = this.client.channels.cache.find(channel => channel.id == channelToSendTo);
+            const myChannel = yield this.client.channels.fetch(channelToSendTo);
             let sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendMessage(channel, message); });
             if (basic)
                 sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendBasicMessage(channel, message); });
@@ -33,7 +33,7 @@ class SendChannelMessage {
     }
     OverwriteMessage(newMessageText, messageId, messageChannel, basic = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            const myChannel = this.client.channels.cache.find(channel => channel.id == messageChannel);
+            const myChannel = yield this.client.channels.fetch(messageChannel);
             const message = yield myChannel.messages.fetch(messageId);
             if (basic) {
                 yield message.edit(newMessageText);

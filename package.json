@@ -16,7 +16,7 @@
     "dotenv": "^8.2.0",
     "inversify": "^5.0.1",
     "moment-timezone": "^0.5.33",
-    "mongodb": "^3.6.0",
+    "mongodb": "^3.7.2",
     "mongoose": "^5.13.7",
     "node-fetch": "^2.6.0",
     "reflect-metadata": "^0.1.13",

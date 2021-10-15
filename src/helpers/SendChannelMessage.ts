@@ -8,8 +8,8 @@ export class SendChannelMessage {
 
     }
 
-    public async SendMessageToChannel(message: string, channelToSendTo: DiscordChannels, basic = false): Promise<void> {
-        const myChannel = this.client.channels.cache.find(channel => channel.id == channelToSendTo) as TextChannel;
+    public async SendMessageToChannel(message: string, channelToSendTo: DiscordChannels | string, basic = false): Promise<void> {
+        const myChannel = await this.client.channels.fetch(channelToSendTo) as TextChannel;
         let sendMessage = async (channel, message) => await this.SendMessage(channel, message);
         if (basic)
             sendMessage = async (channel, message) => await this.SendBasicMessage(channel, message);
@@ -25,7 +25,7 @@ export class SendChannelMessage {
     }
 
     public async OverwriteMessage(newMessageText: string, messageId: string, messageChannel: DiscordChannels, basic = false) {
-        const myChannel = this.client.channels.cache.find(channel => channel.id == messageChannel) as TextChannel;
+        const myChannel = await this.client.channels.fetch(messageChannel) as TextChannel;
         const message = await myChannel.messages.fetch(messageId);
         if (basic) {
             await message.edit(newMessageText);

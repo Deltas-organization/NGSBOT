@@ -10,6 +10,7 @@ async function sendSchedule() {
         await cronHelper.sendScheduleForDad();
         await cronHelper.sendScheduleForMom();
         await cronHelper.sendScheduleForSis();
+        await cronHelper.sendRequestedSchedules();
     }
     catch (e) {
         Globals.log(e);
