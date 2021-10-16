@@ -44,7 +44,6 @@ const GamesCommand_1 = require("./translators/GamesCommand");
 const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
-const UpdateCaptainsListCommand_1 = require("./commands/UpdateCaptainsListCommand");
 const Leave_1 = require("./translators/Leave");
 const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
 const UnusedRoles_1 = require("./translators/UnusedRoles");
@@ -61,7 +60,6 @@ let Bot = /** @class */ (() => {
             this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
-            this.captainsListCommand = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
             this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));

@@ -41,7 +41,6 @@ export class Bot {
     private scheduleLister: ScheduleLister;
     private dependencies: CommandDependencies;
     private messageSender: SendChannelMessage;
-    private captainsListCommand: UpdateCaptainsListCommand;
     private assignFreeAgentTranslator: ToggleFreeAgentRole;
 
     constructor(
@@ -54,7 +53,6 @@ export class Bot {
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
-        this.captainsListCommand = new UpdateCaptainsListCommand(this.dependencies);
         this.translators.push(this.scheduleLister);
         this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));

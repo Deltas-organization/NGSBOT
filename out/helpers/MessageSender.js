@@ -26,12 +26,23 @@ class MessageSender {
     get Requester() {
         return this.GuildMember.user;
     }
+    SendBasicMessage(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            while (message.length > 2048) {
+                let newMessage = message.slice(0, 2048);
+                message = message.substr(2048);
+                yield this.SendBasicMessage(newMessage);
+            }
+            var sentMessage = yield this.TextChannel.send(message);
+            return sentMessage;
+        });
+    }
     SendMessage(message, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
             while (message.length > 2048) {
                 let newMessage = message.slice(0, 2048);
                 message = message.substr(2048);
-                yield this.SendMessage(newMessage);
+                yield this.SendMessage(newMessage, storeMessage);
             }
             var sentMessage = yield this.TextChannel.send({
                 embed: {

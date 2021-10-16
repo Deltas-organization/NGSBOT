@@ -27,13 +27,25 @@ export class MessageSender
 
     }
 
+    public async SendBasicMessage(message: string)
+    {
+        while (message.length > 2048)
+        {
+            let newMessage = message.slice(0, 2048);
+            message = message.substr(2048);
+            await this.SendBasicMessage(newMessage);
+        }
+        var sentMessage = await this.TextChannel.send(message);
+        return sentMessage
+    }
+
     public async SendMessage(message: string, storeMessage = true)
     {
         while (message.length > 2048)
         {
             let newMessage = message.slice(0, 2048);
             message = message.substr(2048);
-            await this.SendMessage(newMessage);
+            await this.SendMessage(newMessage, storeMessage);
         }
         var sentMessage = await this.TextChannel.send({
             embed: {

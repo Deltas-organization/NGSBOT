@@ -28,7 +28,12 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
             }
             else {
                 let createdRecord = yield this.createMongoRecord();
-                yield this.messageSender.SendMessage(`You are now watching divisions: ${createdRecord.divisions.join(',')}`);
+                if (this.hasCapabilityToSendMessage()) {
+                    yield this.messageSender.SendMessage(`You are now watching divisions: ${createdRecord.divisions.join(',')}`);
+                }
+                else {
+                    yield this.messageSender.SendBasicMessage("You need to Enable EmbedLinks for me to post the schedule in this channel.");
+                }
             }
         });
     }
@@ -47,6 +52,9 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
             }
         }
         return unsupportedCommands;
+    }
+    hasCapabilityToSendMessage() {
+        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.TextChannel.id).has(['SEND_MESSAGES', 'EMBED_LINKS']);
     }
     createMongoRecord() {
         return __awaiter(this, void 0, void 0, function* () {
