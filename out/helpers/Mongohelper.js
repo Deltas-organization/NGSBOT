@@ -38,7 +38,17 @@ class Mongohelper {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
             var collection = this.ngsDatabase.collection("ScheduleRequest");
-            yield collection.insertOne(request);
+            var selectOneFilter = { channelId: { $eq: request.channelId } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            if (existingRecord) {
+                existingRecord.divisions = [...new Set([...existingRecord.divisions, ...request.divisions])];
+                yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+                return existingRecord;
+            }
+            else {
+                yield collection.insertOne(request);
+                return request;
+            }
         });
     }
 }

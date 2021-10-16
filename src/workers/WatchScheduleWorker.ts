@@ -19,8 +19,8 @@ export class WatchScheduleWorker extends WorkerBase {
             await this.messageSender.SendMessage(`Some of the requested divisions were not found: \n ${unsupportedCommands.join(',')}`)
         }
         else {
-            await this.createMongoRecord();
-            await this.messageSender.SendMessage(`You are now watching divisions: ${this.divisionsToWatch.join(',')}`);
+            let createdRecord = await this.createMongoRecord();
+            await this.messageSender.SendMessage(`You are now watching divisions: ${createdRecord.divisions.join(',')}`);
         }
     }
 
@@ -48,6 +48,6 @@ export class WatchScheduleWorker extends WorkerBase {
             requestType: 'divisions'
         } as IMongoScheduleRequest;
 
-        await this.mongoHelper.addScheduleRequest(scheduleRequest);
+        return await this.mongoHelper.addScheduleRequest(scheduleRequest);
     }
 }

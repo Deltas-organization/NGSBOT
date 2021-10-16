@@ -27,8 +27,8 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
                 yield this.messageSender.SendMessage(`Some of the requested divisions were not found: \n ${unsupportedCommands.join(',')}`);
             }
             else {
-                yield this.createMongoRecord();
-                yield this.messageSender.SendMessage(`You are now watching divisions: ${this.divisionsToWatch.join(',')}`);
+                let createdRecord = yield this.createMongoRecord();
+                yield this.messageSender.SendMessage(`You are now watching divisions: ${createdRecord.divisions.join(',')}`);
             }
         });
     }
@@ -55,7 +55,7 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
                 divisions: this.divisionsToWatch,
                 requestType: 'divisions'
             };
-            yield this.mongoHelper.addScheduleRequest(scheduleRequest);
+            return yield this.mongoHelper.addScheduleRequest(scheduleRequest);
         });
     }
 }
