@@ -57,7 +57,8 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                     }
                 }
                 fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
-                    detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
+                    updatedTeams: messagesLog.filter(this.FindUpdatedTeams).map(m => m.CreateJsonMessage()),
+                    nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
                 }));
                 yield this.messageSender.TextChannel.send({
                     files: [{
@@ -99,23 +100,33 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             yield progressMessage.delete();
         });
     }
+    FindUpdatedTeams(message) {
+        const options = message.Options;
+        if (options.AssignedCaptainCount > 0)
+            return true;
+        if (options.AssignedDivCount > 0)
+            return true;
+        if (options.AssignedTeamCount > 0)
+            return true;
+        return false;
+    }
     AssignValidRoles(team, guildMembers) {
         return __awaiter(this, void 0, void 0, function* () {
             const teamName = team.teamName;
-            let result = new MessageHelper_1.MessageHelper(team.teamName);
-            const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(result, teamName);
+            let messageTracker = new MessageHelper_1.MessageHelper(team.teamName);
+            const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageTracker, teamName);
             try {
                 if (team.divisionDisplayName) {
                     const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
                     var divRoleOnDiscord = roleResponse.div == NGSRoles_1.NGSRoles.Storm ? null : roleResponse.role;
                 }
-                yield this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+                yield this.AssignUsersToRoles(team, guildMembers, messageTracker, teamRoleOnDiscord, divRoleOnDiscord);
             }
             catch (e) {
-                result.AddNewLine(`There was a problem assigning team: ${teamName}`);
-                result.AddJSONLine(e);
+                messageTracker.AddNewLine(`There was a problem assigning team: ${teamName}`);
+                messageTracker.AddJSONLine(e);
             }
-            return result;
+            return messageTracker;
         });
     }
     CreateOrFindTeamRole(messageTracker, teamName) {

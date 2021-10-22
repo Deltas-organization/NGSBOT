@@ -52,7 +52,8 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 }
             }
             fs.writeFileSync('./files/assignedRoles.json', JSON.stringify({
-                detailedInformation: messagesLog.map(message => message.CreateJsonMessage())
+                updatedTeams: messagesLog.filter(this.FindUpdatedTeams).map(m => m.CreateJsonMessage()),
+                nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
             }));
             await this.messageSender.TextChannel.send({
                 files: [{
@@ -98,22 +99,33 @@ export class AssignRolesWorker extends RoleWorkerBase {
         await progressMessage.delete();
     }
 
+    private FindUpdatedTeams(message: MessageHelper<AssignRolesOptions>) {
+        const options = message.Options;
+        if (options.AssignedCaptainCount > 0)
+            return true;
+        if (options.AssignedDivCount > 0)
+            return true;
+        if (options.AssignedTeamCount > 0)
+            return true;
+        return false;
+    }
+
     private async AssignValidRoles(team: INGSTeam, guildMembers: GuildMember[]) {
         const teamName = team.teamName;
-        let result = new MessageHelper<AssignRolesOptions>(team.teamName);
-        const teamRoleOnDiscord = await this.CreateOrFindTeamRole(result, teamName);
+        let messageTracker = new MessageHelper<AssignRolesOptions>(team.teamName);
+        const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageTracker, teamName);
         try {
             if (team.divisionDisplayName) {
                 const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
                 var divRoleOnDiscord = roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
             }
-            await this.AssignUsersToRoles(team, guildMembers, result, teamRoleOnDiscord, divRoleOnDiscord);
+            await this.AssignUsersToRoles(team, guildMembers, messageTracker, teamRoleOnDiscord, divRoleOnDiscord);
         }
         catch (e) {
-            result.AddNewLine(`There was a problem assigning team: ${teamName}`);
-            result.AddJSONLine(e);
+            messageTracker.AddNewLine(`There was a problem assigning team: ${teamName}`);
+            messageTracker.AddJSONLine(e);
         }
-        return result;
+        return messageTracker;
     }
 
     private async CreateOrFindTeamRole(messageTracker: MessageHelper<AssignRolesOptions>, teamName: string) {
@@ -198,7 +210,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 displayName: user.displayName,
                 apiKey: this.apiKey,
                 discordId: guildMember.id
-            });            
+            });
             Globals.log(`saved discord id for user: ${user.displayName}`)
         }
         catch (e) {
