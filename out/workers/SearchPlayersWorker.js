@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchPlayersWorker = void 0;
 const NGSHistoryActions_1 = require("../enums/NGSHistoryActions");
 const MessageHelper_1 = require("../helpers/MessageHelper");
+const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
 const WorkerBase_1 = require("./Bases/WorkerBase");
 class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
@@ -42,7 +43,7 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
         players.forEach(p => {
             message.AddNewLine(`**Name**: ${p.displayName}`);
             if (p.teamName)
-                message.AddNewLine(`**TeamName**: ${p.teamName}`);
+                message.AddNewLine(`**TeamName**: ${TranslationHelpers_1.Translationhelpers.GetTeamURL(p.teamName)}`);
             else
                 message.AddNewLine("**No Team Found**");
             for (var rank of p.verifiedRankHistory.sort(this.RankHistorySort)) {

@@ -1,5 +1,6 @@
 import { HistoryActions } from "../enums/NGSHistoryActions";
 import { MessageHelper } from "../helpers/MessageHelper";
+import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { INGSRank, INGSUser } from "../interfaces";
 import { WorkerBase } from "./Bases/WorkerBase";
 
@@ -38,7 +39,7 @@ export class SearchPlayersWorker extends WorkerBase
         {
             message.AddNewLine(`**Name**: ${p.displayName}`);
             if (p.teamName)
-                message.AddNewLine(`**TeamName**: ${p.teamName}`);
+                message.AddNewLine(`**TeamName**: ${Translationhelpers.GetTeamURL(p.teamName)}`);
             else
                 message.AddNewLine("**No Team Found**");
 
