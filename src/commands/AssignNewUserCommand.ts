@@ -1,5 +1,6 @@
 import { Client, Guild, GuildMember, PartialGuildMember, Role, TextChannel, User } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
+import { DiscordGuilds } from "../enums/DiscordGuilds";
 import { NGSRoles } from "../enums/NGSRoles";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
@@ -24,14 +25,17 @@ export class AssignNewUserCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async AssignUser(guildMember: GuildMember | PartialGuildMember) : Promise<MessageHelper<AssignNewUserOptions>> {
+    public async AssignUser(guildMember: GuildMember | PartialGuildMember): Promise<MessageHelper<AssignNewUserOptions>> {
         await this.Setup(guildMember);
         const messageOptions = new MessageHelper<AssignNewUserOptions>("NewUsers");
+        if (guildMember.guild.id != DiscordGuilds.NGS)
+            return;
+
         messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
         const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.dataStore.GetUsers());
-        if(!ngsUser)
+        if (!ngsUser)
             return messageOptions;
-            
+
         const team = await this.dataStore.LookForRegisteredTeam(ngsUser);
         if (team) {
             messageOptions.Options.FoundTeam = true;
@@ -46,7 +50,7 @@ export class AssignNewUserCommand {
     }
 
     private async Setup(guildMember: GuildMember | PartialGuildMember) {
-        this. _serverRoleHelper =  await RoleHelper.CreateFrom(guildMember.guild);
+        this._serverRoleHelper = await RoleHelper.CreateFrom(guildMember.guild);
         this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
     }
 

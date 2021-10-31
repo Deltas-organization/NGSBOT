@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignNewUserCommand = void 0;
+const DiscordGuilds_1 = require("../enums/DiscordGuilds");
 const NGSRoles_1 = require("../enums/NGSRoles");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
@@ -23,6 +24,8 @@ class AssignNewUserCommand {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.Setup(guildMember);
             const messageOptions = new MessageHelper_1.MessageHelper("NewUsers");
+            if (guildMember.guild.id != DiscordGuilds_1.DiscordGuilds.NGS)
+                return;
             messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
             const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dataStore.GetUsers());
             if (!ngsUser)

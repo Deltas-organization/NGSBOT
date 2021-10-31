@@ -92,11 +92,13 @@ let Bot = /** @class */ (() => {
             this.client.on('guildMemberAdd', (member) => __awaiter(this, void 0, void 0, function* () {
                 let newUserCommand = new AssignNewUserCommand_1.AssignNewUserCommand(this.dependencies);
                 let message = yield newUserCommand.AssignUser(member);
-                const stringMessage = message.CreateStringMessage();
-                if (message.Options.FoundTeam) {
-                    yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
+                if (message) {
+                    const stringMessage = message.CreateStringMessage();
+                    if (message.Options.FoundTeam) {
+                        yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
+                    }
+                    yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
                 }
-                yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
             }));
         }
         WatchForUserFreeAgent() {
