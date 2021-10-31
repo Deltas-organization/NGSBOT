@@ -90,12 +90,13 @@ export class Bot {
         this.client.on('guildMemberAdd', async member => {
             let newUserCommand = new AssignNewUserCommand(this.dependencies);
             let message = await newUserCommand.AssignUser(member);
-            const stringMessage = message.CreateStringMessage();
-            if (message.Options.FoundTeam)
-            {
-                await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.NGSDiscord);
+            if (message) {
+                const stringMessage = message.CreateStringMessage();
+                if (message.Options.FoundTeam) {
+                    await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.NGSDiscord);
+                }
+                await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.DeltaServer);
             }
-            await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.DeltaServer);
         });
     }
 
