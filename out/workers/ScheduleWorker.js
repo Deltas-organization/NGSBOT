@@ -15,7 +15,7 @@ const WorkerBase_1 = require("./Bases/WorkerBase");
 class ScheduleWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
-            let duration = 0;
+            let duration = 1;
             if (commands.length == 1) {
                 let parsedNumber = parseInt(commands[0]);
                 if (isNaN(parsedNumber)) {
@@ -26,13 +26,13 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
                     yield this.messageSender.SendMessage(`the value provided is above 10 ${commands[0]}`);
                     return;
                 }
-                duration = parsedNumber - 1;
+                duration = parsedNumber;
             }
             else if (commands.length == 2) {
                 yield this.SearchByDivision(commands);
                 return;
             }
-            let filteredGames = yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule(), duration);
+            let filteredGames = yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule(), duration);
             let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
             for (var index = 0; index < messages.length; index++) {
                 yield this.messageSender.SendMessage(messages[index]);
@@ -52,7 +52,7 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
                 else
                     division += `-${coast}`;
             }
-            let scheduledGames = yield yield ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule());
+            let scheduledGames = yield yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule());
             scheduledGames = scheduledGames.filter(s => {
                 if (!s.divisionConcat.startsWith(division))
                     return false;

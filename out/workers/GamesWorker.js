@@ -92,7 +92,7 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
     }
     GetScheduleMessages(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
-            let games = ScheduleHelper_1.ScheduleHelper.GetFutureGamesSorted(yield this.dataStore.GetSchedule());
+            let games = ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule());
             games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
             return yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
         });

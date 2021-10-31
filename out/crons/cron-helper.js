@@ -24,6 +24,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CronHelper = void 0;
 const discord_js_1 = require("discord.js");
 const inversify_1 = require("inversify");
+const CheckReportedGames_1 = require("../commands/CheckReportedGames");
 const CleanupFreeAgentsChannel_1 = require("../commands/CleanupFreeAgentsChannel");
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const NGSDivisions_1 = require("../enums/NGSDivisions");
@@ -45,6 +46,7 @@ let CronHelper = /** @class */ (() => {
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(this.client, new MessageStore_1.MessageStore());
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dataStore);
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
+            this.checkReportedGames = new CheckReportedGames_1.CheckReportedGames(this.client, this.dataStore);
             this.mongoHelper = new Mongohelper_1.Mongohelper(mongoConnection);
         }
         sendSchedule() {
@@ -78,7 +80,7 @@ let CronHelper = /** @class */ (() => {
         sendScheduleByDivision(channel, ...divisions) {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
-                let messages = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
+                const messages = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
                         yield this.messageSender.SendMessageToChannel(messages[index], channel);
@@ -105,7 +107,7 @@ let CronHelper = /** @class */ (() => {
         CheckHistory() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
-                let messages = yield this.historyDisplay.GetRecentHistory(1);
+                const messages = yield this.historyDisplay.GetRecentHistory(1);
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
@@ -123,6 +125,15 @@ let CronHelper = /** @class */ (() => {
                 }
                 catch (e) {
                     Globals_1.Globals.log(e);
+                }
+            });
+        }
+        CheckReportedGames() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.client.login(this.token);
+                const messages = yield this.checkReportedGames.Check();
+                for (const message of messages) {
+                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSDiscord);
                 }
             });
         }

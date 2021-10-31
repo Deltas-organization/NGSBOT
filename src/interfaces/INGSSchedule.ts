@@ -9,4 +9,5 @@ export interface INGSSchedule
     scheduledTime: { startTime: number }
     divisionDisplayName: string;
     divisionConcat: string;    
+    reported: boolean;
 }

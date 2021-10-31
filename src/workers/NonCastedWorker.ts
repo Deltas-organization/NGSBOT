@@ -2,10 +2,10 @@ import { Message } from "discord.js";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { WorkerBase } from "./Bases/WorkerBase";
 
-export class NonCastedWorker extends WorkerBase {    
+export class NonCastedWorker extends WorkerBase {
     private _messageCommand: (message: string[], storeMessage?: boolean) => Promise<Message[]>;
 
-    protected async Start(commands: string[]) {        
+    protected async Start(commands: string[]) {
         this._messageCommand = (messages: string[], _?: boolean) => this.messageSender.DMMessages(messages);
         if (this.detailed) {
             this._messageCommand = (messages: string[], storeMessage?: boolean) => this.messageSender.SendMessages(messages, storeMessage);
@@ -32,8 +32,7 @@ export class NonCastedWorker extends WorkerBase {
     }
 
     protected async GetNonCastedGames(futureDays: number) {
-        let futureGames = ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule());
-        futureGames = futureGames.filter(game => ScheduleHelper.GetGamesBetweenDates(game, futureDays));
+        let futureGames = ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule(), futureDays);
         return futureGames.filter(game => !game.casterName);
     }
 }

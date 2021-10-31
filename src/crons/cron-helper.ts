@@ -1,5 +1,6 @@
 import { Client } from "discord.js";
 import { inject, injectable } from "inversify";
+import { CheckReportedGames } from "../commands/CheckReportedGames";
 import { CleanupFreeAgentsChannel } from "../commands/CleanupFreeAgentsChannel";
 import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSDivisions } from "../enums/NGSDivisions";
@@ -22,6 +23,7 @@ export class CronHelper {
     private historyDisplay: HistoryDisplay;
     private cleanupFreeAgentsChannel: CleanupFreeAgentsChannel;
     private mongoHelper: Mongohelper;
+    private checkReportedGames: CheckReportedGames;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -33,6 +35,7 @@ export class CronHelper {
         this.messageSender = new SendChannelMessage(this.client, new MessageStore());
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
+        this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);
         this.mongoHelper = new Mongohelper(mongoConnection);
     }
 
@@ -62,7 +65,7 @@ export class CronHelper {
 
     public async sendScheduleByDivision(channel: DiscordChannels | string, ...divisions: NGSDivisions[]) {
         await this.client.login(this.token);
-        let messages = await ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
+        const messages = await ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
         if (messages) {
             for (var index = 0; index < messages.length; index++) {
                 await this.messageSender.SendMessageToChannel(messages[index], channel);
@@ -87,7 +90,7 @@ export class CronHelper {
 
     public async CheckHistory() {
         await this.client.login(this.token);
-        let messages = await this.historyDisplay.GetRecentHistory(1);
+        const messages = await this.historyDisplay.GetRecentHistory(1);
         if (messages) {
             for (var index = 0; index < messages.length; index++) {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
@@ -104,6 +107,14 @@ export class CronHelper {
         }
         catch (e) {
             Globals.log(e);
+        }
+    }
+
+    public async CheckReportedGames() {
+        await this.client.login(this.token);
+        const messages = await this.checkReportedGames.Check();
+        for (const message of messages) {
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSDiscord);
         }
     }
 }

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScheduleHelper = void 0;
+exports.ScheduleInformation = exports.ScheduleHelper = void 0;
 const MessageHelper_1 = require("./MessageHelper");
 const moment = require("moment-timezone");
 const DateHelper_1 = require("./DateHelper");
@@ -18,12 +18,12 @@ const ScehduleContainer_1 = require("../models/ScehduleContainer");
 class ScheduleHelper {
     static GetTodaysGamesSorted(dataStore) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.GetFutureGamesSorted(yield dataStore.GetSchedule());
+            return this.GetGamesSorted(yield dataStore.GetSchedule());
         });
     }
     static GetTodaysGamesByDivisions(dataStore, ...divisions) {
         return __awaiter(this, void 0, void 0, function* () {
-            var filteredGames = yield ScheduleHelper.GetTodaysGamesSorted(dataStore);
+            var filteredGames = (yield ScheduleHelper.GetTodaysGamesSorted(dataStore));
             filteredGames = filteredGames.filter(f => {
                 for (var division of divisions) {
                     if (f.divisionDisplayName == division)
@@ -37,30 +37,60 @@ class ScheduleHelper {
             return yield ScheduleHelper.GetMessages(filteredGames);
         });
     }
-    static GetFutureGamesSorted(scheduledGames, daysInFuture = 0) {
-        let futureGames = [];
+    static GetGamesByDaysSorted(scheduledGames, dayBuffer) {
+        let games = [];
         const todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
+        var positive = dayBuffer > 0;
+        var absoluteValue = dayBuffer;
+        if (!positive)
+            absoluteValue = dayBuffer * -1;
         for (var schedule of scheduledGames) {
             let scheduledDate = new Date(+schedule.scheduledTime.startTime);
             let scheduledUTC = DateHelper_1.DateHelper.ConvertDateToUTC(scheduledDate);
-            var ms = scheduledUTC.getTime() - todaysUTC.getTime();
-            if (ms > 0) {
-                futureGames.push(schedule);
+            var dayDifference = this.GetDayDifference(scheduledUTC, todaysUTC);
+            var dayCount = dayDifference.dayCount;
+            if (dayCount < absoluteValue) {
+                if (positive) {
+                    if (dayDifference.future) {
+                        games.push({ days: dayCount, schedule });
+                    }
+                }
+                else {
+                    if (!dayDifference.future) {
+                        games.push({ days: dayCount, schedule });
+                    }
+                }
             }
         }
-        futureGames = futureGames.sort((s1, s2) => {
-            let f1Date = new Date(+s1.scheduledTime.startTime);
-            let f2Date = new Date(+s2.scheduledTime.startTime);
+        return ScheduleHelper.SortGames(games);
+    }
+    static GetDayDifference(firstDate, secondDate) {
+        var ms = firstDate.getTime() - secondDate.getTime();
+        var inFuture = true;
+        if (ms < 0) {
+            inFuture = false;
+            ms *= -1;
+        }
+        var result = Math.floor(ms / 1000 / 60 / 60 / 24);
+        return { dayCount: result, future: inFuture };
+    }
+    static GetGamesSorted(scheduledGames, daysInFuture = 1) {
+        return ScheduleHelper.GetGamesByDaysSorted(scheduledGames, daysInFuture).map(g => g.schedule);
+    }
+    static SortGames(games) {
+        return games.sort((s1, s2) => {
+            let s1Schedule = s1.schedule;
+            let s2Schedule = s2.schedule;
+            let f1Date = new Date(+s1Schedule.scheduledTime.startTime);
+            let f2Date = new Date(+s2Schedule.scheduledTime.startTime);
             let timeDiff = f1Date.getTime() - f2Date.getTime();
             if (timeDiff > 0)
                 return 1;
             else if (timeDiff < 0)
                 return -1;
             else
-                return TeamSorter_1.TeamSorter.SortByDivision(s1.divisionDisplayName, s2.divisionDisplayName);
+                return TeamSorter_1.TeamSorter.SortByDivision(s1Schedule.divisionDisplayName, s2Schedule.divisionDisplayName);
         });
-        futureGames = futureGames.filter(s => ScheduleHelper.GetGamesBetweenDates(s, daysInFuture));
-        return futureGames;
     }
     static GetMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {
@@ -113,17 +143,13 @@ class ScheduleHelper {
             resolver(messagesToSend);
         });
     }
-    static GetGamesBetweenDates(schedule, daysInFuture) {
-        let todaysUTC = DateHelper_1.DateHelper.ConvertDateToUTC(new Date());
-        let scheduledDate = new Date(+schedule.scheduledTime.startTime);
-        let scheduledUTC = DateHelper_1.DateHelper.ConvertDateToUTC(scheduledDate);
-        var ms = scheduledUTC.getTime() - todaysUTC.getTime();
-        let dayDifference = Math.floor(ms / 1000 / 60 / 60 / 24);
-        if (dayDifference >= 0 && dayDifference <= daysInFuture) {
-            return true;
-        }
-        return false;
-    }
 }
 exports.ScheduleHelper = ScheduleHelper;
+class ScheduleInformation {
+    constructor(days, schedule) {
+        this.days = days;
+        this.schedule = schedule;
+    }
+}
+exports.ScheduleInformation = ScheduleInformation;
 //# sourceMappingURL=ScheduleHelper.js.map

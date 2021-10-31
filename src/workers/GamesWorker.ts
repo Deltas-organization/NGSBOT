@@ -88,7 +88,7 @@ export class GamesWorker extends WorkerBase {
     }
 
     private async GetScheduleMessages(ngsTeam: INGSTeam) {
-        let games = ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule());
+        let games = ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule());
         games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
         return await ScheduleHelper.GetMessages(games);
     }

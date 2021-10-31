@@ -4,7 +4,7 @@ import { WorkerBase } from "./Bases/WorkerBase";
 
 export class ScheduleWorker extends WorkerBase {
     protected async Start(commands: string[]) {    
-        let duration = 0;
+        let duration = 1;
         if (commands.length == 1) {
             let parsedNumber = parseInt(commands[0])
             if (isNaN(parsedNumber)) {
@@ -15,14 +15,14 @@ export class ScheduleWorker extends WorkerBase {
                 await this.messageSender.SendMessage(`the value provided is above 10 ${commands[0]}`)
                 return;
             }
-            duration = parsedNumber -1;
+            duration = parsedNumber;
         }
         else if (commands.length == 2) {
             await this.SearchByDivision(commands);
             return;
         }
 
-        let filteredGames = await ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule(), duration);
+        let filteredGames = await ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule(), duration);
         let messages = await ScheduleHelper.GetMessages(filteredGames);
         for (var index = 0; index < messages.length; index++) {
             await this.messageSender.SendMessage(messages[index]);
@@ -42,7 +42,7 @@ export class ScheduleWorker extends WorkerBase {
                 division += `-${coast}`;
         }
 
-        let scheduledGames = await await ScheduleHelper.GetFutureGamesSorted(await this.dataStore.GetSchedule());
+        let scheduledGames = await await ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule());
         scheduledGames = scheduledGames.filter(s => {
             if (!s.divisionConcat.startsWith(division))
                 return false;
