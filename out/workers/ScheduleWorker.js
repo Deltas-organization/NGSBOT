@@ -34,8 +34,11 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
             }
             let filteredGames = yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule(), duration);
             let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
-            for (var index = 0; index < messages.length; index++) {
-                yield this.messageSender.SendMessage(messages[index]);
+            if (messages.length <= 0) {
+                messages.push("Couldn't find any scheduled Games");
+            }
+            for (const message of messages) {
+                yield this.messageSender.SendMessage(message);
             }
             yield this.messageSender.originalMessage.delete();
         });

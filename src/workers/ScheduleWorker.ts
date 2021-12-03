@@ -3,7 +3,7 @@ import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class ScheduleWorker extends WorkerBase {
-    protected async Start(commands: string[]) {    
+    protected async Start(commands: string[]) {
         let duration = 1;
         if (commands.length == 1) {
             let parsedNumber = parseInt(commands[0])
@@ -24,8 +24,11 @@ export class ScheduleWorker extends WorkerBase {
 
         let filteredGames = await ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule(), duration);
         let messages = await ScheduleHelper.GetMessages(filteredGames);
-        for (var index = 0; index < messages.length; index++) {
-            await this.messageSender.SendMessage(messages[index]);
+        if (messages.length <= 0) {
+            messages.push("Couldn't find any scheduled Games");
+        }
+        for (const message of messages) {
+            await this.messageSender.SendMessage(message);
         }
         await this.messageSender.originalMessage.delete();
     }

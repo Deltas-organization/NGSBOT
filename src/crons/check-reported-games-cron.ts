@@ -5,7 +5,6 @@ import { TYPES } from "../inversify/types";
 import { CronHelper } from "./cron-helper";
 
 const cronHelper = container.get<CronHelper>(TYPES.CronHelper);
-cronHelper.CheckReportedGames().then(() =>
-{
+cronHelper.CheckReportedGames().then(() => {
     process.exit();
 });
