@@ -22,16 +22,46 @@ export class CheckReportedGames {
     }
 
     private async GetMessags(): Promise<string[]> {
-        const gamesInThePast = ScheduleHelper.GetGamesByDaysSorted(await this.dataStore.GetSchedule(), -14);
-        const unReportedGames = gamesInThePast.filter(g => g.schedule.reported != true);
-        return [await this.CreateUnreportedMessage(unReportedGames)];
-        // const gamesOneDayOld = unReportedGames.map(g => g.days == 1);
+        const gamesInThePast = ScheduleHelper.GetGamesByDaysSorted(await this.dataStore.GetSchedule(), -50);
+        const unReportedGames = gamesInThePast;//.filter(g => g.schedule.reported != true);
+        //These messages go to the individual captains
+        await this.SendMessageFor1DayOldGames(unReportedGames);
+        return [await this.CreateUnreportedMessage(unReportedGames)].filter(m => m != null);
         // const gamesTwoDaysOld = unReportedGames.map(g => g.days == 2);
         // const gamesThreeDatsOld = unReportedGames.map(g => g.days == 3);
         // const gamesOlderThenThreeDays = unReportedGames.map(g => g.days > 3);
     }
 
+    private async SendMessageFor1DayOldGames(allUnReportedGames: ScheduleInformation[]) {
+        var gamesOneDayOld = allUnReportedGames;//.filter(g => g.days == 1);
+        const message = new MessageHelper();
+        for (const information of gamesOneDayOld) {
+            const schedule = information.schedule;
+            const homeCaptains = await this.GetCaptain("death and delay");
+            const awayCaptain = await this.GetCaptain("death and delay");
+            message.AddNew(`Your game yesterday, **${schedule.home.teamName}** vs **${schedule.away.teamName}** has not been reported.`);
+            message.AddNewLine(`If you won the game please report it on the website.`);
+            message.AddEmptyLine();
+            homeCaptains.send({
+                embed: {
+                    color: 0,
+                    description: message.CreateStringMessage()
+                }
+            });
+            awayCaptain.send({
+                embed: {
+                    color: 0,
+                    description: message.CreateStringMessage()
+                }
+            });
+            return;
+        }
+        return message.CreateStringMessage();
+    }
+
     private async CreateUnreportedMessage(scheduleInformation: ScheduleInformation[]) {
+        if (scheduleInformation.length <= 0)
+            return null;
         const message = new MessageHelper();
         for (const information of scheduleInformation) {
             const schedule = information.schedule;

@@ -39,7 +39,7 @@ class LiveDataStore {
     }
     GetSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/schedule/get/matches/scheduled?season=11'));
+            return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/schedule/get/matches/scheduled?season=12'));
         });
     }
     GetUsers() {

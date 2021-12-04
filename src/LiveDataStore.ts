@@ -15,7 +15,7 @@ export class LiveDataStore {
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
     private cachedUsers = new Cacher<AugmentedNGSUser[]>(60 * 24);
     private cachedTeams = new Cacher<INGSTeam[]>(60 * 24);
-    private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);    
+    private cachedRegisteredTeams = new Cacher<INGSTeam[]>(60 * 24);
     private cachedSeasonTeams = new ListCacher<number, INGSTeam[]>(60 * 24);
 
     public Clear() {
@@ -31,7 +31,7 @@ export class LiveDataStore {
     }
 
     public async GetSchedule(): Promise<INGSSchedule[]> {
-        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>('/schedule/get/matches/scheduled?season=11'));
+        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>('/schedule/get/matches/scheduled?season=12'));
     }
 
     public async GetUsers(): Promise<AugmentedNGSUser[]> {
@@ -43,7 +43,7 @@ export class LiveDataStore {
             userName: searchTerm,
             apiKey: this._apiKey,
             fullProfile: true
-         });
+        });
     }
 
     public async GetRegisteredTeams(): Promise<INGSTeam[]> {
@@ -52,8 +52,8 @@ export class LiveDataStore {
 
     public async GetTeamsBySeason(season: number): Promise<INGSTeam[]> {
         return await this.cachedSeasonTeams.TryGetFromCache(season, async () => {
-            const teamResponse = await new NGSQueryBuilder().PostResponse<{ object: INGSTeam}[]>(`/history/season/teams`, {"season": season});
-            return teamResponse.map(response =>response.object);
+            const teamResponse = await new NGSQueryBuilder().PostResponse<{ object: INGSTeam }[]>(`/history/season/teams`, { "season": season });
+            return teamResponse.map(response => response.object);
         });
     }
 

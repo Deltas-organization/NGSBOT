@@ -31,17 +31,48 @@ class CheckReportedGames {
     }
     GetMessags() {
         return __awaiter(this, void 0, void 0, function* () {
-            const gamesInThePast = ScheduleHelper_1.ScheduleHelper.GetGamesByDaysSorted(yield this.dataStore.GetSchedule(), -14);
-            const unReportedGames = gamesInThePast.filter(g => g.schedule.reported != true);
-            return [yield this.CreateUnreportedMessage(unReportedGames)];
-            // const gamesOneDayOld = unReportedGames.map(g => g.days == 1);
+            const gamesInThePast = ScheduleHelper_1.ScheduleHelper.GetGamesByDaysSorted(yield this.dataStore.GetSchedule(), -50);
+            const unReportedGames = gamesInThePast; //.filter(g => g.schedule.reported != true);
+            //These messages go to the individual captains
+            yield this.SendMessageFor1DayOldGames(unReportedGames);
+            return [yield this.CreateUnreportedMessage(unReportedGames)].filter(m => m != null);
             // const gamesTwoDaysOld = unReportedGames.map(g => g.days == 2);
             // const gamesThreeDatsOld = unReportedGames.map(g => g.days == 3);
             // const gamesOlderThenThreeDays = unReportedGames.map(g => g.days > 3);
         });
     }
+    SendMessageFor1DayOldGames(allUnReportedGames) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var gamesOneDayOld = allUnReportedGames; //.filter(g => g.days == 1);
+            const message = new MessageHelper_1.MessageHelper();
+            for (const information of gamesOneDayOld) {
+                const schedule = information.schedule;
+                const homeCaptains = yield this.GetCaptain("death and delay");
+                const awayCaptain = yield this.GetCaptain("death and delay");
+                message.AddNew(`Your game yesterday, **${schedule.home.teamName}** vs **${schedule.away.teamName}** has not been reported.`);
+                message.AddNewLine(`If you won the game please report it on the website.`);
+                message.AddEmptyLine();
+                homeCaptains.send({
+                    embed: {
+                        color: 0,
+                        description: message.CreateStringMessage()
+                    }
+                });
+                awayCaptain.send({
+                    embed: {
+                        color: 0,
+                        description: message.CreateStringMessage()
+                    }
+                });
+                return;
+            }
+            return message.CreateStringMessage();
+        });
+    }
     CreateUnreportedMessage(scheduleInformation) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (scheduleInformation.length <= 0)
+                return null;
             const message = new MessageHelper_1.MessageHelper();
             for (const information of scheduleInformation) {
                 const schedule = information.schedule;

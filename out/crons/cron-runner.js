@@ -22,7 +22,7 @@ class CronRunner {
             if (processArgs.length !== 3)
                 return;
             const runner = new CronRunner();
-            switch (process[2].toLowerCase()) {
+            switch (processArgs[2].toLowerCase()) {
                 case "schedule":
                     yield runner.SendSchedule();
                     break;
