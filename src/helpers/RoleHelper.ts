@@ -1,6 +1,8 @@
-import { Guild, Role } from "discord.js";
+import { Client, Guild, Role } from "discord.js";
+import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
+import { ClientHelper } from "./ClientHelper";
 
 export class RoleHelper {
     constructor(private roles: Role[]) {
@@ -12,6 +14,10 @@ export class RoleHelper {
         const roles = roleInformation.cache.map((role, _, __) => role);
         const roleHelper = new RoleHelper(roles);
         return roleHelper;
+    }
+
+    public static async CreateFromclient(client: Client, channelId: DiscordChannels) {
+        return await this.CreateFrom(await ClientHelper.GetGuild(client, channelId));
     }
 
     public FindDivRole(divisionDisplayName: string): { div: NGSRoles, role: Role } {

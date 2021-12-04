@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoleHelper = void 0;
 const NGSRoles_1 = require("../enums/NGSRoles");
 const Globals_1 = require("../Globals");
+const ClientHelper_1 = require("./ClientHelper");
 class RoleHelper {
     constructor(roles) {
         this.roles = roles;
@@ -23,6 +24,11 @@ class RoleHelper {
             const roles = roleInformation.cache.map((role, _, __) => role);
             const roleHelper = new RoleHelper(roles);
             return roleHelper;
+        });
+    }
+    static CreateFromclient(client, channelId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.CreateFrom(yield ClientHelper_1.ClientHelper.GetGuild(client, channelId));
         });
     }
     FindDivRole(divisionDisplayName) {
