@@ -33,6 +33,7 @@ export class SelfAssignRolesCreatorWorker extends WorkerBase {
                 if (assignableRoles == null)
                     return;
                 await this.UpsertRecords(assignableRoles);
+                this.messageSender.SendBasicMessage("I have added the role to the list.")
             }
         }
         catch (e) {
