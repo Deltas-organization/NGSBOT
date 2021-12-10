@@ -51,12 +51,15 @@ const UpdateCaptainsList_1 = require("./translators/UpdateCaptainsList");
 const NGSRoles_1 = require("./enums/NGSRoles");
 const RoleHelper_1 = require("./helpers/RoleHelper");
 const WatchSchedule_1 = require("./translators/WatchSchedule");
+const SelfAssignRolesCreator_1 = require("./translators/mongo/SelfAssignRolesCreator");
+const SelfAssignRolesWatcher_1 = require("./translators/mongo/SelfAssignRolesWatcher");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken, mongoConnection) {
             this.client = client;
             this.token = token;
             this.translators = [];
+            this.exclamationTranslators = [];
             this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
@@ -75,8 +78,10 @@ let Bot = /** @class */ (() => {
             this.translators.push(new UnusedRoles_1.UnUsedRoles(this.dependencies));
             this.translators.push(new UpdateCaptainsList_1.UpdateCaptainsList(this.dependencies));
             this.translators.push(new WatchSchedule_1.WatchSchedule(this.dependencies));
+            this.translators.push(new SelfAssignRolesCreator_1.SelfAssignRolesCreator(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
-            this.assignFreeAgentTranslator = new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies);
+            this.exclamationTranslators.push(new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies));
+            this.exclamationTranslators.push(new SelfAssignRolesWatcher_1.SelfAssignRolesWatcher(this.dependencies));
         }
         listen() {
             this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
@@ -126,7 +131,9 @@ let Bot = /** @class */ (() => {
             }
             else if (/^\!/.test(originalContent)) {
                 var trimmedValue = originalContent.substr(1);
-                this.assignFreeAgentTranslator.Translate(trimmedValue, message);
+                for (const translator of this.exclamationTranslators) {
+                    translator.Translate(trimmedValue, message);
+                }
             }
         }
     };

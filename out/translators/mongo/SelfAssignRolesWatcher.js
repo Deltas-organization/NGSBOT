@@ -9,26 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ToggleFreeAgentRole = void 0;
-const AssignFreeAgentRoleWorker_1 = require("../workers/AssignFreeAgentRoleWorker");
-const ngsOnlyTranslatorBase_1 = require("./bases/ngsOnlyTranslatorBase");
-class ToggleFreeAgentRole extends ngsOnlyTranslatorBase_1.NGSOnlyTranslatorBase {
+exports.SelfAssignRolesWatcher = void 0;
+const SelfAssignRolesWatcherWorker_1 = require("../../workers/Mongo/SelfAssignRolesWatcherWorker");
+const translatorBase_1 = require("../bases/translatorBase");
+class SelfAssignRolesWatcher extends translatorBase_1.TranslatorBase {
     get commandBangs() {
-        return ["assign", "unassign"];
+        return ['assign'];
     }
     get description() {
-        return "Will assign or unassign free agent role";
+        return 'Will assign you a role if the role is available. -d will list available roles to assign.';
+    }
+    get delimiter() {
+        return ';';
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (commands.length <= 0)
-                return;
-            if (commands[0].toLowerCase().startsWith("free")) {
-                const assignRolesWorker = new AssignFreeAgentRoleWorker_1.AssignFreeAgentRoleWorker(this.translatorDependencies, detailed, messageSender);
-                yield assignRolesWorker.Begin(commands);
-            }
+            const watchWorker = new SelfAssignRolesWatcherWorker_1.SelfAssignRolesWatcherWorker(this.CreateMongoHelper(), this.translatorDependencies, detailed, messageSender);
+            yield watchWorker.Begin(commands);
         });
     }
 }
-exports.ToggleFreeAgentRole = ToggleFreeAgentRole;
-//# sourceMappingURL=ToggleFreeAgentRole.js.map
+exports.SelfAssignRolesWatcher = SelfAssignRolesWatcher;
+//# sourceMappingURL=SelfAssignRolesWatcher.js.map

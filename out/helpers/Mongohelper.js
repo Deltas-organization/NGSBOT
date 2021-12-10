@@ -23,18 +23,7 @@ class Mongohelper {
             resolver();
         }));
     }
-    getRequestedSchedules() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.connectedPromise;
-            const result = [];
-            var collection = this.ngsDatabase.collection("ScheduleRequest");
-            yield collection.find().forEach(item => {
-                result.push(item);
-            });
-            return result;
-        });
-    }
-    addScheduleRequest(request) {
+    AddOrUpdateScheduleRequest(request) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
             var collection = this.ngsDatabase.collection("ScheduleRequest");
@@ -49,6 +38,46 @@ class Mongohelper {
                 yield collection.insertOne(request);
                 return request;
             }
+        });
+    }
+    getRequestedSchedules() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            const result = [];
+            var collection = this.ngsDatabase.collection("ScheduleRequest");
+            yield collection.find().forEach(item => {
+                result.push(item);
+            });
+            return result;
+        });
+    }
+    AddOrUpdateAssignRoleRequest(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("AssignRoleRequest");
+            var selectOneFilter = { guildId: { $eq: request.guildId } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            if (existingRecord) {
+                existingRecord.assignablesRoles = [...new Set([...existingRecord.assignablesRoles, ...request.assignablesRoles])];
+                yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+                return existingRecord;
+            }
+            else {
+                yield collection.insertOne(request);
+                return request;
+            }
+        });
+    }
+    GetAssignedRoleRequests(guildId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("AssignRoleRequest");
+            var selectOneFilter = { guildId: { $eq: guildId } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            if (existingRecord)
+                return existingRecord.assignablesRoles;
+            else
+                return null;
         });
     }
 }

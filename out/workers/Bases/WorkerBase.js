@@ -17,6 +17,7 @@ class WorkerBase {
         this.client = workerDependencies.client;
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
+        this.guild = messageSender.originalMessage.guild;
     }
     Begin(commands) {
         this.Start(commands);

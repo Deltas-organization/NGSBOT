@@ -15,6 +15,9 @@ export class ToggleFreeAgentRole extends NGSOnlyTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+        if (commands.length <= 0)
+            return;
+
         if (commands[0].toLowerCase().startsWith("free")) {
             const assignRolesWorker = new AssignFreeAgentRoleWorker(this.translatorDependencies, detailed, messageSender);
             await assignRolesWorker.Begin(commands);

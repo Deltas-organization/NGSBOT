@@ -63,7 +63,7 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
                 divisions: this.divisionsToWatch,
                 requestType: 'divisions'
             };
-            return yield this.mongoHelper.addScheduleRequest(scheduleRequest);
+            return yield this.mongoHelper.AddOrUpdateScheduleRequest(scheduleRequest);
         });
     }
 }

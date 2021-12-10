@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, Guild } from "discord.js";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { MessageSender } from "../../helpers/MessageSender";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
@@ -10,11 +10,13 @@ export abstract class WorkerBase {
     protected readonly dataStore: DataStoreWrapper;
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
+    protected readonly guild: Guild;
 
     constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender) {
         this.client = workerDependencies.client;
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
+        this.guild = messageSender.originalMessage.guild;
     }
 
     public Begin(commands: string[]) {

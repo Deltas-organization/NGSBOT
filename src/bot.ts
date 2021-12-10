@@ -16,32 +16,28 @@ import { RegisteredCount } from "./translators/RegisteredCount";
 import { Purge } from "./translators/Purge";
 import { SendChannelMessage } from "./helpers/SendChannelMessage";
 import { DiscordChannels } from "./enums/DiscordChannels";
-import { HistoryDisplay } from "./scheduled/HistoryDisplay";
 import { Reload } from "./translators/Reload";
-import { NGSDivisions } from "./enums/NGSDivisions";
 import { GamesCommand } from "./translators/GamesCommand";
 import { NonCastedGamesCommand } from "./translators/NonCastedGamesCommand";
 import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
 import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
-import { UpdateCaptainsListCommand } from "./commands/UpdateCaptainsListCommand";
 import { Leave } from "./translators/Leave";
-import { MessageDictionary } from "./helpers/MessageDictionary";
 import { ToggleFreeAgentRole } from "./translators/ToggleFreeAgentRole";
-import { CleanupFreeAgentsChannel } from "./commands/CleanupFreeAgentsChannel";
-import { Globals } from "./Globals";
 import { UnUsedRoles } from "./translators/UnusedRoles";
 import { UpdateCaptainsList } from "./translators/UpdateCaptainsList";
 import { NGSRoles } from "./enums/NGSRoles";
 import { RoleHelper } from "./helpers/RoleHelper";
 import { WatchSchedule } from "./translators/WatchSchedule";
+import { SelfAssignRolesCreator } from "./translators/mongo/SelfAssignRolesCreator";
+import { SelfAssignRolesWatcher } from "./translators/mongo/SelfAssignRolesWatcher";
 
 @injectable()
 export class Bot {
     private translators: ITranslate[] = [];
+    private exclamationTranslators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
     private dependencies: CommandDependencies;
     private messageSender: SendChannelMessage;
-    private assignFreeAgentTranslator: ToggleFreeAgentRole;
 
     constructor(
         @inject(TYPES.Client) public client: Client,
@@ -68,9 +64,11 @@ export class Bot {
         this.translators.push(new UnUsedRoles(this.dependencies));
         this.translators.push(new UpdateCaptainsList(this.dependencies));
         this.translators.push(new WatchSchedule(this.dependencies));
+        this.translators.push(new SelfAssignRolesCreator(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
-        this.assignFreeAgentTranslator = new ToggleFreeAgentRole(this.dependencies);
+        this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
+        this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));
     }
 
     public listen(): Promise<string> {
@@ -127,7 +125,9 @@ export class Bot {
         }
         else if (/^\!/.test(originalContent)) {
             var trimmedValue = originalContent.substr(1);
-            this.assignFreeAgentTranslator.Translate(trimmedValue, message);
+            for (const translator of this.exclamationTranslators) {
+                translator.Translate(trimmedValue, message);
+            }
         }
     }
 }

@@ -9,26 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ToggleFreeAgentRole = void 0;
-const AssignFreeAgentRoleWorker_1 = require("../workers/AssignFreeAgentRoleWorker");
-const ngsOnlyTranslatorBase_1 = require("./bases/ngsOnlyTranslatorBase");
-class ToggleFreeAgentRole extends ngsOnlyTranslatorBase_1.NGSOnlyTranslatorBase {
+exports.SelfAssignRolesCreator = void 0;
+const SelfAssignRoles_1 = require("../../workers/Mongo/SelfAssignRoles");
+const adminTranslatorBase_1 = require("../bases/adminTranslatorBase");
+class SelfAssignRolesCreator extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
-        return ["assign", "unassign"];
+        return ["self"];
     }
     get description() {
-        return "Will assign or unassign free agent role";
+        return "Will register which roles can be self assigned for your discord. Detailed (-d) will list the current roles that can be self assigned.";
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (commands.length <= 0)
-                return;
-            if (commands[0].toLowerCase().startsWith("free")) {
-                const assignRolesWorker = new AssignFreeAgentRoleWorker_1.AssignFreeAgentRoleWorker(this.translatorDependencies, detailed, messageSender);
-                yield assignRolesWorker.Begin(commands);
-            }
+            const watchWorker = new SelfAssignRoles_1.SelfAssignRolesCreatorWorker(this.CreateMongoHelper(), this.translatorDependencies, detailed, messageSender);
+            yield watchWorker.Begin(commands);
         });
     }
 }
-exports.ToggleFreeAgentRole = ToggleFreeAgentRole;
-//# sourceMappingURL=ToggleFreeAgentRole.js.map
+exports.SelfAssignRolesCreator = SelfAssignRolesCreator;
+//# sourceMappingURL=SelfAssignRoles.js.map
