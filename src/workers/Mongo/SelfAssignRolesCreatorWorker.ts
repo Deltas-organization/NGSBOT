@@ -56,6 +56,9 @@ export class SelfAssignRolesCreatorWorker extends WorkerBase {
                     allRolesValid = false;
                 }
             }
+            else {
+                allRolesValid = false;
+            }
         }
         if (!allRolesValid) {
             await this.messageSender.SendBasicMessage("Unable to find all valid roles, Aborting...");
