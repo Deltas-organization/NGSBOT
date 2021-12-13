@@ -25,6 +25,7 @@ export abstract class RoleWorkerBase extends WorkerBase {
         'HCI Player',
         'Trait Value',
         NGSRoles.Storm,
+        'MemberList',
         '@everyone'];
 
     protected reserveredRoles: Role[] = [];

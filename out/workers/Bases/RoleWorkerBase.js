@@ -36,6 +36,7 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             'HCI Player',
             'Trait Value',
             NGSRoles_1.NGSRoles.Storm,
+            'MemberList',
             '@everyone'
         ];
         this.reserveredRoles = [];
