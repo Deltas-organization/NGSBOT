@@ -67,7 +67,7 @@ export class Bot {
         this.translators.push(new SelfAssignRolesCreator(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
-        this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
+        // this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
         this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));
     }
 

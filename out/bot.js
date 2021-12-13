@@ -45,7 +45,6 @@ const NonCastedGamesCommand_1 = require("./translators/NonCastedGamesCommand");
 const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
 const DataStoreWrapper_1 = require("./helpers/DataStoreWrapper");
 const Leave_1 = require("./translators/Leave");
-const ToggleFreeAgentRole_1 = require("./translators/ToggleFreeAgentRole");
 const UnusedRoles_1 = require("./translators/UnusedRoles");
 const UpdateCaptainsList_1 = require("./translators/UpdateCaptainsList");
 const NGSRoles_1 = require("./enums/NGSRoles");
@@ -80,7 +79,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new WatchSchedule_1.WatchSchedule(this.dependencies));
             this.translators.push(new SelfAssignRolesCreator_1.SelfAssignRolesCreator(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
-            this.exclamationTranslators.push(new ToggleFreeAgentRole_1.ToggleFreeAgentRole(this.dependencies));
+            // this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
             this.exclamationTranslators.push(new SelfAssignRolesWatcher_1.SelfAssignRolesWatcher(this.dependencies));
         }
         listen() {
