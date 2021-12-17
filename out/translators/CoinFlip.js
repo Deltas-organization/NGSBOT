@@ -25,7 +25,7 @@ class CoinFlip extends nonNGSTranslatorBase_1.NonNGSTranslatorBase {
                 yield messageSender.SendBasicMessage(`${messageSender.GuildMember} heads`);
             }
             else {
-                yield messageSender.SendBasicMessage(`${messageSender.GuildMember} heads`);
+                yield messageSender.SendBasicMessage(`${messageSender.GuildMember} tails`);
             }
         });
     }

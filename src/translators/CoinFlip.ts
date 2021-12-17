@@ -17,7 +17,7 @@ export class CoinFlip extends NonNGSTranslatorBase {
         if (x) {
             await messageSender.SendBasicMessage(`${messageSender.GuildMember} heads`);
         } else {
-            await messageSender.SendBasicMessage(`${messageSender.GuildMember} heads`);
+            await messageSender.SendBasicMessage(`${messageSender.GuildMember} tails`);
         }
     }
 }
