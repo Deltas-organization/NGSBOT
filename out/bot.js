@@ -54,6 +54,7 @@ const SelfAssignRolesCreator_1 = require("./translators/mongo/SelfAssignRolesCre
 const SelfAssignRolesWatcher_1 = require("./translators/mongo/SelfAssignRolesWatcher");
 const SelfAssignRolesRemover_1 = require("./translators/mongo/SelfAssignRolesRemover");
 const CoinFlip_1 = require("./translators/CoinFlip");
+const Random_1 = require("./translators/Random");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken, mongoConnection) {
@@ -81,6 +82,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new WatchSchedule_1.WatchSchedule(this.dependencies));
             this.translators.push(new SelfAssignRolesCreator_1.SelfAssignRolesCreator(this.dependencies));
             this.translators.push(new SelfAssignRolesRemover_1.SelfAssignRolesRemover(this.dependencies));
+            this.translators.push(new Random_1.RandomTranslator(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
             // this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
             this.exclamationTranslators.push(new SelfAssignRolesWatcher_1.SelfAssignRolesWatcher(this.dependencies));

@@ -1,0 +1,108 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AllHeroes = exports.Tank = exports.Support = exports.Assassin = exports.RangedAssassin = exports.MeleeAssassin = exports.Healer = exports.Bruiser = void 0;
+exports.Bruiser = [
+    "Artanis",
+    "Chen",
+    "D.Va",
+    "Deathwing",
+    "Dehaka",
+    "Gazlowe",
+    "Hogger",
+    "Imperius",
+    "Leoric",
+    "Malthael",
+    "Ragnaros",
+    "Rexxar",
+    "Sonya",
+    "Thrall",
+    "Varian",
+    "Xul",
+    "Yrel",
+];
+exports.Healer = [
+    "Alexstrasza",
+    "Ana",
+    "Anduin",
+    "Auriel",
+    "Brightwing",
+    "Deckard",
+    "Kharazim",
+    "Li Li",
+    "Lt. Morales",
+    "Lúcio",
+    "Malfurion",
+    "Rehgar",
+    "Stukov",
+    "Tyrande",
+    "Uther",
+    "Whitemane"
+];
+exports.MeleeAssassin = [
+    "Alarak",
+    "Illidan",
+    "Kerrigan",
+    "Maiev",
+    "Murky",
+    "Qhira",
+    "Samuro",
+    "The Butcher",
+    "Valeera",
+    "Zeratul",
+];
+exports.RangedAssassin = [
+    "Azmodan",
+    "Cassia",
+    "Chromie",
+    "Falstad",
+    "Fenix",
+    "Gall",
+    "Genji",
+    "Greymane",
+    "Gul'dan",
+    "Hanzo",
+    "Jaina",
+    "Junkrat",
+    "Kael'thas",
+    "Kel'Thuzad",
+    "Li-Ming",
+    "Lunara",
+    "Mephisto",
+    "Nazeebo",
+    "Nova",
+    "Orphea",
+    "Probius",
+    "Raynor",
+    "Sgt. Hammer",
+    "Sylvanas",
+    "Tassadar",
+    "Tracer",
+    "Tychus",
+    "Valla",
+    "Zagara",
+    "Zul'jin",
+];
+exports.Assassin = [...exports.MeleeAssassin, ...exports.RangedAssassin];
+exports.Support = [
+    "Abathur",
+    "Medivh",
+    "The Lost Vikings",
+    "Zarya",
+];
+exports.Tank = [
+    "Anub'arak",
+    "Arthas",
+    "Blaze",
+    "Cho",
+    "Diablo",
+    "E.T.C.",
+    "Garrosh",
+    "Johanna",
+    "Mal'Ganis",
+    "Mei",
+    "Muradin",
+    "Stitches",
+    "Tyrael"
+];
+exports.AllHeroes = [...exports.Bruiser, ...exports.Assassin, ...exports.Support, ...exports.Tank, ...exports.Healer];
+//# sourceMappingURL=Heroes.js.map
