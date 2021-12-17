@@ -10,7 +10,7 @@ export abstract class NonNGSTranslatorBase extends TranslatorBase {
             case DiscordGuilds.NGS:
                 return false;
         }
-        
+
         return true;
     }
 }

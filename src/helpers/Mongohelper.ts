@@ -65,6 +65,28 @@ export class Mongohelper {
         }
     }
 
+    public async RemoveAssignedRoles(request: IMongoAssignRolesRequest): Promise<IMongoAssignRolesRequest> {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<IMongoAssignRolesRequest>("AssignRoleRequest");
+        var selectOneFilter = { guildId: { $eq: request.guildId } };
+        const existingRecord = await collection.findOne(selectOneFilter);
+        if (existingRecord) {
+            var rolesToAssign = existingRecord.assignablesRoles;
+            for (const roleToRemove of request.assignablesRoles) {
+                const currentIndex = rolesToAssign.indexOf(roleToRemove);
+                if (currentIndex > -1) {
+                    rolesToAssign.splice(currentIndex, 1);
+                }
+            }
+            existingRecord.assignablesRoles = rolesToAssign;
+            await collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+            return existingRecord;
+        }
+        else {
+            return null;
+        }
+    }
+
     public async GetAssignedRoleRequests(guildId: string) {
         await this.connectedPromise;
         var collection = this.ngsDatabase.collection<IMongoAssignRolesRequest>("AssignRoleRequest");

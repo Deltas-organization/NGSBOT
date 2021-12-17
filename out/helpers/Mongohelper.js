@@ -68,6 +68,29 @@ class Mongohelper {
             }
         });
     }
+    RemoveAssignedRoles(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("AssignRoleRequest");
+            var selectOneFilter = { guildId: { $eq: request.guildId } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            if (existingRecord) {
+                var rolesToAssign = existingRecord.assignablesRoles;
+                for (const roleToRemove of request.assignablesRoles) {
+                    const currentIndex = rolesToAssign.indexOf(roleToRemove);
+                    if (currentIndex > -1) {
+                        rolesToAssign.splice(currentIndex, 1);
+                    }
+                }
+                existingRecord.assignablesRoles = rolesToAssign;
+                yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+                return existingRecord;
+            }
+            else {
+                return null;
+            }
+        });
+    }
     GetAssignedRoleRequests(guildId) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;

@@ -30,6 +30,8 @@ import { RoleHelper } from "./helpers/RoleHelper";
 import { WatchSchedule } from "./translators/WatchSchedule";
 import { SelfAssignRolesCreator } from "./translators/mongo/SelfAssignRolesCreator";
 import { SelfAssignRolesWatcher } from "./translators/mongo/SelfAssignRolesWatcher";
+import { SelfAssignRolesRemover } from "./translators/mongo/SelfAssignRolesRemover";
+import { CoinFlip } from "./translators/CoinFlip";
 
 @injectable()
 export class Bot {
@@ -65,10 +67,12 @@ export class Bot {
         this.translators.push(new UpdateCaptainsList(this.dependencies));
         this.translators.push(new WatchSchedule(this.dependencies));
         this.translators.push(new SelfAssignRolesCreator(this.dependencies));
+        this.translators.push(new SelfAssignRolesRemover(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
         // this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
         this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));
+        this.exclamationTranslators.push(new CoinFlip(this.dependencies));
     }
 
     public listen(): Promise<string> {

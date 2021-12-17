@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SelfAssignRolesCreatorWorker = void 0;
+exports.SelfAssignRolesRemoverWorker = void 0;
 const WorkerBase_1 = require("../Bases/WorkerBase");
-class SelfAssignRolesCreatorWorker extends WorkerBase_1.WorkerBase {
+class SelfAssignRolesRemoverWorker extends WorkerBase_1.WorkerBase {
     constructor(mongoHelper, workerDependencies, detailed, messageSender) {
         super(workerDependencies, detailed, messageSender);
         this.mongoHelper = mongoHelper;
@@ -21,25 +21,11 @@ class SelfAssignRolesCreatorWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (this.detailed) {
-                    const currentRolesToWatch = yield this.mongoHelper.GetAssignedRoleRequests(this.guild.id);
-                    const allRoles = yield this.guild.roles.fetch();
-                    const roleNames = [];
-                    for (var roleNameWatching of currentRolesToWatch) {
-                        let role = yield allRoles.fetch(roleNameWatching);
-                        if (role)
-                            roleNames.push(role.name);
-                    }
-                    const message = `The roles currently assignable are: ${roleNames.join(', ')}.`;
-                    this.messageSender.SendBasicMessage(message);
-                }
-                else {
-                    const assignableRoles = yield this.GetAssignablesRoles(commands);
-                    if (assignableRoles == null)
-                        return;
-                    yield this.UpsertRecords(assignableRoles);
-                    this.messageSender.SendBasicMessage("I have added the role to the list.");
-                }
+                const assignableRoles = yield this.GetAssignablesRoles(commands);
+                if (assignableRoles == null)
+                    return;
+                yield this.RemoveRoles(assignableRoles);
+                this.messageSender.SendBasicMessage("I have removed the roles from the list.");
             }
             catch (e) {
             }
@@ -72,15 +58,15 @@ class SelfAssignRolesCreatorWorker extends WorkerBase_1.WorkerBase {
             return rolesToWatch;
         });
     }
-    UpsertRecords(rolesToWatch) {
+    RemoveRoles(rolesToWatch) {
         return __awaiter(this, void 0, void 0, function* () {
             const assignRolesRequest = {
                 guildId: this.guild.id,
                 assignablesRoles: rolesToWatch
             };
-            return yield this.mongoHelper.AddOrUpdateAssignRoleRequest(assignRolesRequest);
+            return yield this.mongoHelper.RemoveAssignedRoles(assignRolesRequest);
         });
     }
 }
-exports.SelfAssignRolesCreatorWorker = SelfAssignRolesCreatorWorker;
-//# sourceMappingURL=SelfAssignRolesCreatorWorker copy.js.map
+exports.SelfAssignRolesRemoverWorker = SelfAssignRolesRemoverWorker;
+//# sourceMappingURL=SelfAssignRolesRemoverWorker.js.map
