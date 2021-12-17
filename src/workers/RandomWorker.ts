@@ -20,7 +20,7 @@ export class RandomWorker extends WorkerBase {
                 case "heroes":
                     {
                         const random = this.GetRandom(AllHeroes);
-                        this.messageHelper.AddNewLine(`Your **hero is: ${random}.`);
+                        this.messageHelper.AddNewLine(`Your **hero** is: ${random}.`);
                     }
                     break;
                 case "assassin":
