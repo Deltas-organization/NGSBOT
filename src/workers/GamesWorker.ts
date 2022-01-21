@@ -1,13 +1,14 @@
 import { Message } from "discord.js";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
+import { MessageWrapper } from "../helpers/MessageWrapper";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { INGSTeam } from "../interfaces";
 import { WorkerBase } from "./Bases/WorkerBase";
 
-export class GamesWorker extends WorkerBase {    
-    private _messageCommand: (message: string, storeMessage?: boolean) => Promise<Message>;
-    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<Message[]>;
+export class GamesWorker extends WorkerBase {
+    private _messageCommand: (message: string, storeMessage?: boolean) => Promise<MessageWrapper>;
+    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<MessageWrapper[]>;
 
     protected async Start(commands: string[]) {
         this._messageCommand = (message: string, _?: boolean) => this.messageSender.DMMessage(message);
@@ -34,7 +35,7 @@ export class GamesWorker extends WorkerBase {
                 //     await this._messageCommand("Borntoshine has been notified of your failings.");
                 // }
                 // else {
-                    await this._messageCommand("Nothing scheduled yet.");
+                await this._messageCommand("Nothing scheduled yet.");
                 //}
             }
             if (!this.detailed) {

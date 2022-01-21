@@ -1,9 +1,10 @@
 import { Message } from "discord.js";
+import { MessageWrapper } from "../helpers/MessageWrapper";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class NonCastedWorker extends WorkerBase {
-    private _messageCommand: (message: string[], storeMessage?: boolean) => Promise<Message[]>;
+    private _messageCommand: (message: string[], storeMessage?: boolean) => Promise<MessageWrapper[]>;
 
     protected async Start(commands: string[]) {
         this._messageCommand = (messages: string[], _?: boolean) => this.messageSender.DMMessages(messages);

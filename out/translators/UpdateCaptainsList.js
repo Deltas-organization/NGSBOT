@@ -38,7 +38,7 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
                     yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, division);
                 }
             }
-            messageSender.Edit(message, "Captains list has been updated");
+            message.Edit("Captains list has been updated");
         });
     }
     AttemptToUpdateCaptainMessage(captainsListCommand, channelSender, division) {

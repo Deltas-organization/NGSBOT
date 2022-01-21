@@ -32,11 +32,11 @@ export class AssignRolesWorker extends RoleWorkerBase {
     private async BeginAssigning() {
         const progressMessage = await this.messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
         const teams = await this.dataStore.GetTeams();
-        await this.messageSender.Edit(progressMessage, "Loading Discord Members.");
+        await progressMessage.Edit("Loading Discord Members.");
         const messagesLog: MessageHelper<AssignRolesOptions>[] = [];
         try {
             const guildMembers = (await this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
-            await this.messageSender.Edit(progressMessage, "Members loaded. \n Assigning Now.");
+            await progressMessage.Edit("Members loaded. \n Assigning Now.");
             let count = 0;
             let progressCount = 1;
             let steps = 10;
@@ -47,7 +47,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
                     messagesLog.push(messageHelper);
                 }
                 if (count > (teams.length / steps) * progressCount) {
-                    await this.messageSender.Edit(progressMessage, `Assignment Continuing \n Progress: ${progressCount * (100 / steps)}%`);
+                    await progressMessage.Edit(`Assignment Continuing \n Progress: ${progressCount * (100 / steps)}%`);
                     progressCount++;
                 }
             }
@@ -96,7 +96,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
             messageHelper.AddNewLine(`All teams Have 3 people registed on the website and present in the discord!!!`);
 
         await this.messageSender.SendMessage(messageHelper.CreateStringMessage());
-        await progressMessage.delete();
+        await progressMessage.Delete();
     }
 
     private FindUpdatedTeams(message: MessageHelper<AssignRolesOptions>) {

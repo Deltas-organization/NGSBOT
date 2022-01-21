@@ -21,7 +21,7 @@ class DeleteMessageWorker extends WorkerBase_1.WorkerBase {
                     amountToDelete = parsedNumber;
                 }
             }
-            var message = yield this.messageSender.SendMessage(`would you like me to delete my last ${amountToDelete} message${(amountToDelete > 1 && 's?') || '?'}`, false);
+            var message = (yield this.messageSender.SendMessage(`would you like me to delete my last ${amountToDelete} message${(amountToDelete > 1 && 's?') || '?'}`, false)).Message;
             message.react('✅');
             const filter = (reaction, user) => {
                 return ['✅'].includes(reaction.emoji.name) && user.id === this.messageSender.originalMessage.author.id;
