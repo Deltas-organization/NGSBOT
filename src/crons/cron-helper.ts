@@ -52,7 +52,7 @@ export class CronHelper {
     }
 
     public async sendScheduleForDad() {
-        await this.sendScheduleByDivision(DiscordChannels.DeltaServer, NGSDivisions.BSouthEast);
+        await this.sendScheduleByDivision(DiscordChannels.DeltaServer, NGSDivisions.AEast);
     }
 
     public async sendScheduleForSis() {
@@ -60,7 +60,7 @@ export class CronHelper {
     }
 
     public async sendScheduleForMom() {
-        await this.sendScheduleByDivision(DiscordChannels.MomSchedule, NGSDivisions.BSouthEast);
+        await this.sendScheduleByDivision(DiscordChannels.MomSchedule, NGSDivisions.BEast);
     }
 
     public async sendScheduleByDivision(channel: DiscordChannels | string, ...divisions: NGSDivisions[]) {
