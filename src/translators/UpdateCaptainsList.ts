@@ -17,38 +17,31 @@ import { SendChannelMessage } from "../helpers/SendChannelMessage";
 
 const fs = require('fs');
 
-export class UpdateCaptainsList extends ngsTranslatorBase
-{
-    public get commandBangs(): string[]
-    {
+export class UpdateCaptainsList extends ngsTranslatorBase {
+    public get commandBangs(): string[] {
         return ["captain", "captains"];
     }
 
-    public get description(): string
-    {
+    public get description(): string {
         return "Will update the captain list";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
-    {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
         const updateCaptainsList = new UpdateCaptainsListCommand(this.translatorDependencies);
         const channelSender = new SendChannelMessage(this.client, this.messageStore);
         const message = await messageSender.SendMessage("Updating captains list now");
-        for (var value in NGSDivisions)
-        {
+        for (var value in NGSDivisions) {
             const division = NGSDivisions[value];
-            try
-            {
+            try {
                 await this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, division);
             }
             catch {
                 await this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, division)
             }
         }
-        messageSender.Edit(message, "Captains list has been updated");
+        message.Edit("Captains list has been updated");
     }
-    private async AttemptToUpdateCaptainMessage(captainsListCommand: UpdateCaptainsListCommand, channelSender: SendChannelMessage, division: NGSDivisions)
-    {
+    private async AttemptToUpdateCaptainMessage(captainsListCommand: UpdateCaptainsListCommand, channelSender: SendChannelMessage, division: NGSDivisions) {
         const messageId = MessageDictionary.GetSavedMessage(division);
         const message = await captainsListCommand.CreateDivisionList(division, DiscordChannels.NGSDiscord);
         if (messageId)

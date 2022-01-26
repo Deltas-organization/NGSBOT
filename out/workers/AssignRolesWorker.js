@@ -37,11 +37,11 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             const progressMessage = yield this.messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
             const teams = yield this.dataStore.GetTeams();
-            yield this.messageSender.Edit(progressMessage, "Loading Discord Members.");
+            yield progressMessage.Edit("Loading Discord Members.");
             const messagesLog = [];
             try {
                 const guildMembers = (yield this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
-                yield this.messageSender.Edit(progressMessage, "Members loaded. \n Assigning Now.");
+                yield progressMessage.Edit("Members loaded. \n Assigning Now.");
                 let count = 0;
                 let progressCount = 1;
                 let steps = 10;
@@ -52,7 +52,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                         messagesLog.push(messageHelper);
                     }
                     if (count > (teams.length / steps) * progressCount) {
-                        yield this.messageSender.Edit(progressMessage, `Assignment Continuing \n Progress: ${progressCount * (100 / steps)}%`);
+                        yield progressMessage.Edit(`Assignment Continuing \n Progress: ${progressCount * (100 / steps)}%`);
                         progressCount++;
                     }
                 }
@@ -97,7 +97,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             else
                 messageHelper.AddNewLine(`All teams Have 3 people registed on the website and present in the discord!!!`);
             yield this.messageSender.SendMessage(messageHelper.CreateStringMessage());
-            yield progressMessage.delete();
+            yield progressMessage.Delete();
         });
     }
     FindUpdatedTeams(message) {

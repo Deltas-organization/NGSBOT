@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageSender = void 0;
 const Globals_1 = require("../Globals");
+const MessageWrapper_1 = require("./MessageWrapper");
 class MessageSender {
     constructor(client, originalMessage, messageStore) {
         this.client = client;
@@ -52,7 +53,7 @@ class MessageSender {
             });
             if (storeMessage)
                 this.messageStore.AddMessage(sentMessage);
-            return sentMessage;
+            return new MessageWrapper_1.MessageWrapper(this, sentMessage);
         });
     }
     SendMessages(messages, storeMessage = true) {
@@ -88,7 +89,7 @@ class MessageSender {
                     description: message
                 }
             });
-            return sentMessage;
+            return new MessageWrapper_1.MessageWrapper(this, sentMessage);
         });
     }
     Edit(message, newContent) {

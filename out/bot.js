@@ -129,13 +129,13 @@ let Bot = /** @class */ (() => {
         checkTranslators(message) {
             let originalContent = message.content;
             if (/^\>/.test(originalContent)) {
-                var trimmedValue = originalContent.substr(1);
+                var trimmedValue = originalContent.substring(1);
                 this.translators.forEach(translator => {
                     translator.Translate(trimmedValue, message);
                 });
             }
             else if (/^\!/.test(originalContent)) {
-                var trimmedValue = originalContent.substr(1);
+                var trimmedValue = originalContent.substring(1);
                 for (const translator of this.exclamationTranslators) {
                     translator.Translate(trimmedValue, message);
                 }

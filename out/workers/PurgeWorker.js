@@ -32,7 +32,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             const progressMessage = yield this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
             const teams = yield this.dataStore.GetTeams();
-            yield this.messageSender.Edit(progressMessage, `Purging STARTED... STAND BY...`);
+            yield progressMessage.Edit(`Purging STARTED... STAND BY...`);
             const messages = [];
             const guildMembers = (yield this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
             let count = 0;
@@ -59,7 +59,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 }
                 messages.push(messageHelper);
                 if (count > (guildMembers.length / 4) * progressCount) {
-                    yield this.messageSender.Edit(progressMessage, `Purging \n Progress: ${progressCount * 25}%`);
+                    yield progressMessage.Edit(`Purging \n Progress: ${progressCount * 25}%`);
                     progressCount++;
                 }
             }
@@ -78,7 +78,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             }).catch(console.error);
             yield this.messageSender.SendMessage(`Finished Purging Roles! \n
             Removed ${removedRoles.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`);
-            yield progressMessage.delete();
+            yield progressMessage.Delete();
         });
     }
     ShouldRemoveRoles(guildMember) {

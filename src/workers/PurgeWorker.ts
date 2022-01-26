@@ -22,7 +22,7 @@ export class PurgeWorker extends RoleWorkerBase {
     private async BeginPurge() {
         const progressMessage = await this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
         const teams = await this.dataStore.GetTeams();
-        await this.messageSender.Edit(progressMessage, `Purging STARTED... STAND BY...`);
+        await progressMessage.Edit(`Purging STARTED... STAND BY...`);
         const messages: MessageHelper<IPurgeInformation>[] = [];
         const guildMembers = (await this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
         let count = 0;
@@ -50,7 +50,7 @@ export class PurgeWorker extends RoleWorkerBase {
 
             messages.push(messageHelper);
             if (count > (guildMembers.length / 4) * progressCount) {
-                await this.messageSender.Edit(progressMessage, `Purging \n Progress: ${progressCount * 25}%`);
+                await progressMessage.Edit(`Purging \n Progress: ${progressCount * 25}%`);
                 progressCount++;
             }
         }
@@ -73,7 +73,7 @@ export class PurgeWorker extends RoleWorkerBase {
         await this.messageSender.SendMessage(`Finished Purging Roles! \n
             Removed ${removedRoles.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`);
 
-        await progressMessage.delete();
+        await progressMessage.Delete();
     }
 
     private async ShouldRemoveRoles(guildMember: GuildMember) {
