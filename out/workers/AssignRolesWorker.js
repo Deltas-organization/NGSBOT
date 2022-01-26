@@ -75,9 +75,9 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             const teamRolesCreated = messagesLog.filter(m => m.Options.CreatedTeamRole).length;
             if (teamRolesCreated)
                 messageHelper.AddNewLine(`Created ${teamRolesCreated} Team Roles`);
-            messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} Team Roles`);
-            messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedDivCount).reduce((m1, m2) => m1 + m2, 0)} Div Roles`);
-            messageHelper.AddNewLine(`Assigned ${messagesLog.map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
+            messageHelper.AddNewLine(`Assigned ${messagesLog.filter(m => m.Options.AssignedTeamCount != null).map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} Team Roles`);
+            messageHelper.AddNewLine(`Assigned ${messagesLog.filter(m => m.Options.AssignedTeamCount != null).map(m => m.Options.AssignedDivCount).reduce((m1, m2) => m1 + m2, 0)} Div Roles`);
+            messageHelper.AddNewLine(`Assigned ${messagesLog.filter(m => m.Options.AssignedTeamCount != null).map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
             const teamsWithNoValidCaptain = [];
             const teamsWithLessThen3People = [];
             for (var message of messagesLog) {
@@ -124,6 +124,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             }
             catch (e) {
                 messageTracker.AddNewLine(`There was a problem assigning team: ${teamName}`);
+                Globals_1.Globals.log(e);
                 messageTracker.AddJSONLine(e);
             }
             return messageTracker;
