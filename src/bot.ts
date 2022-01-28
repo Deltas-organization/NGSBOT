@@ -115,6 +115,9 @@ export class Bot {
                 }
                 message.member.roles.add(freeAgentRole);
             }
+            if (message.channel.type == "dm") {
+                await this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels.DeltaPmChannel);
+            }
         });
     }
 

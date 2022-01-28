@@ -121,6 +121,9 @@ let Bot = /** @class */ (() => {
                     }
                     message.member.roles.add(freeAgentRole);
                 }
+                if (message.channel.type == "dm") {
+                    yield this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
+                }
             }));
         }
         OnMessageReceived(message) {

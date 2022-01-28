@@ -1,5 +1,4 @@
-export enum DiscordChannels
-{
+export enum DiscordChannels {
     NGSHype = "522574547405242389",
     NGSDiscord = "429807712222576650",
     DeltaServer = "761410049926889544",
@@ -8,5 +7,6 @@ export enum DiscordChannels
     NGSCaptainList = "431452468933820418",
     DadSchedule = "674530041694257192",
     MomSchedule = "861743079019249714",
-    SisSchedule = "793559101975429151"
+    SisSchedule = "793559101975429151",
+    DeltaPmChannel = "936761691734171699"
 }

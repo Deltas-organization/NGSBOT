@@ -12,5 +12,6 @@ var DiscordChannels;
     DiscordChannels["DadSchedule"] = "674530041694257192";
     DiscordChannels["MomSchedule"] = "861743079019249714";
     DiscordChannels["SisSchedule"] = "793559101975429151";
+    DiscordChannels["DeltaPmChannel"] = "936761691734171699";
 })(DiscordChannels = exports.DiscordChannels || (exports.DiscordChannels = {}));
 //# sourceMappingURL=DiscordChannels.js.map
