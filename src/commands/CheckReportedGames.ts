@@ -41,18 +41,18 @@ export class CheckReportedGames {
         const message = new MessageHelper();
         for (const information of gamesOneDayOld) {
             const schedule = information.schedule;
-            const homeCaptains = await this.GetCaptain("death and delay");
-            const awayCaptain = await this.GetCaptain("death and delay");
+            const homeCaptains = await this.GetCaptain(schedule.home.teamName);
+            const awayCaptain = await this.GetCaptain(schedule.away.teamName);
             message.AddNew(`Your game yesterday, **${schedule.home.teamName}** vs **${schedule.away.teamName}** has not been reported.`);
             message.AddNewLine(`If you won the game please report it on the website.`);
             message.AddEmptyLine();
-            homeCaptains.send({
+            homeCaptains.member.send({
                 embed: {
                     color: 0,
                     description: message.CreateStringMessage()
                 }
             });
-            awayCaptain.send({
+            awayCaptain.member.send({
                 embed: {
                     color: 0,
                     description: message.CreateStringMessage()

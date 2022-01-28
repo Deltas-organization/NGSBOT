@@ -42,20 +42,13 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 const teamInformation = yield this.FindInTeam(member.user, teams);
                 const messageHelper = new MessageHelper_1.MessageHelper(member.user.username);
                 messageHelper.Options.rolesRemovedCount = 0;
-                const shouldContinue = yield this.ShouldRemoveRoles(member);
-                if (shouldContinue) {
-                    if (teamInformation == null) {
-                        messageHelper.AddNewLine(`No Team Found.`);
-                        yield this.PurgeAllRoles(member, messageHelper);
-                    }
-                    else {
-                        messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
-                        yield this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
-                    }
+                if (teamInformation == null) {
+                    messageHelper.AddNewLine(`No Team Found.`);
+                    yield this.PurgeAllRoles(member, messageHelper);
                 }
                 else {
-                    messageHelper.Options.ignoredUser = true;
-                    messageHelper.AddNewLine(`Didn't remove roles for: ${member.displayName}`);
+                    messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
+                    yield this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
                 }
                 messages.push(messageHelper);
                 if (count > (guildMembers.length / 4) * progressCount) {
@@ -68,7 +61,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             fs.writeFileSync('./files/purgedRoles.json', JSON.stringify({
                 affectedUserCount: removedRoles.length,
                 detailedInformation: removedRoles.map(message => message.CreateJsonMessage()),
-                ignoredUsers: ignoredUsers.map(message => message.CreateStringMessage())
+                ignoredUsers: ignoredUsers.map(message => message.CreateJsonMessage())
             }));
             this.messageSender.TextChannel.send({
                 files: [{
@@ -116,9 +109,15 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 if (!this.reserveredRoles.find(serverRole => serverRole == role)) {
                     if (this.myBotRole.comparePositionTo(role) > 0) {
                         try {
-                            yield this.RemoveRole(guildMember, role);
-                            messageHelper.Options.rolesRemovedCount++;
-                            messageHelper.AddNewLine(`Removed Role: ${role.name}`, 4);
+                            if (yield this.ShouldRemoveRoles(guildMember)) {
+                                yield this.RemoveRole(guildMember, role);
+                                messageHelper.Options.rolesRemovedCount++;
+                                messageHelper.AddNewLine(`Removed Role: ${role.name}`, 4);
+                            }
+                            else {
+                                messageHelper.Options.ignoredUser = true;
+                                messageHelper.AddNewLine(`Wanted to remove role: ${role.name}, but didn't.`, 4);
+                            }
                         }
                         catch (e) {
                             Globals_1.Globals.log("Error removing roles", e);
@@ -148,9 +147,15 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                             messageHelper.AddNewLine("Kept Captain Role.", 4);
                         }
                         else if (this.myBotRole.comparePositionTo(role) > 0) {
-                            yield this.RemoveRole(guildMember, role);
-                            messageHelper.Options.rolesRemovedCount++;
-                            messageHelper.AddNewLine(`Removed: ${role.name}`, 4);
+                            if (yield this.ShouldRemoveRoles(guildMember)) {
+                                yield this.RemoveRole(guildMember, role);
+                                messageHelper.Options.rolesRemovedCount++;
+                                messageHelper.AddNewLine(`Removed: ${role.name}`, 4);
+                            }
+                            else {
+                                messageHelper.Options.ignoredUser = true;
+                                messageHelper.AddJSONLine(`Wanted to remove role: ${role.name}, but didn't.`);
+                            }
                         }
                     }
                     else if (role.name == NGSRoles_1.NGSRoles.FreeAgents) {

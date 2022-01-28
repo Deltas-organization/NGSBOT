@@ -4,12 +4,12 @@ import { INGSUser } from "../interfaces";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class DiscordFuzzySearch {
-    public static FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): GuildMember {
+    public static FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): { member: GuildMember, updateDiscordId: boolean } {
         const ngsDiscordId = user.discordId;
         if (ngsDiscordId) {
             let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
             if (members.length == 1)
-                return members[0];
+                return { member: members[0], updateDiscordId: false };
 
             Globals.log(`Unable to find user by discordID: ${ngsDiscordId}, name: ${user.displayName}`);
         }
@@ -18,7 +18,11 @@ export class DiscordFuzzySearch {
         if (!ngsDiscordTag)
             return null;
 
-        return DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
+        var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
+        if (member)
+            return { member: member, updateDiscordId: true };
+        else
+            return null;
     }
 
     private static FindByDiscordTag(ngsDiscordTag: string, guildMembers: GuildMember[]): GuildMember {

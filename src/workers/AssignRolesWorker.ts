@@ -117,7 +117,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
         try {
             if (team.divisionDisplayName) {
                 const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
-                var divRoleOnDiscord = roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
+                var divRoleOnDiscord = roleResponse.role;// roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
             }
             await this.AssignUsersToRoles(team, guildMembers, messageTracker, teamRoleOnDiscord, divRoleOnDiscord);
         }
@@ -162,10 +162,12 @@ export class AssignRolesWorker extends RoleWorkerBase {
         messageTracker.AddNewLine(teamName);
         messageTracker.AddNewLine("**Users**");
         for (let user of teamUsers) {
-            const guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+            var searchResult = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
             messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
-            if (guildMember) {
-                await this.AttemptToUpdateDiscordID(user, guildMember);
+            if (searchResult) {
+                const guildMember = searchResult.member;
+                if (searchResult.updateDiscordId)
+                    await this.UpdateDiscordID(user, guildMember);
                 messageTracker.Options.PlayersInDiscord++;
                 var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                 messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
@@ -202,15 +204,12 @@ export class AssignRolesWorker extends RoleWorkerBase {
         return messageTracker;
     }
 
-    private async AttemptToUpdateDiscordID(user: INGSUser, guildMember: GuildMember): Promise<void> {
-        if (user.discordId)
-            return;
-
+    private async UpdateDiscordID(user: INGSUser, member: GuildMember): Promise<void> {
         try {
             await new NGSQueryBuilder().PostResponse('user/save/discordid', {
                 displayName: user.displayName,
                 apiKey: this.apiKey,
-                discordId: guildMember.id
+                discordId: member.id
             });
             Globals.log(`saved discord id for user: ${user.displayName}`)
         }

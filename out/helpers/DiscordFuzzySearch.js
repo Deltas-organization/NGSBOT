@@ -18,13 +18,17 @@ class DiscordFuzzySearch {
         if (ngsDiscordId) {
             let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
             if (members.length == 1)
-                return members[0];
+                return { member: members[0], updateDiscordId: false };
             Globals_1.Globals.log(`Unable to find user by discordID: ${ngsDiscordId}, name: ${user.displayName}`);
         }
         const ngsDiscordTag = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
         if (!ngsDiscordTag)
             return null;
-        return DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
+        var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
+        if (member)
+            return { member: member, updateDiscordId: true };
+        else
+            return null;
     }
     static FindByDiscordTag(ngsDiscordTag, guildMembers) {
         const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);

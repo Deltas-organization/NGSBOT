@@ -62,7 +62,6 @@ class NGSQueryBuilder {
                     chunks += chunk;
                 }).on('end', () => {
                     try {
-                        console.error(chunks);
                         var parsedObject = JSON.parse(chunks);
                         var response = parsedObject.returnObject;
                         Globals_1.Globals.logAdvanced(`retrieved: ${path}`);
