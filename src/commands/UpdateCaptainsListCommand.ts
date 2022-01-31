@@ -41,15 +41,26 @@ export class UpdateCaptainsListCommand {
                 for (let user of users.sort((user1, user2) => this.userSort(user1, user2))) {
                     if (user.IsCaptain) {
                         let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
-                        messageHelper.AddNew(` - captain ${guildMember ?? user.displayName}`)
+                        if (guildMember)
+                            messageHelper.AddNew(` - captain ${guildMember.member}`)
+                        else
+                            messageHelper.AddNew(` - captain ${user.displayName}`)
                     }
                     if (user.IsAssistantCaptain) {
                         let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
                         if (hasAssistant) {
-                            messageHelper.AddNew(` and ${guildMember ?? user.displayName}`)
+                            if (guildMember)
+                                messageHelper.AddNew(` and ${guildMember.member}`)
+                            else
+                                messageHelper.AddNew(` and ${user.displayName}`)
+
                         }
                         else {
-                            messageHelper.AddNew(` / ${guildMember ?? user.displayName}`);
+                            if (guildMember)
+                                messageHelper.AddNew(` / ${guildMember.member}`);
+                            else
+                                messageHelper.AddNew(` / ${user.displayName}`);
+
                             hasAssistant = true;
                         }
                     }
@@ -68,7 +79,7 @@ export class UpdateCaptainsListCommand {
         const divisionTeams = teams.filter(team => team.divisionDisplayName == division).sort((t1, t2) => TeamSorter.SortByTeamName(t1, t2));
         return divisionTeams;
     }
-    
+
     private async GetGuild(channelId: string) {
         const channel = (await this.client.channels.fetch(channelId, false)) as GuildChannel;
         return channel.guild;
