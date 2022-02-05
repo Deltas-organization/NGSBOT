@@ -156,7 +156,8 @@ class CheckReportedGames {
             const captains = teamMembers.filter(mem => mem.IsCaptain);
             for (var captain of captains) {
                 const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
-                return guildMember.member;
+                if (guildMember)
+                    return guildMember.member;
             }
         });
     }
