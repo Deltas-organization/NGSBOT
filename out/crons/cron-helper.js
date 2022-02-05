@@ -132,8 +132,11 @@ let CronHelper = /** @class */ (() => {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
                 const messages = yield this.checkReportedGames.Check();
-                for (const message of messages) {
-                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.DeltaServer);
+                for (const message of messages.CaptainMessages) {
+                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptainList);
+                }
+                for (const message of messages.ModMessages) {
+                    yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSDiscord);
                 }
             });
         }

@@ -113,8 +113,11 @@ export class CronHelper {
     public async CheckReportedGames() {
         await this.client.login(this.token);
         const messages = await this.checkReportedGames.Check();
-        for (const message of messages) {
-            await this.messageSender.SendMessageToChannel(message, DiscordChannels.DeltaServer);
+        for (const message of messages.CaptainMessages) {
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSCaptainList);
+        }
+        for (const message of messages.ModMessages) {
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSDiscord);
         }
     }
 }

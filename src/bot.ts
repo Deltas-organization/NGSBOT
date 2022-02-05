@@ -80,7 +80,7 @@ export class Bot {
 
     public listen(): Promise<string> {
         this.client.on('message', async (message: Message) => {
-            this.OnMessageReceived(message);
+            await this.OnMessageReceived(message);
         });
 
         return this.client.login(this.token);
@@ -115,14 +115,15 @@ export class Bot {
                 }
                 message.member.roles.add(freeAgentRole);
             }
-            if (message.channel.type == "dm") {
-                await this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels.DeltaPmChannel);
-            }
         });
     }
 
-    private OnMessageReceived(message: Message) {
+    private async OnMessageReceived(message: Message) {
         this.checkTranslators(message);
+
+        if (message.channel.type == "dm" && message.author.bot == false) {
+            await this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels.DeltaPmChannel);
+        }
     }
 
     private checkTranslators(message: Message) {

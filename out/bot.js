@@ -90,7 +90,7 @@ let Bot = /** @class */ (() => {
         }
         listen() {
             this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
-                this.OnMessageReceived(message);
+                yield this.OnMessageReceived(message);
             }));
             return this.client.login(this.token);
         }
@@ -121,13 +121,15 @@ let Bot = /** @class */ (() => {
                     }
                     message.member.roles.add(freeAgentRole);
                 }
-                if (message.channel.type == "dm") {
-                    yield this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
-                }
             }));
         }
         OnMessageReceived(message) {
-            this.checkTranslators(message);
+            return __awaiter(this, void 0, void 0, function* () {
+                this.checkTranslators(message);
+                if (message.channel.type == "dm" && message.author.bot == false) {
+                    yield this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
+                }
+            });
         }
         checkTranslators(message) {
             let originalContent = message.content;
