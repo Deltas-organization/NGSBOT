@@ -9,5 +9,6 @@ export enum DiscordChannels {
     DadSchedule = "674530041694257192",
     MomSchedule = "861743079019249714",
     SisSchedule = "793559101975429151",
-    DeltaPmChannel = "936761691734171699"
+    DeltaPmChannel = "936761691734171699",
+    NGSMods = "517100802154954754"
 }

@@ -137,7 +137,7 @@ let CronHelper = /** @class */ (() => {
                         yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptains);
                     }
                     for (const message of messages.ModMessages) {
-                        yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSDiscord);
+                        yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSMods);
                     }
                 }
                 catch (e) {
