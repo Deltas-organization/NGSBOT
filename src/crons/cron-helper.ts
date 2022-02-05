@@ -114,7 +114,7 @@ export class CronHelper {
         await this.client.login(this.token);
         const messages = await this.checkReportedGames.Check();
         for (const message of messages.CaptainMessages) {
-            await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSCaptainList);
+            await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSCaptains);
         }
         for (const message of messages.ModMessages) {
             await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSDiscord);

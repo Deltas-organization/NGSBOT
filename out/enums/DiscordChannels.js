@@ -9,6 +9,7 @@ var DiscordChannels;
     DiscordChannels["NGSHistory"] = "750452200685174965";
     DiscordChannels["NGSFreeAgents"] = "325854401765834772";
     DiscordChannels["NGSCaptainList"] = "431452468933820418";
+    DiscordChannels["NGSCaptains"] = "329900204214059008";
     DiscordChannels["DadSchedule"] = "674530041694257192";
     DiscordChannels["MomSchedule"] = "861743079019249714";
     DiscordChannels["SisSchedule"] = "793559101975429151";
