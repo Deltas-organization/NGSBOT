@@ -85,14 +85,14 @@ class CheckReportedGames {
                 const homeCaptain = yield this.GetCaptain(schedule.home.teamName);
                 const homeACs = yield this.GetAssistantCaptains(schedule.home.teamName);
                 const awayCaptain = yield this.GetCaptain(schedule.away.teamName);
-                const awayAcs = yield this.GetAssistantCaptains(schedule.home.teamName);
+                const awayAcs = yield this.GetAssistantCaptains(schedule.away.teamName);
                 message.AddNew(`A game has not been reported for 2 days from **${schedule.home.teamName}** vs **${schedule.away.teamName}**`);
                 message.AddNewLine(`Whoever won, You must report the match.`);
-                message.AddNewLine(`${homeCaptain}`);
+                message.AddNewLine(`${schedule.home.teamName}: ${homeCaptain}`);
                 homeACs.forEach(ac => {
                     message.AddNew(` ${ac} `);
                 });
-                message.AddNewLine(`${awayCaptain}`);
+                message.AddNewLine(`${schedule.away.teamName}:  ${awayCaptain}`);
                 awayAcs.forEach(ac => {
                     message.AddNew(` ${ac} `);
                 });
@@ -116,16 +116,16 @@ class CheckReportedGames {
                 const awayAcs = yield this.GetAssistantCaptains(schedule.away.teamName);
                 message.AddNew(`A game has not been reported for 3 days from **${schedule.home.teamName}** vs **${schedule.away.teamName}**`);
                 message.AddNewLine(`Whoever won, You must report the match, or the winning team will be penalized.`);
-                message.AddNewLine(`${homeCaptain}`);
+                message.AddNewLine(`${schedule.home.teamName}: ${homeCaptain}`);
                 homeACs.forEach(ac => {
                     message.AddNew(` ${ac} `);
                 });
-                message.AddNewLine(`${awayCaptain}`);
+                message.AddNewLine(`${schedule.away.teamName}: ${awayCaptain}`);
                 awayAcs.forEach(ac => {
                     message.AddNew(` ${ac} `);
                 });
                 const divMods = yield this.GetDivMods(schedule.divisionDisplayName);
-                message.AddNewLine('');
+                message.AddNewLine('MOD: ');
                 divMods.forEach(divMod => {
                     message.AddNew(` ${divMod} `);
                 });
