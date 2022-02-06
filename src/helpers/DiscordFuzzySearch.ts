@@ -53,11 +53,12 @@ export class DiscordFuzzySearch {
 
     private static SplitNameAndDiscriminator(ngsDiscordTag: string) {
         const splitNgsDiscord = ngsDiscordTag.split("#");
-        if (splitNgsDiscord.length != 2)
+        if (splitNgsDiscord.length < 2)
             return null;
 
-        const ngsUserName = splitNgsDiscord[0].toLowerCase();
-        return { name: ngsUserName, discriminator: splitNgsDiscord[1] };
+        const ngsUserName: string = splitNgsDiscord[0];
+
+        return { name: ngsUserName, discriminator: splitNgsDiscord.pop() };
     }
 
     public static CompareGuildUser(user: INGSUser, guildUser: User): boolean {
