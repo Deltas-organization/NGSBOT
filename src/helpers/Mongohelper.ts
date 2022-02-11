@@ -2,6 +2,7 @@
 import * as mongoDB from "mongodb";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { IMongoAssignRolesRequest, IMongoScheduleRequest } from "../mongo";
+import { CaptainList } from "../mongo/models/captain-list";
 
 export class Mongohelper {
     private client: mongoDB.MongoClient;
@@ -96,5 +97,25 @@ export class Mongohelper {
             return existingRecord.assignablesRoles;
         else
             return null;
+    }
+
+    public async GetCaptainListMessageId(season: number, division: NGSDivisions) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<CaptainList>("CaptainList");
+        var selectOneFilter = { season: { $eq: season }, division: { $eq: division } };
+        var existingMessage = await collection.findOne(selectOneFilter)
+        return existingMessage?.messageId;
+    }
+
+    public async CreateCaptainListRecord(messageId: string, season: number, division: NGSDivisions) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<CaptainList>("CaptainList");
+        var newRecord: CaptainList = {
+            season: season,
+            messageId: messageId,
+            division: division
+        }
+        await collection.insertOne(newRecord);
+        return newRecord;
     }
 }

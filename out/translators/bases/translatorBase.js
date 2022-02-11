@@ -53,7 +53,8 @@ class TranslatorBase {
             if (foundBang) {
                 let commands = this.RetrieveCommands(messageText);
                 let messageSender = new MessageSender_1.MessageSender(this.client, message, this.messageStore);
-                this.Interpret(commands, detailed, messageSender);
+                yield this.Interpret(commands, detailed, messageSender);
+                Globals_1.Globals.log("Might be done running", this.constructor.name);
             }
         });
     }

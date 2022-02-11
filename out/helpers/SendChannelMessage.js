@@ -21,14 +21,16 @@ class SendChannelMessage {
             let sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendMessage(channel, message); });
             if (basic)
                 sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendBasicMessage(channel, message); });
+            var result = [];
             if (myChannel != null) {
                 while (message.length > 2048) {
                     let newMessage = message.slice(0, 2048);
                     message = message.substr(2048);
-                    yield sendMessage(myChannel, newMessage);
+                    result.push(yield sendMessage(myChannel, newMessage));
                 }
-                yield sendMessage(myChannel, message);
+                result.push(yield sendMessage(myChannel, message));
             }
+            return result;
         });
     }
     OverwriteMessage(newMessageText, messageId, messageChannel, basic = false) {

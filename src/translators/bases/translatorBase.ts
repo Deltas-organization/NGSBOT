@@ -62,7 +62,9 @@ export abstract class TranslatorBase implements ITranslate {
         if (foundBang) {
             let commands = this.RetrieveCommands(messageText);
             let messageSender = new MessageSender(this.client, message, this.messageStore);
-            this.Interpret(commands, detailed, messageSender);
+            await this.Interpret(commands, detailed, messageSender);
+            Globals.log("Might be done running", this.constructor.name);
+
         }
     }
 

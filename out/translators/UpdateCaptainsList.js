@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateCaptainsList = void 0;
+const Globals_1 = require("../Globals");
 const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const UpdateCaptainsListCommand_1 = require("../commands/UpdateCaptainsListCommand");
 const NGSDivisions_1 = require("../enums/NGSDivisions");
-const MessageDictionary_1 = require("../helpers/MessageDictionary");
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const SendChannelMessage_1 = require("../helpers/SendChannelMessage");
 const fs = require('fs');
@@ -32,23 +32,41 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
             for (var value in NGSDivisions_1.NGSDivisions) {
                 const division = NGSDivisions_1.NGSDivisions[value];
                 try {
-                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, division);
+                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, 13, division);
                 }
                 catch (_a) {
-                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, division);
+                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, 13, division);
                 }
             }
             message.Edit("Captains list has been updated");
         });
     }
-    AttemptToUpdateCaptainMessage(captainsListCommand, channelSender, division) {
+    AttemptToUpdateCaptainMessage(captainsListCommand, channelSender, season, division) {
         return __awaiter(this, void 0, void 0, function* () {
-            const messageId = MessageDictionary_1.MessageDictionary.GetSavedMessage(division);
+            const messageId = yield this.GetSavedMessage(season, division);
             const message = yield captainsListCommand.CreateDivisionList(division, DiscordChannels_1.DiscordChannels.NGSDiscord);
             if (messageId)
                 yield channelSender.OverwriteMessage(message, messageId, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
-            else
-                yield channelSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
+            else {
+                var messages = yield channelSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptainList, true);
+                yield this.CreateMongoRecord(messages, season, division);
+            }
+        });
+    }
+    GetSavedMessage(season, division) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var mongoHelper = this.CreateMongoHelper();
+            return mongoHelper.GetCaptainListMessageId(season, division);
+        });
+    }
+    CreateMongoRecord(messages, season, division) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (messages.length > 1) {
+                Globals_1.Globals.log("There is more then one captain message for a division help...");
+                return;
+            }
+            var mongoHelper = this.CreateMongoHelper();
+            return yield mongoHelper.CreateCaptainListRecord(messages[0].id, season, division);
         });
     }
 }

@@ -18,7 +18,7 @@ export class ScheduleHelper {
         var filteredGames = (await ScheduleHelper.GetTodaysGamesSorted(dataStore));
         filteredGames = filteredGames.filter(f => {
             for (var division of divisions) {
-                if (f.divisionDisplayName == division)
+                if (f.divisionDisplayName.toLowerCase().replace(/\s/g, '') == division.toLowerCase().replace(/\s/g, ''))
                     return true
             }
             return false;

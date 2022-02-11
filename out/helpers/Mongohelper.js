@@ -103,6 +103,28 @@ class Mongohelper {
                 return null;
         });
     }
+    GetCaptainListMessageId(season, division) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("CaptainList");
+            var selectOneFilter = { season: { $eq: season }, division: { $eq: division } };
+            var existingMessage = yield collection.findOne(selectOneFilter);
+            return existingMessage === null || existingMessage === void 0 ? void 0 : existingMessage.messageId;
+        });
+    }
+    CreateCaptainListRecord(messageId, season, division) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("CaptainList");
+            var newRecord = {
+                season: season,
+                messageId: messageId,
+                division: division
+            };
+            yield collection.insertOne(newRecord);
+            return newRecord;
+        });
+    }
 }
 exports.Mongohelper = Mongohelper;
 //# sourceMappingURL=Mongohelper.js.map
