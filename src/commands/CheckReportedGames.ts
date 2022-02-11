@@ -130,7 +130,7 @@ export class CheckReportedGames {
     }
 
     private async CreateMessageForOlderGames(allUnReportedGames: ScheduleInformation[]): Promise<string[]> {
-        var gamesTooOld = allUnReportedGames.filter(g => g.days > 3);
+        var gamesTooOld = allUnReportedGames.filter(g => g.days > 2);
         if (gamesTooOld.length <= 0)
             return [];
 
@@ -138,7 +138,7 @@ export class CheckReportedGames {
         for (const information of gamesTooOld) {
             const message = new MessageHelper<void>();
             const schedule = information.schedule;
-            message.AddNew(`This game has not been reported for ${information.days} days from **${schedule.home.teamName}** vs **${schedule.away.teamName}**`);
+            message.AddNew(`This game has not been reported for ${information.days + 1} days from **${schedule.home.teamName}** vs **${schedule.away.teamName}**`);
             message.AddNewLine(`The Division is: ${schedule.divisionDisplayName}`);
             messages.push(message);
         }

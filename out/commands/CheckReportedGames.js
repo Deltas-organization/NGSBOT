@@ -136,14 +136,14 @@ class CheckReportedGames {
     }
     CreateMessageForOlderGames(allUnReportedGames) {
         return __awaiter(this, void 0, void 0, function* () {
-            var gamesTooOld = allUnReportedGames.filter(g => g.days > 3);
+            var gamesTooOld = allUnReportedGames.filter(g => g.days > 2);
             if (gamesTooOld.length <= 0)
                 return [];
             var messages = [];
             for (const information of gamesTooOld) {
                 const message = new MessageHelper_1.MessageHelper();
                 const schedule = information.schedule;
-                message.AddNew(`This game has not been reported for ${information.days} days from **${schedule.home.teamName}** vs **${schedule.away.teamName}**`);
+                message.AddNew(`This game has not been reported for ${information.days + 1} days from **${schedule.home.teamName}** vs **${schedule.away.teamName}**`);
                 message.AddNewLine(`The Division is: ${schedule.divisionDisplayName}`);
                 messages.push(message);
             }
