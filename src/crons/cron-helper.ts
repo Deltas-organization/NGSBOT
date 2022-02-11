@@ -77,13 +77,18 @@ export class CronHelper {
         await this.client.login(this.token);
         const requestedSchedules = await this.mongoHelper.getRequestedSchedules();
         for (var schedule of requestedSchedules) {
-            if (schedule.requestType == "divisions") {
-                try {
-                    await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+            try {
+                if (schedule.requestType == "divisions") {
+                    try {
+                        await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                    }
+                    catch (e) {
+                        Globals.log(`unable to send schedule: ${e}`)
+                    }
                 }
-                catch (e) {
-                    Globals.log(`unable to send schedule: ${e}`)
-                }
+            }
+            catch (exception) {
+                Globals.log(exception);
             }
         }
     }

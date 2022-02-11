@@ -93,13 +93,18 @@ let CronHelper = /** @class */ (() => {
                 yield this.client.login(this.token);
                 const requestedSchedules = yield this.mongoHelper.getRequestedSchedules();
                 for (var schedule of requestedSchedules) {
-                    if (schedule.requestType == "divisions") {
-                        try {
-                            yield this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                    try {
+                        if (schedule.requestType == "divisions") {
+                            try {
+                                yield this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                            }
+                            catch (e) {
+                                Globals_1.Globals.log(`unable to send schedule: ${e}`);
+                            }
                         }
-                        catch (e) {
-                            Globals_1.Globals.log(`unable to send schedule: ${e}`);
-                        }
+                    }
+                    catch (exception) {
+                        Globals_1.Globals.log(exception);
                     }
                 }
             });
