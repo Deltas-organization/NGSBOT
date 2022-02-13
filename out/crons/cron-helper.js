@@ -53,7 +53,7 @@ let CronHelper = /** @class */ (() => {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
                 const games = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-                if (games.length > 1) {
+                if (games.length > 0) {
                     const messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
                     for (var index = 0; index < messages.length; index++) {
                         yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype);

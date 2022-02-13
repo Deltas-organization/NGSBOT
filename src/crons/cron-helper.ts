@@ -42,7 +42,7 @@ export class CronHelper {
     public async sendSchedule() {
         await this.client.login(this.token);
         const games = await ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-        if (games.length > 1) {
+        if (games.length > 0) {
             const messages = await ScheduleHelper.GetMessages(games);
             for (var index = 0; index < messages.length; index++) {
                 await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHype);
