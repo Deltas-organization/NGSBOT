@@ -45,10 +45,9 @@ class DataStoreWrapper {
             return this._dataStore.GetTeamsBySeason(season);
         });
     }
-    // public GetMatches(round: number)
-    // {
-    //     return this._dataStore.GetMatches(round);
-    // }
+    GetScheduleByRoundAndDivision(divisionConcat, round) {
+        return this._dataStore.GetScheduleByRoundAndDivision(divisionConcat, round);
+    }
     Clear() {
         this._dataStore.Clear();
     }

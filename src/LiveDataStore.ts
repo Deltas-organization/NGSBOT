@@ -1,4 +1,5 @@
 
+import { NGSDivisions } from './enums/NGSDivisions';
 import { Globals } from './Globals';
 import { Cacher } from './helpers/Cacher';
 import { ListCacher } from './helpers/ListCacher';
@@ -7,6 +8,8 @@ import { INGSDivision, INGSSchedule, INGSTeam, INGSUser } from './interfaces';
 import { AugmentedNGSUser } from './models/AugmentedNGSUser';
 
 export class LiveDataStore {
+
+    private static season: string = '13';
 
     constructor(private _apiKey: string) {
 
@@ -31,7 +34,15 @@ export class LiveDataStore {
     }
 
     public async GetSchedule(): Promise<INGSSchedule[]> {
-        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>('/schedule/get/matches/scheduled?season=12'));
+        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
+    }
+
+    public async GetScheduleByRoundAndDivision(divisionConcat: string, round: number): Promise<INGSSchedule[]> {
+        return new NGSQueryBuilder().PostResponse<INGSSchedule[]>('schedule/fetch/matches', {
+            division: divisionConcat,
+            round: round,
+            season: LiveDataStore.season
+        });
     }
 
     public async GetUsers(): Promise<AugmentedNGSUser[]> {

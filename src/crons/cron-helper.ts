@@ -1,6 +1,8 @@
 import { Client } from "discord.js";
 import { inject, injectable } from "inversify";
+import moment = require("moment");
 import { CheckReportedGames } from "../commands/CheckReportedGames";
+import { CheckUnscheduledGamesForWeek } from "../commands/CheckUnscheduledGamesForWeek";
 import { CleanupFreeAgentsChannel } from "../commands/CleanupFreeAgentsChannel";
 import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSDivisions } from "../enums/NGSDivisions";
@@ -24,6 +26,7 @@ export class CronHelper {
     private cleanupFreeAgentsChannel: CleanupFreeAgentsChannel;
     private mongoHelper: Mongohelper;
     private checkReportedGames: CheckReportedGames;
+    private checkUnscheduledGamesForWeek: CheckUnscheduledGamesForWeek;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -36,6 +39,7 @@ export class CronHelper {
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
         this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);
+        this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek(this.client, this.dataStore);
         this.mongoHelper = new Mongohelper(mongoConnection);
     }
 
@@ -124,6 +128,23 @@ export class CronHelper {
             }
             for (const message of messages.ModMessages) {
                 await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSMods);
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+
+    public async CheckSundaysUnScheduledGames() {
+        var IsSunday = moment().weekday() == 7;
+        if (!IsSunday)
+            return;
+        await this.client.login(this.token);
+        const messages = await this.checkUnscheduledGamesForWeek.Check();
+        try {
+
+            for (const message of messages) {
+                await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.DeltaServer, true);
             }
         }
         catch (e) {

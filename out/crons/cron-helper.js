@@ -24,7 +24,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CronHelper = void 0;
 const discord_js_1 = require("discord.js");
 const inversify_1 = require("inversify");
+const moment = require("moment");
 const CheckReportedGames_1 = require("../commands/CheckReportedGames");
+const CheckUnscheduledGamesForWeek_1 = require("../commands/CheckUnscheduledGamesForWeek");
 const CleanupFreeAgentsChannel_1 = require("../commands/CleanupFreeAgentsChannel");
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const NGSDivisions_1 = require("../enums/NGSDivisions");
@@ -47,6 +49,7 @@ let CronHelper = /** @class */ (() => {
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dataStore);
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
             this.checkReportedGames = new CheckReportedGames_1.CheckReportedGames(this.client, this.dataStore);
+            this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek_1.CheckUnscheduledGamesForWeek(this.client, this.dataStore);
             this.mongoHelper = new Mongohelper_1.Mongohelper(mongoConnection);
         }
         sendSchedule() {
@@ -143,6 +146,23 @@ let CronHelper = /** @class */ (() => {
                     }
                     for (const message of messages.ModMessages) {
                         yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSMods);
+                    }
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            });
+        }
+        CheckSundaysUnScheduledGames() {
+            return __awaiter(this, void 0, void 0, function* () {
+                var IsSunday = moment().weekday() == 7;
+                if (!IsSunday)
+                    return;
+                yield this.client.login(this.token);
+                const messages = yield this.checkUnscheduledGamesForWeek.Check();
+                try {
+                    for (const message of messages) {
+                        yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.DeltaServer, true);
                     }
                 }
                 catch (e) {

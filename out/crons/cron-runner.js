@@ -32,6 +32,9 @@ class CronRunner {
                 case "check":
                     yield cronHelper.CheckReportedGames();
                     break;
+                case "nextweek":
+                    yield cronHelper.CheckSundaysUnScheduledGames();
+                    break;
             }
             process.exit();
         });
