@@ -155,7 +155,7 @@ let CronHelper = /** @class */ (() => {
         }
         CheckSundaysUnScheduledGames() {
             return __awaiter(this, void 0, void 0, function* () {
-                var IsSunday = moment().weekday() == 7;
+                var IsSunday = moment().isoWeekday() == 7;
                 if (!IsSunday)
                     return;
                 yield this.client.login(this.token);

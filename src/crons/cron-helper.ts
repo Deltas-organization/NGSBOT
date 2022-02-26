@@ -136,7 +136,7 @@ export class CronHelper {
     }
 
     public async CheckSundaysUnScheduledGames() {
-        var IsSunday = moment().weekday() == 7;
+        var IsSunday = moment().isoWeekday() == 7;
         if (!IsSunday)
             return;
         await this.client.login(this.token);
