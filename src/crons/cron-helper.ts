@@ -8,6 +8,7 @@ import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { Globals } from "../Globals";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
+import { MessageHelper } from "../helpers/MessageHelper";
 import { Mongohelper } from "../helpers/Mongohelper";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { SendChannelMessage } from "../helpers/SendChannelMessage";
@@ -142,9 +143,8 @@ export class CronHelper {
         await this.client.login(this.token);
         const messages = await this.checkUnscheduledGamesForWeek.Check();
         try {
-
             for (const message of messages) {
-                await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.DeltaServer, true);
+                await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.NGSMods, true);
             }
         }
         catch (e) {

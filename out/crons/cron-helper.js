@@ -162,7 +162,7 @@ let CronHelper = /** @class */ (() => {
                 const messages = yield this.checkUnscheduledGamesForWeek.Check();
                 try {
                     for (const message of messages) {
-                        yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.DeltaServer, true);
+                        yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.NGSMods, true);
                     }
                 }
                 catch (e) {
