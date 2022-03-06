@@ -44,7 +44,7 @@ class CheckUnscheduledGamesForWeek {
             var unscheduledGames = [];
             var divisions = yield this.dataStore.GetDivisions();
             const divisionConcat = divisions.filter(d => d.displayName == division)[0].divisionConcat;
-            var matches = yield this.dataStore.GetScheduleByRoundAndDivision(divisionConcat, 5);
+            var matches = yield this.dataStore.GetScheduleByRoundAndDivision(divisionConcat, 6);
             for (var match of matches) {
                 if (!match.scheduledTime) {
                     unscheduledGames.push(match);
