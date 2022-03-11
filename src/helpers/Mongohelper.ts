@@ -3,6 +3,7 @@ import * as mongoDB from "mongodb";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { IMongoAssignRolesRequest, IMongoScheduleRequest } from "../mongo";
 import { CaptainList } from "../mongo/models/captain-list";
+import { SeasonInformation } from "../mongo/models/season-information";
 
 export class Mongohelper {
     private client: mongoDB.MongoClient;
@@ -117,5 +118,23 @@ export class Mongohelper {
         }
         await collection.insertOne(newRecord);
         return newRecord;
+    }
+
+    public async GetNgsInformation(season: number): Promise<SeasonInformation> {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<SeasonInformation>("SeasonInformation");
+        var selectOneFilter = { season: { $eq: season } };
+        return await collection.findOne(selectOneFilter)
+    }
+
+    public async UpdateSeasonRound(season: number): Promise<SeasonInformation> {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<SeasonInformation>("SeasonInformation");
+        var selectOneFilter = { season: { $eq: season } };
+        const existingRecord = await collection.findOne(selectOneFilter);
+        existingRecord.round += 1;
+        await collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+        return existingRecord;
+
     }
 }

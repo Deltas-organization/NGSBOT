@@ -45,12 +45,12 @@ let CronHelper = /** @class */ (() => {
             this.client = client;
             this.token = token;
             this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
+            this.mongoHelper = new Mongohelper_1.Mongohelper(mongoConnection);
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(this.client, new MessageStore_1.MessageStore());
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dataStore);
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
             this.checkReportedGames = new CheckReportedGames_1.CheckReportedGames(this.client, this.dataStore);
-            this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek_1.CheckUnscheduledGamesForWeek(this.client, this.dataStore);
-            this.mongoHelper = new Mongohelper_1.Mongohelper(mongoConnection);
+            this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek_1.CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
         }
         sendSchedule() {
             return __awaiter(this, void 0, void 0, function* () {

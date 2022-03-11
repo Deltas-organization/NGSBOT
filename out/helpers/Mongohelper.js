@@ -125,6 +125,25 @@ class Mongohelper {
             return newRecord;
         });
     }
+    GetNgsInformation(season) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("SeasonInformation");
+            var selectOneFilter = { season: { $eq: season } };
+            return yield collection.findOne(selectOneFilter);
+        });
+    }
+    UpdateSeasonRound(season) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection("SeasonInformation");
+            var selectOneFilter = { season: { $eq: season } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            existingRecord.round += 1;
+            yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+            return existingRecord;
+        });
+    }
 }
 exports.Mongohelper = Mongohelper;
 //# sourceMappingURL=Mongohelper.js.map

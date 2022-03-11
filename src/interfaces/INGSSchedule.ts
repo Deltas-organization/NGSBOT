@@ -10,4 +10,5 @@ export interface INGSSchedule
     divisionDisplayName: string;
     divisionConcat: string;    
     reported: boolean;
+    forfeit: boolean;
 }

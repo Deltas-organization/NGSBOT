@@ -36,12 +36,13 @@ export class CronHelper {
         @inject(TYPES.MongConection) mongoConnection: string
     ) {
         this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
+        this.mongoHelper = new Mongohelper(mongoConnection);
+        
         this.messageSender = new SendChannelMessage(this.client, new MessageStore());
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
         this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);
-        this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek(this.client, this.dataStore);
-        this.mongoHelper = new Mongohelper(mongoConnection);
+        this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
     }
 
     public async sendSchedule() {
