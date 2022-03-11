@@ -27,6 +27,9 @@ export class CronRunner {
             case "nextweek":
                 await cronHelper.CheckSundaysUnScheduledGames();
                 break;
+            case "flex":
+                await cronHelper.CheckFlexMatches();
+                break;
         }
 
         process.exit();

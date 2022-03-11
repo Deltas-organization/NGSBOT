@@ -18,7 +18,7 @@ const ScehduleContainer_1 = require("../models/ScehduleContainer");
 class ScheduleHelper {
     static GetTodaysGamesSorted(dataStore) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.GetGamesSorted(yield dataStore.GetSchedule());
+            return this.GetGamesSorted(yield dataStore.GetScheduledGames());
         });
     }
     static GetTodaysGamesByDivisions(dataStore, ...divisions) {

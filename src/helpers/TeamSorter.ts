@@ -1,3 +1,4 @@
+import { NGSDivisionConcat } from "../enums/NGSDivisionConcat";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { INGSTeam } from "../interfaces";
 
@@ -27,6 +28,32 @@ export class TeamSorter {
         NGSDivisions.DWest,
         NGSDivisions.EEast,
         NGSDivisions.EWest];
+
+        for (var current of order) {
+            if (divisionDisplay1?.indexOf(current) > -1) {
+                return -1;
+            }
+            else if (divisionDisplay2?.indexOf(current) > -1) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    public static SortByDivisionConcat(divisionDisplay1: string, divisionDisplay2: string): number {
+        const order = [NGSDivisionConcat.Storm,
+        NGSDivisionConcat.Heroic,
+        NGSDivisionConcat.Nexus,
+        NGSDivisionConcat.AEast,
+        NGSDivisionConcat.AWest,
+        NGSDivisionConcat.BEast,
+        NGSDivisionConcat.BWest,
+        NGSDivisionConcat.CEast,
+        NGSDivisionConcat.CWest,
+        NGSDivisionConcat.DEast,
+        NGSDivisionConcat.DWest,
+        NGSDivisionConcat.EEast,
+        NGSDivisionConcat.EWest];
 
         for (var current of order) {
             if (divisionDisplay1?.indexOf(current) > -1) {

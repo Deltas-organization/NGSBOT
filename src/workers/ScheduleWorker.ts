@@ -22,7 +22,7 @@ export class ScheduleWorker extends WorkerBase {
             return;
         }
 
-        let filteredGames = await ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule(), duration);
+        let filteredGames = await ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames(), duration);
         let messages = await ScheduleHelper.GetMessages(filteredGames);
         if (messages.length <= 0) {
             messages.push("Couldn't find any scheduled Games");
@@ -45,7 +45,7 @@ export class ScheduleWorker extends WorkerBase {
                 division += `-${coast}`;
         }
 
-        let scheduledGames = await await ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule());
+        let scheduledGames = await await ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames());
         scheduledGames = scheduledGames.filter(s => {
             if (!s.divisionConcat.startsWith(division))
                 return false;

@@ -11,4 +11,5 @@ export interface INGSSchedule
     divisionConcat: string;    
     reported: boolean;
     forfeit: boolean;
+    scheduleDeadline: number;
 }

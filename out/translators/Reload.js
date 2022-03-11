@@ -23,7 +23,7 @@ class Reload extends deltaTranslatorBase_1.DeltaTranslatorBase {
             this.dataStore.Clear();
             yield this.dataStore.GetDivisions();
             let message = yield messageSender.SendMessage("Reloaded 1/4");
-            yield this.dataStore.GetSchedule();
+            yield this.dataStore.GetScheduledGames();
             yield message.Edit("Reloaded 2/4");
             yield this.dataStore.GetTeams();
             yield message.Edit("Reloaded 3/4");

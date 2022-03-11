@@ -33,7 +33,7 @@ export class NonCastedWorker extends WorkerBase {
     }
 
     protected async GetNonCastedGames(futureDays: number) {
-        let futureGames = ScheduleHelper.GetGamesSorted(await this.dataStore.GetSchedule(), futureDays);
+        let futureGames = ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames(), futureDays);
         return futureGames.filter(game => !game.casterName);
     }
 }

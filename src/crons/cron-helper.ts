@@ -1,6 +1,7 @@
 import { Client } from "discord.js";
 import { inject, injectable } from "inversify";
 import moment = require("moment");
+import { CheckFlexMatches } from "../commands/CheckFlexMatches";
 import { CheckReportedGames } from "../commands/CheckReportedGames";
 import { CheckUnscheduledGamesForWeek } from "../commands/CheckUnscheduledGamesForWeek";
 import { CleanupFreeAgentsChannel } from "../commands/CleanupFreeAgentsChannel";
@@ -28,6 +29,7 @@ export class CronHelper {
     private mongoHelper: Mongohelper;
     private checkReportedGames: CheckReportedGames;
     private checkUnscheduledGamesForWeek: CheckUnscheduledGamesForWeek;
+    private checkFlexMatches: CheckFlexMatches;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -37,12 +39,13 @@ export class CronHelper {
     ) {
         this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
         this.mongoHelper = new Mongohelper(mongoConnection);
-        
+
         this.messageSender = new SendChannelMessage(this.client, new MessageStore());
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
         this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);
         this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
+        this.checkFlexMatches = new CheckFlexMatches(this.dataStore);
     }
 
     public async sendSchedule() {
@@ -143,6 +146,19 @@ export class CronHelper {
             return;
         await this.client.login(this.token);
         const messages = await this.checkUnscheduledGamesForWeek.Check();
+        try {
+            for (const message of messages) {
+                await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.NGSMods, true);
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+
+    public async CheckFlexMatches() {
+        await this.client.login(this.token);
+        const messages = await this.checkFlexMatches.Check();
         try {
             for (const message of messages) {
                 await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.NGSMods, true);

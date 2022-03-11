@@ -15,6 +15,7 @@ export class LiveDataStore {
 
     }
     private cachedDivisions = new Cacher<INGSDivision[]>(60 * 24);
+    private cachedScheduled = new Cacher<INGSSchedule[]>(60);
     private cachedSchedule = new Cacher<INGSSchedule[]>(60);
     private cachedUsers = new Cacher<AugmentedNGSUser[]>(60 * 24);
     private cachedTeams = new Cacher<INGSTeam[]>(60 * 24);
@@ -23,6 +24,7 @@ export class LiveDataStore {
 
     public Clear() {
         this.cachedDivisions.Clear();
+        this.cachedScheduled.Clear();
         this.cachedSchedule.Clear();
         this.cachedUsers.Clear();
         this.cachedTeams.Clear();
@@ -33,8 +35,14 @@ export class LiveDataStore {
         return this.cachedDivisions.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSDivision[]>('/division/get/all'));
     }
 
+    public async GetScheduledGames(): Promise<INGSSchedule[]> {
+        return this.cachedScheduled.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
+    }
+
     public async GetSchedule(): Promise<INGSSchedule[]> {
-        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
+        return this.cachedSchedule.TryGetFromCache(() =>  new NGSQueryBuilder().PostResponse<INGSSchedule[]>('schedule/fetch/matches', {
+            season: LiveDataStore.season
+        }));
     }
 
     public async GetScheduleByRoundAndDivision(divisionConcat: string, round: number): Promise<INGSSchedule[]> {

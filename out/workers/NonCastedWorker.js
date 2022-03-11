@@ -41,7 +41,7 @@ class NonCastedWorker extends WorkerBase_1.WorkerBase {
     }
     GetNonCastedGames(futureDays) {
         return __awaiter(this, void 0, void 0, function* () {
-            let futureGames = ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule(), futureDays);
+            let futureGames = ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames(), futureDays);
             return futureGames.filter(game => !game.casterName);
         });
     }

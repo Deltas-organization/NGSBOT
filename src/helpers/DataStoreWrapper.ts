@@ -13,6 +13,10 @@ export class DataStoreWrapper {
         return this._dataStore.GetRegisteredTeams();
     }
 
+    public async GetScheduledGames() {
+        return this._dataStore.GetScheduledGames();
+    }
+    
     public async GetSchedule() {
         return this._dataStore.GetSchedule();
     }

@@ -11,7 +11,7 @@ import { DetailedPeerCertificate } from "tls";
 export class ScheduleHelper {
 
     public static async GetTodaysGamesSorted(dataStore: DataStoreWrapper): Promise<INGSSchedule[]> {
-        return this.GetGamesSorted(await dataStore.GetSchedule());
+        return this.GetGamesSorted(await dataStore.GetScheduledGames());
     }
 
     public static async GetTodaysGamesByDivisions(dataStore, ...divisions: NGSDivisions[]) {

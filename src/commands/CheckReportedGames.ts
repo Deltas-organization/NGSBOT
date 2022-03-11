@@ -28,7 +28,7 @@ export class CheckReportedGames {
     }
 
     private async GetMessages(): Promise<ReportedGamesContainer> {
-        const gamesInThePast = ScheduleHelper.GetGamesByDaysSorted(await this.dataStore.GetSchedule(), -10);
+        const gamesInThePast = ScheduleHelper.GetGamesByDaysSorted(await this.dataStore.GetScheduledGames(), -10);
         const unReportedGames = gamesInThePast.filter(g => g.schedule.reported != true);
         //These messages go to the individual captains
         await this.SendMessageFor1DayOldGames(unReportedGames);

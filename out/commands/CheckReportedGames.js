@@ -33,7 +33,7 @@ class CheckReportedGames {
     }
     GetMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-            const gamesInThePast = ScheduleHelper_1.ScheduleHelper.GetGamesByDaysSorted(yield this.dataStore.GetSchedule(), -10);
+            const gamesInThePast = ScheduleHelper_1.ScheduleHelper.GetGamesByDaysSorted(yield this.dataStore.GetScheduledGames(), -10);
             const unReportedGames = gamesInThePast.filter(g => g.schedule.reported != true);
             //These messages go to the individual captains
             yield this.SendMessageFor1DayOldGames(unReportedGames);

@@ -20,6 +20,11 @@ class DataStoreWrapper {
             return this._dataStore.GetRegisteredTeams();
         });
     }
+    GetScheduledGames() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this._dataStore.GetScheduledGames();
+        });
+    }
     GetSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
             return this._dataStore.GetSchedule();

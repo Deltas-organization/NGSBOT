@@ -25,6 +25,7 @@ exports.CronHelper = void 0;
 const discord_js_1 = require("discord.js");
 const inversify_1 = require("inversify");
 const moment = require("moment");
+const CheckFlexMatches_1 = require("../commands/CheckFlexMatches");
 const CheckReportedGames_1 = require("../commands/CheckReportedGames");
 const CheckUnscheduledGamesForWeek_1 = require("../commands/CheckUnscheduledGamesForWeek");
 const CleanupFreeAgentsChannel_1 = require("../commands/CleanupFreeAgentsChannel");
@@ -51,6 +52,7 @@ let CronHelper = /** @class */ (() => {
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
             this.checkReportedGames = new CheckReportedGames_1.CheckReportedGames(this.client, this.dataStore);
             this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek_1.CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
+            this.checkFlexMatches = new CheckFlexMatches_1.CheckFlexMatches(this.dataStore);
         }
         sendSchedule() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -160,6 +162,20 @@ let CronHelper = /** @class */ (() => {
                     return;
                 yield this.client.login(this.token);
                 const messages = yield this.checkUnscheduledGamesForWeek.Check();
+                try {
+                    for (const message of messages) {
+                        yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.NGSMods, true);
+                    }
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            });
+        }
+        CheckFlexMatches() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.client.login(this.token);
+                const messages = yield this.checkFlexMatches.Check();
                 try {
                     for (const message of messages) {
                         yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.NGSMods, true);

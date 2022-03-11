@@ -20,6 +20,7 @@ let LiveDataStore = /** @class */ (() => {
         constructor(_apiKey) {
             this._apiKey = _apiKey;
             this.cachedDivisions = new Cacher_1.Cacher(60 * 24);
+            this.cachedScheduled = new Cacher_1.Cacher(60);
             this.cachedSchedule = new Cacher_1.Cacher(60);
             this.cachedUsers = new Cacher_1.Cacher(60 * 24);
             this.cachedTeams = new Cacher_1.Cacher(60 * 24);
@@ -28,6 +29,7 @@ let LiveDataStore = /** @class */ (() => {
         }
         Clear() {
             this.cachedDivisions.Clear();
+            this.cachedScheduled.Clear();
             this.cachedSchedule.Clear();
             this.cachedUsers.Clear();
             this.cachedTeams.Clear();
@@ -38,9 +40,16 @@ let LiveDataStore = /** @class */ (() => {
                 return this.cachedDivisions.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse('/division/get/all'));
             });
         }
+        GetScheduledGames() {
+            return __awaiter(this, void 0, void 0, function* () {
+                return this.cachedScheduled.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
+            });
+        }
         GetSchedule() {
             return __awaiter(this, void 0, void 0, function* () {
-                return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
+                return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('schedule/fetch/matches', {
+                    season: LiveDataStore.season
+                }));
             });
         }
         GetScheduleByRoundAndDivision(divisionConcat, round) {

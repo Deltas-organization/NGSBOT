@@ -15,7 +15,7 @@ export class Reload extends DeltaTranslatorBase {
         this.dataStore.Clear();
         await this.dataStore.GetDivisions();
         let message = await messageSender.SendMessage("Reloaded 1/4");
-        await this.dataStore.GetSchedule();
+        await this.dataStore.GetScheduledGames();
         await message.Edit("Reloaded 2/4");
         await this.dataStore.GetTeams();
         await message.Edit("Reloaded 3/4");

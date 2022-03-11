@@ -32,7 +32,7 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
                 yield this.SearchByDivision(commands);
                 return;
             }
-            let filteredGames = yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule(), duration);
+            let filteredGames = yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames(), duration);
             let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(filteredGames);
             if (messages.length <= 0) {
                 messages.push("Couldn't find any scheduled Games");
@@ -55,7 +55,7 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
                 else
                     division += `-${coast}`;
             }
-            let scheduledGames = yield yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetSchedule());
+            let scheduledGames = yield yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames());
             scheduledGames = scheduledGames.filter(s => {
                 if (!s.divisionConcat.startsWith(division))
                     return false;
