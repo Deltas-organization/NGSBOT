@@ -25,9 +25,14 @@ class DataStoreWrapper {
             return this._dataStore.GetScheduledGames();
         });
     }
-    GetSchedule() {
+    GetUnScheduledFlexMatches() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this._dataStore.GetSchedule();
+            return this._dataStore.GetScheduleQuery({
+                type: "seasonal",
+                scheduleDeadline: { $exists: false },
+                scheduledTime: { $exists: false },
+                forfeit: { $exists: false }
+            });
         });
     }
     GetUsers() {

@@ -16,9 +16,14 @@ export class DataStoreWrapper {
     public async GetScheduledGames() {
         return this._dataStore.GetScheduledGames();
     }
-    
-    public async GetSchedule() {
-        return this._dataStore.GetSchedule();
+
+    public async GetUnScheduledFlexMatches() {
+        return this._dataStore.GetScheduleQuery({
+            type: "seasonal",
+            scheduleDeadline: { $exists: false },
+            scheduledTime: { $exists: false },
+            forfeit: { $exists: false }
+        });
     }
 
     public async GetUsers() {

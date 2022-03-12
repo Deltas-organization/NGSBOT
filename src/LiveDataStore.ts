@@ -39,10 +39,13 @@ export class LiveDataStore {
         return this.cachedScheduled.TryGetFromCache(() => new NGSQueryBuilder().GetResponse<INGSSchedule[]>(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
     }
 
-    public async GetSchedule(): Promise<INGSSchedule[]> {
-        return this.cachedSchedule.TryGetFromCache(() =>  new NGSQueryBuilder().PostResponse<INGSSchedule[]>('schedule/fetch/matches', {
+    public async GetScheduleQuery(queryItem: any): Promise<INGSSchedule[]> {
+        var postRequest = {
+            apiKey: this._apiKey,
             season: LiveDataStore.season
-        }));
+        };
+        postRequest = { ...postRequest, ...queryItem }
+        return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().PostResponse<INGSSchedule[]>('schedule/query/matches', postRequest));
     }
 
     public async GetScheduleByRoundAndDivision(divisionConcat: string, round: number): Promise<INGSSchedule[]> {

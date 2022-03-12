@@ -22,13 +22,7 @@ class CheckFlexMatches {
             try {
                 var result = [];
                 var unscheduledFlexMatch = [];
-                var scheduleList = yield this.dataStore.GetSchedule();
-                for (var schedule of scheduleList) {
-                    if (schedule.scheduledTime || schedule.reported || schedule.forfeit)
-                        continue;
-                    if (!schedule.scheduleDeadline)
-                        unscheduledFlexMatch.push(schedule);
-                }
+                var unscheduledFlexMatch = yield this.dataStore.GetUnScheduledFlexMatches();
                 unscheduledFlexMatch = unscheduledFlexMatch.sort((i1, i2) => TeamSorter_1.TeamSorter.SortByDivisionConcat(i1.divisionConcat, i2.divisionConcat));
                 var lastDivision;
                 var currentDivisionMessage;

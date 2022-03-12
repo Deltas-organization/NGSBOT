@@ -15,18 +15,12 @@ export class CheckFlexMatches {
         try {
             var result: MessageHelper<void>[] = [];
             var unscheduledFlexMatch: INGSSchedule[] = [];
-            var scheduleList = await this.dataStore.GetSchedule();
-            for (var schedule of scheduleList) {
-                if (schedule.scheduledTime || schedule.reported || schedule.forfeit)
-                    continue;
-                if (!schedule.scheduleDeadline)
-                    unscheduledFlexMatch.push(schedule);
-            }
+            var unscheduledFlexMatch = await this.dataStore.GetUnScheduledFlexMatches();
             unscheduledFlexMatch = unscheduledFlexMatch.sort((i1, i2) => TeamSorter.SortByDivisionConcat(i1.divisionConcat, i2.divisionConcat))
             var lastDivision: string;
             var currentDivisionMessage: MessageHelper<void>;
             for (var match of unscheduledFlexMatch) {
-                if(!match.divisionConcat)
+                if (!match.divisionConcat)
                     continue;
 
                 try {

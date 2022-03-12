@@ -45,11 +45,14 @@ let LiveDataStore = /** @class */ (() => {
                 return this.cachedScheduled.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().GetResponse(`/schedule/get/matches/scheduled?season=${LiveDataStore.season}`));
             });
         }
-        GetSchedule() {
+        GetScheduleQuery(queryItem) {
             return __awaiter(this, void 0, void 0, function* () {
-                return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('schedule/fetch/matches', {
+                var postRequest = {
+                    apiKey: this._apiKey,
                     season: LiveDataStore.season
-                }));
+                };
+                postRequest = Object.assign(Object.assign({}, postRequest), queryItem);
+                return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('schedule/query/matches', postRequest));
             });
         }
         GetScheduleByRoundAndDivision(divisionConcat, round) {
