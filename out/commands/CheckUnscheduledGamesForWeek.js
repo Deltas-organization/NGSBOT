@@ -33,7 +33,7 @@ class CheckUnscheduledGamesForWeek {
                         Globals_1.Globals.log(`problem reporting matches by round for division: ${division}`, e);
                     }
                 }
-                // await this.mongoHelper.UpdateSeasonRound(13);
+                yield this.mongoHelper.UpdateSeasonRound(13);
                 return result;
             }
             catch (e) {
