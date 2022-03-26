@@ -26,6 +26,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             if (commands.length > 0)
                 this._testing = true;
             this._mutedRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
+            this._unPurgeable = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.UnPurgeable);
             yield this.BeginPurge();
         });
     }
@@ -40,22 +41,28 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             let progressCount = 1;
             for (let member of guildMembers) {
                 count++;
-                const teamInformation = yield this.FindInTeam(member.user, teams);
-                const messageHelper = new MessageHelper_1.MessageHelper(member.user.username);
                 const rolesOfUser = member.roles.cache.map((role, _, __) => role);
+                const messageHelper = new MessageHelper_1.MessageHelper(member.user.username);
                 messageHelper.Options.rolesRemovedCount = 0;
-                var muted = this.HasRole(rolesOfUser, this._mutedRole);
-                var hasTeam = teamInformation != null;
-                if (!hasTeam || muted) {
-                    if (muted)
-                        messageHelper.AddNewLine('Removed Roles as the person is muted');
-                    if (!hasTeam)
-                        messageHelper.AddNewLine(`No Team Found.`);
-                    yield this.PurgeAllRoles(member, messageHelper);
+                var unPurgeable = this.HasRole(rolesOfUser, this._unPurgeable);
+                if (unPurgeable) {
+                    messageHelper.Options.ignoredUser = true;
                 }
                 else {
-                    messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
-                    yield this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
+                    const teamInformation = yield this.FindInTeam(member.user, teams);
+                    var muted = this.HasRole(rolesOfUser, this._mutedRole);
+                    var hasTeam = teamInformation != null;
+                    if (!hasTeam || muted) {
+                        if (muted)
+                            messageHelper.AddNewLine('Removed Roles as the person is muted');
+                        if (!hasTeam)
+                            messageHelper.AddNewLine(`No Team Found.`);
+                        yield this.PurgeAllRoles(member, messageHelper);
+                    }
+                    else {
+                        messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
+                        yield this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
+                    }
                 }
                 messages.push(messageHelper);
                 if (count > (guildMembers.length / 4) * progressCount) {

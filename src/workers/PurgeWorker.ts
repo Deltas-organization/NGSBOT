@@ -12,12 +12,14 @@ const fs = require('fs');
 export class PurgeWorker extends RoleWorkerBase {
     private _testing: boolean = false;
     private _mutedRole: Role;
+    private _unPurgeable: Role;
 
     protected async Start(commands: string[]) {
         if (commands.length > 0)
             this._testing = true;
 
         this._mutedRole = this.roleHelper.lookForRole(NGSRoles.Muted);
+        this._unPurgeable = this.roleHelper.lookForRole(NGSRoles.UnPurgeable);
         await this.BeginPurge();
     }
 
@@ -31,22 +33,28 @@ export class PurgeWorker extends RoleWorkerBase {
         let progressCount = 1;
         for (let member of guildMembers) {
             count++;
-            const teamInformation = await this.FindInTeam(member.user, teams);
-            const messageHelper = new MessageHelper<IPurgeInformation>(member.user.username);
             const rolesOfUser = member.roles.cache.map((role, _, __) => role);
+            const messageHelper = new MessageHelper<IPurgeInformation>(member.user.username);
             messageHelper.Options.rolesRemovedCount = 0;
-            var muted = this.HasRole(rolesOfUser, this._mutedRole);
-            var hasTeam = teamInformation != null;
-            if (!hasTeam || muted) {
-                if (muted)
-                    messageHelper.AddNewLine('Removed Roles as the person is muted')
-                if (!hasTeam)
-                    messageHelper.AddNewLine(`No Team Found.`);
-                await this.PurgeAllRoles(member, messageHelper);
+            var unPurgeable = this.HasRole(rolesOfUser, this._unPurgeable);
+            if (unPurgeable) {
+                messageHelper.Options.ignoredUser = true;
             }
             else {
-                messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
-                await this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
+                const teamInformation = await this.FindInTeam(member.user, teams);
+                var muted = this.HasRole(rolesOfUser, this._mutedRole);
+                var hasTeam = teamInformation != null;
+                if (!hasTeam || muted) {
+                    if (muted)
+                        messageHelper.AddNewLine('Removed Roles as the person is muted')
+                    if (!hasTeam)
+                        messageHelper.AddNewLine(`No Team Found.`);
+                    await this.PurgeAllRoles(member, messageHelper);
+                }
+                else {
+                    messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
+                    await this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
+                }
             }
 
             messages.push(messageHelper);

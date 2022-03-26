@@ -15,5 +15,6 @@ var NGSRoles;
     NGSRoles["FreeAgents"] = "Free Agents";
     NGSRoles["NGSBot"] = "NGSBOT";
     NGSRoles["Muted"] = "Muted";
+    NGSRoles["UnPurgeable"] = "UnPurgeable";
 })(NGSRoles = exports.NGSRoles || (exports.NGSRoles = {}));
 //# sourceMappingURL=NGSRoles.js.map

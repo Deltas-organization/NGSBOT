@@ -11,5 +11,6 @@ export enum NGSRoles {
     Captain = 'Captains',
     FreeAgents = 'Free Agents',
     NGSBot = 'NGSBOT',
-    Muted = 'Muted'
+    Muted = 'Muted',
+    UnPurgeable = "UnPurgeable"
 }
