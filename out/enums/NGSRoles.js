@@ -14,5 +14,6 @@ var NGSRoles;
     NGSRoles["Captain"] = "Captains";
     NGSRoles["FreeAgents"] = "Free Agents";
     NGSRoles["NGSBot"] = "NGSBOT";
+    NGSRoles["Muted"] = "Muted";
 })(NGSRoles = exports.NGSRoles || (exports.NGSRoles = {}));
 //# sourceMappingURL=NGSRoles.js.map

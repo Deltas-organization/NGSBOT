@@ -11,11 +11,13 @@ const fs = require('fs');
 
 export class PurgeWorker extends RoleWorkerBase {
     private _testing: boolean = false;
+    private _mutedRole: Role;
 
     protected async Start(commands: string[]) {
         if (commands.length > 0)
             this._testing = true;
 
+        this._mutedRole = this.roleHelper.lookForRole(NGSRoles.Muted);
         await this.BeginPurge();
     }
 
@@ -31,9 +33,15 @@ export class PurgeWorker extends RoleWorkerBase {
             count++;
             const teamInformation = await this.FindInTeam(member.user, teams);
             const messageHelper = new MessageHelper<IPurgeInformation>(member.user.username);
+            const rolesOfUser = member.roles.cache.map((role, _, __) => role);
             messageHelper.Options.rolesRemovedCount = 0;
-            if (teamInformation == null) {
-                messageHelper.AddNewLine(`No Team Found.`);
+            var muted = this.HasRole(rolesOfUser, this._mutedRole);
+            var hasTeam = teamInformation != null;
+            if (!hasTeam || muted) {
+                if (muted)
+                    messageHelper.AddNewLine('Removed Roles as the person is muted')
+                if (!hasTeam)
+                    messageHelper.AddNewLine(`No Team Found.`);
                 await this.PurgeAllRoles(member, messageHelper);
             }
             else {
@@ -69,15 +77,15 @@ export class PurgeWorker extends RoleWorkerBase {
         await progressMessage.Delete();
     }
 
+    HasRole(rolesOfUser: Role[], roleToLookFor: any): Role {
+        return rolesOfUser.find(role => role == roleToLookFor);
+    }
+
     private async ShouldRemoveRoles(guildMember: GuildMember) {
         if (guildMember.user.username == "Murda") {
             Globals.log("didnt remove murdas roles");
             return false;
         }
-
-        const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-        if (rolesOfUser.find(role => role == this.stormRole))
-            return false;
 
         return true;
     }

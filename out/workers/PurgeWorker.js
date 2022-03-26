@@ -25,6 +25,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             if (commands.length > 0)
                 this._testing = true;
+            this._mutedRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
             yield this.BeginPurge();
         });
     }
@@ -41,9 +42,15 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 count++;
                 const teamInformation = yield this.FindInTeam(member.user, teams);
                 const messageHelper = new MessageHelper_1.MessageHelper(member.user.username);
+                const rolesOfUser = member.roles.cache.map((role, _, __) => role);
                 messageHelper.Options.rolesRemovedCount = 0;
-                if (teamInformation == null) {
-                    messageHelper.AddNewLine(`No Team Found.`);
+                var muted = this.HasRole(rolesOfUser, this._mutedRole);
+                var hasTeam = teamInformation != null;
+                if (!hasTeam || muted) {
+                    if (muted)
+                        messageHelper.AddNewLine('Removed Roles as the person is muted');
+                    if (!hasTeam)
+                        messageHelper.AddNewLine(`No Team Found.`);
                     yield this.PurgeAllRoles(member, messageHelper);
                 }
                 else {
@@ -74,15 +81,15 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             yield progressMessage.Delete();
         });
     }
+    HasRole(rolesOfUser, roleToLookFor) {
+        return rolesOfUser.find(role => role == roleToLookFor);
+    }
     ShouldRemoveRoles(guildMember) {
         return __awaiter(this, void 0, void 0, function* () {
             if (guildMember.user.username == "Murda") {
                 Globals_1.Globals.log("didnt remove murdas roles");
                 return false;
             }
-            const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-            if (rolesOfUser.find(role => role == this.stormRole))
-                return false;
             return true;
         });
     }

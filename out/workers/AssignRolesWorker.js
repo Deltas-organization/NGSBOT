@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignRolesWorker = void 0;
+const NGSRoles_1 = require("../enums/NGSRoles");
 const Globals_1 = require("../Globals");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
@@ -30,6 +31,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             if (commands.length > 0)
                 this._testing = true;
             yield this.BeginAssigning();
+            this._mutedRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
         });
     }
     BeginAssigning() {
@@ -169,6 +171,10 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                         yield this.UpdateDiscordID(user, guildMember);
                     messageTracker.Options.PlayersInDiscord++;
                     var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
+                    if (this.HasRole(rolesOfUser, this._mutedRole)) {
+                        messageTracker.AddJSONLine('Didnt add roles as the person is muted');
+                        continue;
+                    }
                     messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
                     messageTracker.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
                     if (teamRole != null && !this.HasRole(rolesOfUser, teamRole)) {

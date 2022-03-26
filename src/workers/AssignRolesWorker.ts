@@ -17,6 +17,7 @@ const fs = require('fs');
 export class AssignRolesWorker extends RoleWorkerBase {
 
     private _testing = false;
+    private _mutedRole: Role;
 
     constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender, private apiKey: string) {
         super(workerDependencies, detailed, messageSender);
@@ -27,6 +28,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
             this._testing = true;
 
         await this.BeginAssigning();
+        this._mutedRole = this.roleHelper.lookForRole(NGSRoles.Muted);
     }
 
     private async BeginAssigning() {
@@ -170,6 +172,10 @@ export class AssignRolesWorker extends RoleWorkerBase {
                     await this.UpdateDiscordID(user, guildMember);
                 messageTracker.Options.PlayersInDiscord++;
                 var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
+                if (this.HasRole(rolesOfUser, this._mutedRole)) {
+                    messageTracker.AddJSONLine('Didnt add roles as the person is muted')
+                    continue;
+                }
                 messageTracker.AddNewLine(`**Current Roles**: ${rolesOfUser.join(',')}`, 4);
                 messageTracker.AddJSONLine(`**Current Roles**: ${rolesOfUser.map(role => role.name).join(',')}`);
                 if (teamRole != null && !this.HasRole(rolesOfUser, teamRole)) {
