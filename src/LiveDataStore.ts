@@ -90,7 +90,7 @@ export class LiveDataStore {
             try {
                 const encodedUsers = team.teamMembers.map(member => encodeURIComponent(member.displayName));
                 const ngsMembers = await new NGSQueryBuilder().GetResponse<INGSUser[]>(`/user/get?users=${encodedUsers.join()}`);
-                const teamMembers = this.AugmentNgsUsers(ngsMembers, team);
+                const teamMembers = AugmentedNGSUser.CreateFromMultiple(ngsMembers, team);
                 allUsers = allUsers.concat(teamMembers);
             }
             catch (e) {
@@ -99,22 +99,6 @@ export class LiveDataStore {
         }
 
         return allUsers;
-    }
-
-    private AugmentNgsUsers(ngsMembers: INGSUser[], team: INGSTeam) {
-        const captainName = team.captain.toLowerCase();
-        const assistantCaptains = team.assistantCaptain.map(ac => ac.toLowerCase());
-        const teamMembers = ngsMembers.map(member => new AugmentedNGSUser(member));
-        for (var teamMember of teamMembers) {
-            const lowerCaseDisplayName = teamMember.displayName.toLowerCase();
-            if (lowerCaseDisplayName == captainName) {
-                teamMember.IsCaptain = true;
-            }
-            else if (assistantCaptains?.find(ac => ac == lowerCaseDisplayName)) {
-                teamMember.IsAssistantCaptain = true;
-            }
-        }
-        return teamMembers;
     }
 
     private async GetFreshTeams(): Promise<INGSTeam[]> {

@@ -46,7 +46,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 let count = 0;
                 let progressCount = 1;
                 let steps = 10;
-                for (var team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
+                for (var team of teams.GetTeamsSortedByTeamNames()) {
                     count++;
                     let messageHelper = yield this.AssignValidRoles(team, guildMembers);
                     if (messageHelper) {

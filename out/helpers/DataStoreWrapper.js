@@ -11,13 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataStoreWrapper = void 0;
 const Globals_1 = require("../Globals");
+const TeamHelper_1 = require("./TeamHelper");
 class DataStoreWrapper {
     constructor(_dataStore) {
         this._dataStore = _dataStore;
     }
     GetTeams() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this._dataStore.GetRegisteredTeams();
+            var teams = yield this._dataStore.GetRegisteredTeams();
+            return new TeamHelper_1.TeamHelper(this, teams);
         });
     }
     GetScheduledGames() {
@@ -76,14 +78,7 @@ class DataStoreWrapper {
     }
     SearchForRegisteredTeams(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const allTeams = yield this.GetTeams();
-                const searchRegex = new RegExp(searchTerm, 'i');
-                return allTeams.filter(team => searchRegex.test(team.teamName));
-            }
-            catch (ex) {
-                Globals_1.Globals.log(ex);
-            }
+            return (yield this.GetTeams()).SearchForTeam(searchTerm);
         });
     }
     SearchForTeamBySeason(season, searchTerm) {

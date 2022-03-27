@@ -62,16 +62,16 @@ export class RoleHelper {
     }
 
     public lookForRole(roleName: string): Role {
-        let groomedRoleName = this.GroomRoleNameAsLowerCase(roleName);
+        let groomedRoleName = RoleHelper.GroomRoleNameAsLowerCase(roleName);
         for (const role of this.roles) {
-            let groomedServerRole = this.GroomRoleNameAsLowerCase(role.name);
+            let groomedServerRole = RoleHelper.GroomRoleNameAsLowerCase(role.name);
             if (groomedServerRole === groomedRoleName)
                 return role;
         }
         return null;
     }
 
-    public GroomRoleNameAsLowerCase(roleName: string) {
+    public static GroomRoleNameAsLowerCase(roleName: string) {
         let roleNameTrimmed = roleName.trim();
         const indexOfWidthdrawn = roleNameTrimmed.indexOf('(Withdrawn');
         if (indexOfWidthdrawn > -1) {

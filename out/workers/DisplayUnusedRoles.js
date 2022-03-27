@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DisplayUnusedRoles = void 0;
 const Globals_1 = require("../Globals");
+const RoleHelper_1 = require("../helpers/RoleHelper");
 const RoleWorkerBase_1 = require("./Bases/RoleWorkerBase");
-const fs = require('fs');
 class DisplayUnusedRoles extends RoleWorkerBase_1.RoleWorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,22 +21,15 @@ class DisplayUnusedRoles extends RoleWorkerBase_1.RoleWorkerBase {
     }
     BeginAssigning() {
         return __awaiter(this, void 0, void 0, function* () {
-            const teams = yield this.dataStore.GetTeams();
+            const TeamHelper = yield this.dataStore.GetTeams();
             const unusedRoles = [];
             try {
                 let allRoles = (yield this.messageSender.originalMessage.guild.roles.fetch()).cache.map((mem, _, __) => mem);
                 for (var role of allRoles.sort((r1, r2) => r2.position - r1.position)) {
                     if (this.myBotRole.comparePositionTo(role) > 0) {
                         let color = role.hexColor;
-                        const roleName = this.roleHelper.GroomRoleNameAsLowerCase(role.name);
-                        let found = false;
-                        for (var team of teams) {
-                            let teamName = this.roleHelper.GroomRoleNameAsLowerCase(team.teamName);
-                            if (teamName == roleName) {
-                                found = true;
-                                break;
-                            }
-                        }
+                        const roleName = RoleHelper_1.RoleHelper.GroomRoleNameAsLowerCase(role.name);
+                        let found = TeamHelper.LookForTeamByRole(roleName);
                         if (!found) {
                             unusedRoles.push(color + ":" + role.name);
                         }

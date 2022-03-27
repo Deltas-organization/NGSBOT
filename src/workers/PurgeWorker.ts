@@ -3,8 +3,9 @@ import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
-import { INGSTeam } from "../interfaces";
+import { TeamHelper } from "../helpers/TeamHelper";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
+import { PlayerContainer } from "../models/TeamContainer";
 import { RoleWorkerBase } from "./Bases/RoleWorkerBase";
 
 const fs = require('fs');
@@ -25,6 +26,7 @@ export class PurgeWorker extends RoleWorkerBase {
 
     private async BeginPurge() {
         const progressMessage = await this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
+
         const teams = await this.dataStore.GetTeams();
         await progressMessage.Edit(`Purging STARTED... STAND BY...`);
         const messages: MessageHelper<IPurgeInformation>[] = [];
@@ -41,7 +43,7 @@ export class PurgeWorker extends RoleWorkerBase {
                 messageHelper.Options.ignoredUser = true;
             }
             else {
-                const teamInformation = await this.FindInTeam(member.user, teams);
+                const teamInformation = await teams.FindUserInTeam(member.user);
                 var muted = this.HasRole(rolesOfUser, this._mutedRole);
                 var hasTeam = teamInformation != null;
                 if (!hasTeam || muted) {
@@ -52,7 +54,7 @@ export class PurgeWorker extends RoleWorkerBase {
                     await this.PurgeAllRoles(member, messageHelper);
                 }
                 else {
-                    messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
+                    messageHelper.AddNewLine(`Team Found: ** ${teamInformation.teamName} ** `);
                     await this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
                 }
             }
@@ -98,22 +100,6 @@ export class PurgeWorker extends RoleWorkerBase {
         return true;
     }
 
-    private async FindInTeam(guildUser: User, teams: INGSTeam[]): Promise<teamInformation> {
-        for (var team of teams) {
-            const teamName = team.teamName;
-            const allUsers = await this.dataStore.GetUsers();
-            const teamUsers = allUsers.filter(user => user.teamName == teamName);
-            for (var ngsUser of teamUsers) {
-                const foundGuildUser = DiscordFuzzySearch.CompareGuildUser(ngsUser, guildUser)
-                if (foundGuildUser) {
-                    return new teamInformation(team, ngsUser);
-                }
-            }
-        }
-
-        return null;
-    }
-
     private async PurgeAllRoles(guildMember: GuildMember, messageHelper: MessageHelper<IPurgeInformation>): Promise<void> {
         const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
         for (var role of rolesOfUser) {
@@ -138,10 +124,10 @@ export class PurgeWorker extends RoleWorkerBase {
         }
     }
 
-    private async PurgeUnrelatedRoles(guildMember: GuildMember, teamInformation: teamInformation, messageHelper: MessageHelper<any>): Promise<void> {
+    private async PurgeUnrelatedRoles(guildMember: GuildMember, userInformation: AugmentedNGSUser, messageHelper: MessageHelper<any>): Promise<void> {
         try {
-            const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(/ /g, '');
-            let teamDivRole = this.roleHelper.FindDivRole(teamInformation.NGSTeam.divisionDisplayName)?.role;
+            const teamName = userInformation.teamName.toLowerCase().replace(/ /g, '');
+            let teamDivRole = this.roleHelper.FindDivRole(userInformation.DivisionDisplayName)?.role;
             let teamRole = this.roleHelper.lookForRole(teamName);
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
             for (var role of rolesOfUser) {
@@ -152,7 +138,7 @@ export class PurgeWorker extends RoleWorkerBase {
                     else if (role == teamDivRole) {
                         messageHelper.AddNewLine(`Kept Div: ${role.name}.`, 4);
                     }
-                    else if (role == this.captainRole && (teamInformation.NGSUser.IsCaptain || teamInformation.NGSUser.IsAssistantCaptain)) {
+                    else if (role == this.captainRole && (userInformation.IsCaptain || userInformation.IsAssistantCaptain)) {
                         messageHelper.AddNewLine("Kept Captain Role.", 4);
                     }
                     else if (this.myBotRole.comparePositionTo(role) > 0) {
@@ -185,10 +171,6 @@ export class PurgeWorker extends RoleWorkerBase {
         if (!this._testing)
             await guildMember.roles.remove(role);
     }
-}
-
-class teamInformation {
-    constructor(public NGSTeam: INGSTeam, public NGSUser: AugmentedNGSUser) { }
 }
 
 interface IPurgeInformation {

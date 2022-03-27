@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryDisplay = void 0;
 const NGSHistoryActions_1 = require("../enums/NGSHistoryActions");
 const MessageHelper_1 = require("../helpers/MessageHelper");
-const TeamSorter_1 = require("../helpers/TeamSorter");
 class HistoryDisplay {
     constructor(dataStore) {
         this.dataStore = dataStore;
@@ -22,7 +21,7 @@ class HistoryDisplay {
             const teams = yield this.dataStore.GetTeams();
             const todaysUTC = new Date().getTime();
             const validHistories = [];
-            for (let team of teams.sort((t1, t2) => TeamSorter_1.TeamSorter.SortByTeamDivision(t1, t2))) {
+            for (let team of teams.GetTeamsSortedByDivision()) {
                 const historyContainer = new HistoryContainer(team);
                 const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp);
                 const reversedHistory = sortedHistory.slice().reverse();
@@ -55,7 +54,7 @@ class HistoryDisplay {
             const beginningMessage = "**New Teams this season** \n";
             let message = beginningMessage;
             let messages = [];
-            for (let team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
+            for (let team of teams.GetTeamsSortedByTeamNames()) {
                 for (let history of team.history) {
                     if (history.action == NGSHistoryActions_1.HistoryActions.CreatedTeam) {
                         if (history.season == season) {

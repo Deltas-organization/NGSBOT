@@ -72,15 +72,15 @@ class RoleHelper {
         return { div: divRoleName, role: this.lookForRole(divRoleName) };
     }
     lookForRole(roleName) {
-        let groomedRoleName = this.GroomRoleNameAsLowerCase(roleName);
+        let groomedRoleName = RoleHelper.GroomRoleNameAsLowerCase(roleName);
         for (const role of this.roles) {
-            let groomedServerRole = this.GroomRoleNameAsLowerCase(role.name);
+            let groomedServerRole = RoleHelper.GroomRoleNameAsLowerCase(role.name);
             if (groomedServerRole === groomedRoleName)
                 return role;
         }
         return null;
     }
-    GroomRoleNameAsLowerCase(roleName) {
+    static GroomRoleNameAsLowerCase(roleName) {
         let roleNameTrimmed = roleName.trim();
         const indexOfWidthdrawn = roleNameTrimmed.indexOf('(Withdrawn');
         if (indexOfWidthdrawn > -1) {

@@ -7,6 +7,7 @@ import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { RoleHelper } from "../helpers/RoleHelper";
 import { ScheduleHelper, ScheduleInformation } from "../helpers/ScheduleHelper";
+import { TeamHelper } from "../helpers/TeamHelper";
 import { INGSSchedule, INGSUser } from "../interfaces";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
@@ -146,7 +147,8 @@ export class CheckReportedGames {
     }
 
     private async GetCaptain(teamName: string): Promise<GuildMember> {
-        const teamMembers = await this.GetTeamMembers(teamName);
+        var teamHelper = await this.dataStore.GetTeams();
+        const teamMembers = await teamHelper.FindUsersOnTeam(teamName);
         const captains = teamMembers.filter(mem => mem.IsCaptain);
         for (var captain of captains) {
             const guildMember = DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
@@ -156,27 +158,14 @@ export class CheckReportedGames {
     }
 
     private async GetAssistantCaptains(teamName: string): Promise<GuildMember[]> {
-        const teamMembers = await this.GetTeamMembers(teamName);
+        var teamHelper = await this.dataStore.GetTeams();
+        const teamMembers = await teamHelper.FindUsersOnTeam(teamName);
         const captains = teamMembers.filter(mem => mem.IsAssistantCaptain);
         const result: GuildMember[] = [];
         for (var captain of captains) {
             const guildMember = DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers)
             if (guildMember)
                 result.push(guildMember.member)
-        }
-        return result;
-    }
-
-    private async GetTeamMembers(teamName: string): Promise<AugmentedNGSUser[]> {
-        const result: AugmentedNGSUser[] = [];
-        const teams = await this.dataStore.GetTeams();
-        for (let team of teams) {
-            if (teamName == team.teamName) {
-                const users = await this.dataStore.GetUsersOnTeam(team);
-                for (var user of users) {
-                    result.push(user);
-                }
-            }
         }
         return result;
     }

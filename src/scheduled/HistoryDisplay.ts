@@ -19,7 +19,7 @@ export class HistoryDisplay {
         const teams = await this.dataStore.GetTeams();
         const todaysUTC = new Date().getTime();
         const validHistories: HistoryContainer[] = [];
-        for (let team of teams.sort((t1, t2) => TeamSorter.SortByTeamDivision(t1, t2))) {
+        for (let team of teams.GetTeamsSortedByDivision()) {
             const historyContainer = new HistoryContainer(team);
             const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp)
             const reversedHistory = sortedHistory.slice().reverse();
@@ -52,7 +52,7 @@ export class HistoryDisplay {
         const beginningMessage = "**New Teams this season** \n"
         let message = beginningMessage;
         let messages = [];
-        for (let team of teams.sort((t1, t2) => t1.teamName.localeCompare(t2.teamName))) {
+        for (let team of teams.GetTeamsSortedByTeamNames()) {
             for (let history of team.history) {
                 if (history.action == HistoryActions.CreatedTeam) {
                     if (history.season == season) {
@@ -105,7 +105,7 @@ export class HistoryDisplay {
         return result;
     }
 
-   
+
 }
 
 

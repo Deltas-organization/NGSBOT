@@ -152,7 +152,8 @@ class CheckReportedGames {
     }
     GetCaptain(teamName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const teamMembers = yield this.GetTeamMembers(teamName);
+            var teamHelper = yield this.dataStore.GetTeams();
+            const teamMembers = yield teamHelper.FindUsersOnTeam(teamName);
             const captains = teamMembers.filter(mem => mem.IsCaptain);
             for (var captain of captains) {
                 const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
@@ -163,28 +164,14 @@ class CheckReportedGames {
     }
     GetAssistantCaptains(teamName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const teamMembers = yield this.GetTeamMembers(teamName);
+            var teamHelper = yield this.dataStore.GetTeams();
+            const teamMembers = yield teamHelper.FindUsersOnTeam(teamName);
             const captains = teamMembers.filter(mem => mem.IsAssistantCaptain);
             const result = [];
             for (var captain of captains) {
                 const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
                 if (guildMember)
                     result.push(guildMember.member);
-            }
-            return result;
-        });
-    }
-    GetTeamMembers(teamName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = [];
-            const teams = yield this.dataStore.GetTeams();
-            for (let team of teams) {
-                if (teamName == team.teamName) {
-                    const users = yield this.dataStore.GetUsersOnTeam(team);
-                    for (var user of users) {
-                        result.push(user);
-                    }
-                }
             }
             return result;
         });

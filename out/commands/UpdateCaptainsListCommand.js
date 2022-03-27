@@ -14,7 +14,6 @@ const Globals_1 = require("../Globals");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
 const RoleHelper_1 = require("../helpers/RoleHelper");
-const TeamSorter_1 = require("../helpers/TeamSorter");
 class UpdateCaptainsListCommand {
     constructor(dependencies) {
         this.client = dependencies.client;
@@ -77,9 +76,8 @@ class UpdateCaptainsListCommand {
     }
     GetTeamsInDivision(division) {
         return __awaiter(this, void 0, void 0, function* () {
-            const teams = yield this.dataStore.GetTeams();
-            const divisionTeams = teams.filter(team => team.divisionDisplayName == division).sort((t1, t2) => TeamSorter_1.TeamSorter.SortByTeamName(t1, t2));
-            return divisionTeams;
+            const teamHelper = yield this.dataStore.GetTeams();
+            return teamHelper.GetTeamsSortedByTeamNames().filter(team => team.divisionDisplayName == division);
         });
     }
     GetGuild(channelId) {

@@ -3,14 +3,16 @@ import { Globals } from "../Globals";
 import { INGSDivision, INGSSchedule, INGSTeam } from "../interfaces";
 import { LiveDataStore } from "../LiveDataStore";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
+import { TeamHelper } from "./TeamHelper";
 
 export class DataStoreWrapper {
     constructor(private _dataStore: LiveDataStore) {
 
     }
 
-    public async GetTeams() {
-        return this._dataStore.GetRegisteredTeams();
+    public async GetTeams(): Promise<TeamHelper> {
+        var teams = await this._dataStore.GetRegisteredTeams();
+        return new TeamHelper(this, teams);
     }
 
     public async GetScheduledGames() {
@@ -63,14 +65,7 @@ export class DataStoreWrapper {
     }
 
     public async SearchForRegisteredTeams(searchTerm: string): Promise<INGSTeam[]> {
-        try {
-            const allTeams = await this.GetTeams();
-            const searchRegex = new RegExp(searchTerm, 'i');
-            return allTeams.filter(team => searchRegex.test(team.teamName));
-        }
-        catch (ex) {
-            Globals.log(ex);
-        }
+        return (await this.GetTeams()).SearchForTeam(searchTerm);
     }
 
     public async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[]> {

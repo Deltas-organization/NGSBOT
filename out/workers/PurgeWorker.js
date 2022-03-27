@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PurgeWorker = void 0;
 const NGSRoles_1 = require("../enums/NGSRoles");
 const Globals_1 = require("../Globals");
-const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../helpers/MessageHelper");
 const RoleWorkerBase_1 = require("./Bases/RoleWorkerBase");
 const fs = require('fs');
@@ -49,7 +48,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                     messageHelper.Options.ignoredUser = true;
                 }
                 else {
-                    const teamInformation = yield this.FindInTeam(member.user, teams);
+                    const teamInformation = yield teams.FindUserInTeam(member.user);
                     var muted = this.HasRole(rolesOfUser, this._mutedRole);
                     var hasTeam = teamInformation != null;
                     if (!hasTeam || muted) {
@@ -60,7 +59,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                         yield this.PurgeAllRoles(member, messageHelper);
                     }
                     else {
-                        messageHelper.AddNewLine(`Team Found: ** ${teamInformation.NGSTeam.teamName} ** `);
+                        messageHelper.AddNewLine(`Team Found: ** ${teamInformation.teamName} ** `);
                         yield this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
                     }
                 }
@@ -100,22 +99,6 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             return true;
         });
     }
-    FindInTeam(guildUser, teams) {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (var team of teams) {
-                const teamName = team.teamName;
-                const allUsers = yield this.dataStore.GetUsers();
-                const teamUsers = allUsers.filter(user => user.teamName == teamName);
-                for (var ngsUser of teamUsers) {
-                    const foundGuildUser = DiscordFuzzySearch_1.DiscordFuzzySearch.CompareGuildUser(ngsUser, guildUser);
-                    if (foundGuildUser) {
-                        return new teamInformation(team, ngsUser);
-                    }
-                }
-            }
-            return null;
-        });
-    }
     PurgeAllRoles(guildMember, messageHelper) {
         return __awaiter(this, void 0, void 0, function* () {
             const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
@@ -141,12 +124,12 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             }
         });
     }
-    PurgeUnrelatedRoles(guildMember, teamInformation, messageHelper) {
+    PurgeUnrelatedRoles(guildMember, userInformation, messageHelper) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const teamName = teamInformation.NGSTeam.teamName.toLowerCase().replace(/ /g, '');
-                let teamDivRole = (_a = this.roleHelper.FindDivRole(teamInformation.NGSTeam.divisionDisplayName)) === null || _a === void 0 ? void 0 : _a.role;
+                const teamName = userInformation.teamName.toLowerCase().replace(/ /g, '');
+                let teamDivRole = (_a = this.roleHelper.FindDivRole(userInformation.DivisionDisplayName)) === null || _a === void 0 ? void 0 : _a.role;
                 let teamRole = this.roleHelper.lookForRole(teamName);
                 const rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
                 for (var role of rolesOfUser) {
@@ -157,7 +140,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                         else if (role == teamDivRole) {
                             messageHelper.AddNewLine(`Kept Div: ${role.name}.`, 4);
                         }
-                        else if (role == this.captainRole && (teamInformation.NGSUser.IsCaptain || teamInformation.NGSUser.IsAssistantCaptain)) {
+                        else if (role == this.captainRole && (userInformation.IsCaptain || userInformation.IsAssistantCaptain)) {
                             messageHelper.AddNewLine("Kept Captain Role.", 4);
                         }
                         else if (this.myBotRole.comparePositionTo(role) > 0) {
@@ -194,10 +177,4 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
     }
 }
 exports.PurgeWorker = PurgeWorker;
-class teamInformation {
-    constructor(NGSTeam, NGSUser) {
-        this.NGSTeam = NGSTeam;
-        this.NGSUser = NGSUser;
-    }
-}
 //# sourceMappingURL=PurgeWorker.js.map

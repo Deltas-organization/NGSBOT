@@ -75,9 +75,8 @@ export class UpdateCaptainsListCommand {
     }
 
     private async GetTeamsInDivision(division: NGSDivisions) {
-        const teams = await this.dataStore.GetTeams();
-        const divisionTeams = teams.filter(team => team.divisionDisplayName == division).sort((t1, t2) => TeamSorter.SortByTeamName(t1, t2));
-        return divisionTeams;
+        const teamHelper = await this.dataStore.GetTeams();
+        return teamHelper.GetTeamsSortedByTeamNames().filter(team => team.divisionDisplayName == division);
     }
 
     private async GetGuild(channelId: string) {
