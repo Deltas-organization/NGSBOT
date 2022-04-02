@@ -83,7 +83,7 @@ class RandomWorker extends WorkerBase_1.WorkerBase {
     GetRandomMap() {
         let maps = Maps_1.HotsCompetitiveMaps;
         if (this.detailed) {
-            maps.push("BlackHearts Bay", "Haunted Mines", "ARAM");
+            maps = [...maps, "BlackHearts Bay", "Haunted Mines", "ARAM"];
         }
         return maps[Math.floor(Math.random() * maps.length)];
     }

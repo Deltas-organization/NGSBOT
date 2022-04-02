@@ -2,7 +2,6 @@ import { User } from "discord.js";
 import { Globals } from "../Globals";
 import { INGSTeam } from "../interfaces";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
-import { PlayerContainer } from "../models/TeamContainer";
 import { DataStoreWrapper } from "./DataStoreWrapper";
 import { DiscordFuzzySearch } from "./DiscordFuzzySearch";
 import { RoleHelper } from "./RoleHelper";
