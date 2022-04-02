@@ -1,11 +1,8 @@
-import { GuildMember, Role, User } from "discord.js";
+import { GuildMember, Role } from "discord.js";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
-import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
-import { TeamHelper } from "../helpers/TeamHelper";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
-import { PlayerContainer } from "../models/TeamContainer";
 import { RoleWorkerBase } from "./Bases/RoleWorkerBase";
 
 const fs = require('fs');
