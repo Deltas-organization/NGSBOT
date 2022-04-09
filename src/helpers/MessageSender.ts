@@ -24,9 +24,9 @@ export class MessageSender {
     }
 
     public async SendBasicMessage(message: string) {
-        while (message.length > 2048) {
-            let newMessage = message.slice(0, 2048);
-            message = message.substr(2048);
+        while (message.length > 2000) {
+            let newMessage = message.slice(0, 2000);
+            message = message.substr(2000);
             await this.SendBasicMessage(newMessage);
         }
         var sentMessage = await this.TextChannel.send(message);
@@ -34,9 +34,9 @@ export class MessageSender {
     }
 
     public async SendMessage(message: string, storeMessage = true) {
-        while (message.length > 2048) {
-            let newMessage = message.slice(0, 2048);
-            message = message.substr(2048);
+        while (message.length > 2000) {
+            let newMessage = message.slice(0, 2000);
+            message = message.substr(2000);
             await this.SendMessage(newMessage, storeMessage);
         }
         var sentMessage = await this.TextChannel.send({
@@ -70,9 +70,9 @@ export class MessageSender {
     }
 
     public async DMMessage(message: string) {
-        while (message.length > 2048) {
-            let newMessage = message.slice(0, 2048);
-            message = message.substr(2048);
+        while (message.length > 2000) {
+            let newMessage = message.slice(0, 2000);
+            message = message.substr(2000);
             await this.DMMessage(newMessage);
         }
         var sentMessage = await this.Requester.send({
@@ -159,7 +159,7 @@ export class MessageSender {
         let result: string[] = [];
         let currentMessage = '';
         for (var message of messages) {
-            if (currentMessage.length + message.length > 2048) {
+            if (currentMessage.length + message.length > 2000) {
                 result.push(currentMessage);
                 currentMessage = '';
             }

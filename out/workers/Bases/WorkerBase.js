@@ -20,7 +20,9 @@ class WorkerBase {
         this.guild = messageSender.originalMessage.guild;
     }
     Begin(commands) {
-        this.Start(commands);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.Start(commands);
+        });
     }
     SearchForRegisteredTeams(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -29,9 +29,9 @@ class MessageSender {
     }
     SendBasicMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            while (message.length > 2048) {
-                let newMessage = message.slice(0, 2048);
-                message = message.substr(2048);
+            while (message.length > 2000) {
+                let newMessage = message.slice(0, 2000);
+                message = message.substr(2000);
                 yield this.SendBasicMessage(newMessage);
             }
             var sentMessage = yield this.TextChannel.send(message);
@@ -40,9 +40,9 @@ class MessageSender {
     }
     SendMessage(message, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
-            while (message.length > 2048) {
-                let newMessage = message.slice(0, 2048);
-                message = message.substr(2048);
+            while (message.length > 2000) {
+                let newMessage = message.slice(0, 2000);
+                message = message.substr(2000);
                 yield this.SendMessage(newMessage, storeMessage);
             }
             var sentMessage = yield this.TextChannel.send({
@@ -78,9 +78,9 @@ class MessageSender {
     }
     DMMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            while (message.length > 2048) {
-                let newMessage = message.slice(0, 2048);
-                message = message.substr(2048);
+            while (message.length > 2000) {
+                let newMessage = message.slice(0, 2000);
+                message = message.substr(2000);
                 yield this.DMMessage(newMessage);
             }
             var sentMessage = yield this.Requester.send({
@@ -169,7 +169,7 @@ class MessageSender {
         let result = [];
         let currentMessage = '';
         for (var message of messages) {
-            if (currentMessage.length + message.length > 2048) {
+            if (currentMessage.length + message.length > 2000) {
                 result.push(currentMessage);
                 currentMessage = '';
             }

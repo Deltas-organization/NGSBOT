@@ -9,24 +9,24 @@ import { NGSRoles } from "../enums/NGSRoles";
 import { RoleHelper } from "../helpers/RoleHelper";
 import { AssignRolesOptions } from "../message-helpers/AssignRolesOptions";
 import { AssignRolesWorker } from "../workers/AssignRolesWorker";
+import { ChangeCaptainNickNameWorker } from "../workers/ChangeCaptainNickNameWorker";
 
 const fs = require('fs');
 
-export class AssignRoles extends ngsTranslatorBase
-{
-    public get commandBangs(): string[]
-    {
+export class AssignRoles extends ngsTranslatorBase {
+    public get commandBangs(): string[] {
         return ["assign"];
     }
 
-    public get description(): string
-    {
+    public get description(): string {
         return "Will Check all teams for users with discord tags and will assign roles.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
-    {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
         const assignRolesWorker = new AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey);
         await assignRolesWorker.Begin(commands);
+
+        const worker = new ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
+        await worker.Begin(commands);
     }
 }

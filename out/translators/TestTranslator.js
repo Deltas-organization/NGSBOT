@@ -9,26 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AssignRoles = void 0;
-const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
-const AssignRolesWorker_1 = require("../workers/AssignRolesWorker");
-const ChangeCaptainNickNameWorker_1 = require("../workers/ChangeCaptainNickNameWorker");
-const fs = require('fs');
-class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
+exports.TestTranslator = void 0;
+const deltaTranslatorBase_1 = require("./bases/deltaTranslatorBase");
+class TestTranslator extends deltaTranslatorBase_1.DeltaTranslatorBase {
     get commandBangs() {
-        return ["assign"];
+        return ["test"];
     }
     get description() {
-        return "Will Check all teams for users with discord tags and will assign roles.";
+        return "Will run the current command trhat is being tested";
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const assignRolesWorker = new AssignRolesWorker_1.AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey);
-            yield assignRolesWorker.Begin(commands);
-            const worker = new ChangeCaptainNickNameWorker_1.ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
-            yield worker.Begin(commands);
+            // const worker = new ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
+            // await worker.Begin(commands);
         });
     }
 }
-exports.AssignRoles = AssignRoles;
-//# sourceMappingURL=AssignRoles.js.map
+exports.TestTranslator = TestTranslator;
+//# sourceMappingURL=TestTranslator.js.map

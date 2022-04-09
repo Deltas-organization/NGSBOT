@@ -33,7 +33,7 @@ export class TeamHelper {
         return null;
     }
 
-    public async FindUsersOnTeam(teamName: string) {
+    public async FindUsersOnTeam(teamName: string): Promise<AugmentedNGSUser[]> {
         var result: AugmentedNGSUser[] = [];
         for (let team of this.teams) {
             if (teamName == team.teamName) {

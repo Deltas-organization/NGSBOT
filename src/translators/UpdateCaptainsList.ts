@@ -42,6 +42,7 @@ export class UpdateCaptainsList extends ngsTranslatorBase {
         }
         message.Edit("Captains list has been updated");
     }
+
     private async AttemptToUpdateCaptainMessage(captainsListCommand: UpdateCaptainsListCommand, channelSender: SendChannelMessage, season: number, division: NGSDivisions) {
         const messageId = await this.GetSavedMessage(season, division);
         const message = await captainsListCommand.CreateDivisionList(division, DiscordChannels.NGSDiscord);

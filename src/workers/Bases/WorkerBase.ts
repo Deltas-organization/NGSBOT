@@ -19,8 +19,8 @@ export abstract class WorkerBase {
         this.guild = messageSender.originalMessage.guild;
     }
 
-    public Begin(commands: string[]) {
-        this.Start(commands);
+    public async Begin(commands: string[]) {
+        await this.Start(commands);
     }
 
     protected abstract Start(commands: string[]);
