@@ -34,6 +34,7 @@ import { SelfAssignRolesRemover } from "./translators/mongo/SelfAssignRolesRemov
 import { CoinFlip } from "./translators/CoinFlip";
 import { RandomWorker } from "./workers/RandomWorker";
 import { RandomTranslator } from "./translators/Random";
+import { TestTranslator } from "./translators/TestTranslator";
 
 @injectable()
 export class Bot {
@@ -71,9 +72,9 @@ export class Bot {
         this.translators.push(new SelfAssignRolesCreator(this.dependencies));
         this.translators.push(new SelfAssignRolesRemover(this.dependencies));
         this.translators.push(new RandomTranslator(this.dependencies));
+        this.translators.push(new TestTranslator(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
-        // this.exclamationTranslators.push(new ToggleFreeAgentRole(this.dependencies));
         this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));
         this.exclamationTranslators.push(new CoinFlip(this.dependencies));
     }
