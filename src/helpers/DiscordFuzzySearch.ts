@@ -10,8 +10,6 @@ export class DiscordFuzzySearch {
             let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
             if (members.length == 1)
                 return { member: members[0], updateDiscordId: false };
-
-            Globals.log(`Unable to find user by discordID: ${ngsDiscordId}, name: ${user.displayName}`);
         }
 
         const ngsDiscordTag = user.discordTag?.replace(' ', '').toLowerCase();
@@ -26,7 +24,6 @@ export class DiscordFuzzySearch {
     }
 
     private static FindByDiscordTag(ngsDiscordTag: string, guildMembers: GuildMember[]): GuildMember {
-
         const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
         if (!information || !information.discriminator || !information.name)
             return;

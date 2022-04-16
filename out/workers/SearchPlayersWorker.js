@@ -67,6 +67,9 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
                 else if (history.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
                     message.AddNewLine(`**Joined Team**: ${history.target}. Season: ${history.season}`);
                 }
+                else if (history.action == NGSHistoryActions_1.HistoryActions.CreatedTeam) {
+                    message.AddNewLine(`**Created Team**: ${history.target}. Season: ${history.season}`);
+                }
             }
         }
         return message;

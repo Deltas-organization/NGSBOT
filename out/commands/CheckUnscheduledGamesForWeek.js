@@ -17,6 +17,7 @@ class CheckUnscheduledGamesForWeek {
     constructor(mongoHelper, dataStore) {
         this.mongoHelper = mongoHelper;
         this.dataStore = dataStore;
+        this._divisionsWithAllGamesScheduled = [];
     }
     Check() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,6 +35,10 @@ class CheckUnscheduledGamesForWeek {
                     }
                 }
                 yield this.mongoHelper.UpdateSeasonRound(13);
+                var successfulDivisions = new MessageHelper_1.MessageHelper();
+                successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`));
+                successfulDivisions.AddNewLine(division.join(", "));
+                result.push(successfulDivisions);
                 return result;
             }
             catch (e) {
@@ -54,7 +59,7 @@ class CheckUnscheduledGamesForWeek {
             }
             var messageToSend = new MessageHelper_1.MessageHelper();
             if (unscheduledGames.length < 1) {
-                messageToSend.AddNew(`**${division}** Division has all of their games scheduled for next week!`);
+                this._divisionsWithAllGamesScheduled.push(division);
             }
             else {
                 messageToSend.AddNew(`Found some unschedule games for Division: **${division}**`);

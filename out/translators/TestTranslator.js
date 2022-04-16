@@ -16,7 +16,7 @@ class TestTranslator extends deltaTranslatorBase_1.DeltaTranslatorBase {
         return ["test"];
     }
     get description() {
-        return "Will run the current command trhat is being tested";
+        return "Will run the current command that is being tested";
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {

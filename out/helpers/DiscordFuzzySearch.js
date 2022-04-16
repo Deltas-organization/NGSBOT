@@ -19,7 +19,6 @@ class DiscordFuzzySearch {
             let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
             if (members.length == 1)
                 return { member: members[0], updateDiscordId: false };
-            Globals_1.Globals.log(`Unable to find user by discordID: ${ngsDiscordId}, name: ${user.displayName}`);
         }
         const ngsDiscordTag = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
         if (!ngsDiscordTag)

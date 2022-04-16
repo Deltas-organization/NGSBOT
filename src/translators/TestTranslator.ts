@@ -11,7 +11,7 @@ export class TestTranslator extends DeltaTranslatorBase {
     }
 
     public get description(): string {
-        return "Will run the current command trhat is being tested";
+        return "Will run the current command that is being tested";
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {

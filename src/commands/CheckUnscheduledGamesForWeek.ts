@@ -13,6 +13,7 @@ import { INGSSchedule, INGSUser } from "../interfaces";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class CheckUnscheduledGamesForWeek {
+    private _divisionsWithAllGamesScheduled: string[] = [];
 
     constructor(private mongoHelper: Mongohelper, private dataStore: DataStoreWrapper) {
 
@@ -33,6 +34,10 @@ export class CheckUnscheduledGamesForWeek {
                 }
             }
             await this.mongoHelper.UpdateSeasonRound(13);
+            var successfulDivisions = new MessageHelper<void>();
+            successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`))
+            successfulDivisions.AddNewLine(division.join(", "))
+            result.push(successfulDivisions);
             return result;
         }
         catch (e) {
@@ -57,7 +62,7 @@ export class CheckUnscheduledGamesForWeek {
 
         var messageToSend = new MessageHelper<void>();
         if (unscheduledGames.length < 1) {
-            messageToSend.AddNew(`**${division}** Division has all of their games scheduled for next week!`);
+            this._divisionsWithAllGamesScheduled.push(division);
         }
         else {
             messageToSend.AddNew(`Found some unschedule games for Division: **${division}**`);
