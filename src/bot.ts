@@ -22,7 +22,6 @@ import { NonCastedGamesCommand } from "./translators/NonCastedGamesCommand";
 import { AssignNewUserCommand } from "./commands/AssignNewUserCommand";
 import { DataStoreWrapper } from "./helpers/DataStoreWrapper";
 import { Leave } from "./translators/Leave";
-import { ToggleFreeAgentRole } from "./translators/ToggleFreeAgentRole";
 import { UnUsedRoles } from "./translators/UnusedRoles";
 import { UpdateCaptainsList } from "./translators/UpdateCaptainsList";
 import { NGSRoles } from "./enums/NGSRoles";
@@ -32,9 +31,9 @@ import { SelfAssignRolesCreator } from "./translators/mongo/SelfAssignRolesCreat
 import { SelfAssignRolesWatcher } from "./translators/mongo/SelfAssignRolesWatcher";
 import { SelfAssignRolesRemover } from "./translators/mongo/SelfAssignRolesRemover";
 import { CoinFlip } from "./translators/CoinFlip";
-import { RandomWorker } from "./workers/RandomWorker";
 import { RandomTranslator } from "./translators/Random";
 import { TestTranslator } from "./translators/TestTranslator";
+import { CleanupTranslator } from "./translators/Cleanup";
 
 @injectable()
 export class Bot {
@@ -73,6 +72,7 @@ export class Bot {
         this.translators.push(new SelfAssignRolesRemover(this.dependencies));
         this.translators.push(new RandomTranslator(this.dependencies));
         this.translators.push(new TestTranslator(this.dependencies));
+        this.translators.push(new CleanupTranslator(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
         this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));
