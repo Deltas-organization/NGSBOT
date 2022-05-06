@@ -17,6 +17,7 @@ class MessageSender {
         this.client = client;
         this.originalMessage = originalMessage;
         this.messageStore = messageStore;
+        this.maxLength = 2000;
     }
     get TextChannel() {
         return this.originalMessage.channel;
@@ -29,28 +30,22 @@ class MessageSender {
     }
     SendBasicMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            while (message.length > 2000) {
-                let newMessage = message.slice(0, 2000);
-                message = message.substr(2000);
+            while (message.length > this.maxLength) {
+                let newMessage = message.slice(0, this.maxLength);
+                message = message.substr(this.maxLength);
                 yield this.SendBasicMessage(newMessage);
             }
-            var sentMessage = yield this.TextChannel.send(message);
-            return sentMessage;
+            return yield this.JustSendIt(message, true);
         });
     }
     SendMessage(message, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
-            while (message.length > 2000) {
-                let newMessage = message.slice(0, 2000);
-                message = message.substr(2000);
+            while (message.length > this.maxLength) {
+                let newMessage = message.slice(0, this.maxLength);
+                message = message.substr(this.maxLength);
                 yield this.SendMessage(newMessage, storeMessage);
             }
-            var sentMessage = yield this.TextChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
+            var sentMessage = yield this.JustSendIt(message, false);
             if (storeMessage)
                 this.messageStore.AddMessage(sentMessage);
             return new MessageWrapper_1.MessageWrapper(this, sentMessage);
@@ -78,17 +73,12 @@ class MessageSender {
     }
     DMMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            while (message.length > 2000) {
-                let newMessage = message.slice(0, 2000);
-                message = message.substr(2000);
+            while (message.length > this.maxLength) {
+                let newMessage = message.slice(0, this.maxLength);
+                message = message.substr(this.maxLength);
                 yield this.DMMessage(newMessage);
             }
-            var sentMessage = yield this.Requester.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
+            var sentMessage = yield this.JustSendIt(message, false);
             return new MessageWrapper_1.MessageWrapper(this, sentMessage);
         });
     }
@@ -165,11 +155,33 @@ class MessageSender {
             return { message: sentMessage, response: response };
         });
     }
+    SendMessageFromContainer(container, storeMessage = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var messages = container.MultiMessages(this.maxLength);
+            for (var message of messages) {
+                var sentMessage = yield this.JustSendIt(message, false);
+                if (storeMessage)
+                    this.messageStore.AddMessage(sentMessage);
+            }
+        });
+    }
+    JustSendIt(message, basic) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (basic)
+                return yield this.TextChannel.send(message);
+            return yield this.TextChannel.send({
+                embed: {
+                    color: 0,
+                    description: message
+                }
+            });
+        });
+    }
     CombineMultiple(messages) {
         let result = [];
         let currentMessage = '';
         for (var message of messages) {
-            if (currentMessage.length + message.length > 2000) {
+            if (currentMessage.length + message.length > this.maxLength) {
                 result.push(currentMessage);
                 currentMessage = '';
             }

@@ -2,12 +2,12 @@ import { HistoryActions } from "../enums/NGSHistoryActions";
 import { MessageHelper } from "../helpers/MessageHelper";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { INGSRank, INGSUser } from "../interfaces";
+import { MessageContainer, MessageGroup } from "../message-helpers/MessageContainer";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class SearchPlayersWorker extends WorkerBase {
     protected async Start(commands: string[]) {
-
-        var message = "";
+        var container = new MessageContainer();
         for (var i = 0; i < commands.length; i++) {
             var playerName = commands[i];
             if (this.detailed)
@@ -15,52 +15,51 @@ export class SearchPlayersWorker extends WorkerBase {
             else
                 var players = await this.SearchForPlayersInCurrentSeason(playerName);
             if (players.length <= 0)
-                message += `No players found for: ${playerName} \n`;
+                container.AddSimpleGroup(`**No players found for: ${playerName}**`);
             else
-                message += this.CreatePlayerMessage(players, this.detailed);
-
-            message += "\n";
+                container.Append(this.CreatePlayerMessage(players, this.detailed))
         }
-        await this.messageSender.SendMessage(message);
+        await this.messageSender.SendMessageFromContainer(container);
     }
 
     private async SearchForPlayersByAPI(searchTerm: string): Promise<INGSUser[]> {
         return await this.dataStore.GetUsersByApi(searchTerm);
     }
 
-    private CreatePlayerMessage(players: INGSUser[], detailed: boolean) {
-        let message = new MessageHelper();
+    private CreatePlayerMessage(players: INGSUser[], detailed: boolean): MessageGroup[] {
+        var result: MessageGroup[] = [];
         players.forEach(p => {
-            message.AddNewLine(`**Name**: ${p.displayName}`);
+            const message = new MessageGroup();
+            message.AddOnNewLine(`**Name**: ${p.displayName}`);
             if (p.teamName)
-                message.AddNewLine(`**TeamName**: ${Translationhelpers.GetTeamURL(p.teamName)}`);
+                message.AddOnNewLine(`**TeamName**: ${Translationhelpers.GetTeamURL(p.teamName)}`);
             else
-                message.AddNewLine("**No Team Found**");
+                message.AddOnNewLine("**No Team Found**");
 
             for (var rank of p.verifiedRankHistory.sort(this.RankHistorySort)) {
                 if (rank.status == 'verified')
-                    message.AddNewLine(`${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}**`);
+                    message.AddOnNewLine(`${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}**`);
             }
             if (detailed) {
-                message.Append(this.CreateDetailedMessage(p))
+                message.Combine(this.CreateDetailedMessage(p))
             }
-            message.AddEmptyLine();
+            result.push(message);
         });
-        return message.CreateStringMessage();
+        return result;
     }
 
-    private CreateDetailedMessage(player: INGSUser): MessageHelper<unknown> {
-        let message = new MessageHelper()
+    private CreateDetailedMessage(player: INGSUser): MessageGroup {
+        let message = new MessageGroup()
         for (var history of player.history.sort((h1, h2) => h2.timestamp - h1.timestamp)) {
             if (history.season) {
                 if (history.action == HistoryActions.LeftTeam) {
-                    message.AddNewLine(`**Left Team**: ${history.target}. Season: ${history.season}`);
+                    message.AddOnNewLine(`**Left Team**: ${history.target}. Season: ${history.season}`);
                 }
                 else if (history.action == HistoryActions.JoinedTeam) {
-                    message.AddNewLine(`**Joined Team**: ${history.target}. Season: ${history.season}`);
+                    message.AddOnNewLine(`**Joined Team**: ${history.target}. Season: ${history.season}`);
                 }
                 else if (history.action == HistoryActions.CreatedTeam) {
-                    message.AddNewLine(`**Created Team**: ${history.target}. Season: ${history.season}`);
+                    message.AddOnNewLine(`**Created Team**: ${history.target}. Season: ${history.season}`);
                 }
             }
         }

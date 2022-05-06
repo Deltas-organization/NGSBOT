@@ -1,11 +1,13 @@
 import { Message, TextChannel, Client, Channel, GuildMember, User } from "discord.js";
 import { resolveModuleName } from "typescript";
 import { Globals } from "../Globals";
+import { MessageContainer } from "../message-helpers/MessageContainer";
 import { MessageStore } from "../MessageStore";
 import { MessageWrapper } from "./MessageWrapper";
 import { CommandDependencies } from "./TranslatorDependencies";
 
 export class MessageSender {
+    private maxLength = 2000;
 
     public get TextChannel() {
         return this.originalMessage.channel;
@@ -24,27 +26,22 @@ export class MessageSender {
     }
 
     public async SendBasicMessage(message: string) {
-        while (message.length > 2000) {
-            let newMessage = message.slice(0, 2000);
-            message = message.substr(2000);
+        while (message.length > this.maxLength) {
+            let newMessage = message.slice(0, this.maxLength);
+            message = message.substr(this.maxLength);
             await this.SendBasicMessage(newMessage);
         }
-        var sentMessage = await this.TextChannel.send(message);
-        return sentMessage
+        return await this.JustSendIt(message, true);
     }
 
     public async SendMessage(message: string, storeMessage = true) {
-        while (message.length > 2000) {
-            let newMessage = message.slice(0, 2000);
-            message = message.substr(2000);
+        while (message.length > this.maxLength) {
+            let newMessage = message.slice(0, this.maxLength);
+            message = message.substr(this.maxLength);
             await this.SendMessage(newMessage, storeMessage);
         }
-        var sentMessage = await this.TextChannel.send({
-            embed: {
-                color: 0,
-                description: message
-            }
-        });
+        var sentMessage = await this.JustSendIt(message, false);
+
         if (storeMessage)
             this.messageStore.AddMessage(sentMessage);
 
@@ -70,17 +67,12 @@ export class MessageSender {
     }
 
     public async DMMessage(message: string) {
-        while (message.length > 2000) {
-            let newMessage = message.slice(0, 2000);
-            message = message.substr(2000);
+        while (message.length > this.maxLength) {
+            let newMessage = message.slice(0, this.maxLength);
+            message = message.substr(this.maxLength);
             await this.DMMessage(newMessage);
         }
-        var sentMessage = await this.Requester.send({
-            embed: {
-                color: 0,
-                description: message
-            }
-        });
+        var sentMessage = await this.JustSendIt(message, false);
 
         return new MessageWrapper(this, sentMessage);
     }
@@ -155,11 +147,34 @@ export class MessageSender {
         return { message: sentMessage, response: response };
     }
 
+    public async SendMessageFromContainer(container: MessageContainer, storeMessage = true) {
+        var messages = container.MultiMessages(this.maxLength);
+        for (var message of messages) {
+            var sentMessage = await this.JustSendIt(message, false);
+
+            if (storeMessage)
+                this.messageStore.AddMessage(sentMessage);
+        }
+    }
+
+    private async JustSendIt(message: string, basic: boolean) {
+        if (basic)
+            return await this.TextChannel.send(message);
+
+        return await this.TextChannel.send({
+            embed: {
+                color: 0,
+                description: message
+            }
+        });
+
+    }
+
     private CombineMultiple(messages: string[]): string[] {
         let result: string[] = [];
         let currentMessage = '';
         for (var message of messages) {
-            if (currentMessage.length + message.length > 2000) {
+            if (currentMessage.length + message.length > this.maxLength) {
                 result.push(currentMessage);
                 currentMessage = '';
             }
