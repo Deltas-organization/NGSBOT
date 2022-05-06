@@ -42,15 +42,18 @@ export class Bot {
     private scheduleLister: ScheduleLister;
     private dependencies: CommandDependencies;
     private messageSender: SendChannelMessage;
+    private botCommand: string;
 
     constructor(
         @inject(TYPES.Client) public client: Client,
         @inject(TYPES.Token) public token: string,
         @inject(TYPES.ApiToken) apiToken: string,
-        @inject(TYPES.MongConection) mongoConnection: string
+        @inject(TYPES.MongConection) mongoConnection: string,
+        @inject(TYPES.BotCommand) botCommand: string
     ) {
         this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken, mongoConnection);
         this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
+        this.botCommand = botCommand;
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.translators.push(this.scheduleLister);
@@ -129,7 +132,9 @@ export class Bot {
 
     private checkTranslators(message: Message) {
         let originalContent = message.content;
-        if (/^\>/.test(originalContent)) {
+        const command = this.botCommand
+        let regex = new RegExp(`^${command}`, "g");
+        if (regex.test(originalContent)) {
             var trimmedValue = originalContent.substring(1);
             this.translators.forEach(translator => {
                 translator.Translate(trimmedValue, message);

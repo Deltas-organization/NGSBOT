@@ -13,5 +13,6 @@ container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client());
 container.bind(types_1.TYPES.Token).toConstantValue(process.env.TOKEN);
 container.bind(types_1.TYPES.ApiToken).toConstantValue(process.env.NGSToken);
 container.bind(types_1.TYPES.MongConection).toConstantValue(process.env.MongoURL);
+container.bind(types_1.TYPES.BotCommand).toConstantValue(process.env.BotCommand);
 exports.default = container;
 //# sourceMappingURL=inversify.config.js.map

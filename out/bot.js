@@ -59,13 +59,14 @@ const TestTranslator_1 = require("./translators/TestTranslator");
 const Cleanup_1 = require("./translators/Cleanup");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
-        constructor(client, token, apiToken, mongoConnection) {
+        constructor(client, token, apiToken, mongoConnection, botCommand) {
             this.client = client;
             this.token = token;
             this.translators = [];
             this.exclamationTranslators = [];
             this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
             this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
+            this.botCommand = botCommand;
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.translators.push(this.scheduleLister);
             this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
@@ -136,7 +137,9 @@ let Bot = /** @class */ (() => {
         }
         checkTranslators(message) {
             let originalContent = message.content;
-            if (/^\>/.test(originalContent)) {
+            const command = this.botCommand;
+            let regex = new RegExp(`^${command}`, "g");
+            if (regex.test(originalContent)) {
                 var trimmedValue = originalContent.substring(1);
                 this.translators.forEach(translator => {
                     translator.Translate(trimmedValue, message);
@@ -156,7 +159,8 @@ let Bot = /** @class */ (() => {
         __param(1, inversify_1.inject(types_1.TYPES.Token)),
         __param(2, inversify_1.inject(types_1.TYPES.ApiToken)),
         __param(3, inversify_1.inject(types_1.TYPES.MongConection)),
-        __metadata("design:paramtypes", [discord_js_1.Client, String, String, String])
+        __param(4, inversify_1.inject(types_1.TYPES.BotCommand)),
+        __metadata("design:paramtypes", [discord_js_1.Client, String, String, String, String])
     ], Bot);
     return Bot;
 })();

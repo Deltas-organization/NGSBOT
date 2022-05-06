@@ -4,5 +4,6 @@ export const TYPES = {
     Token: Symbol("Token"),
     ApiToken: Symbol("ApiToken"),
     MongConection: Symbol("MongConection"),
-    CronHelper: Symbol("CronHelper")
+    CronHelper: Symbol("CronHelper"),
+    BotCommand: Symbol("BotCommand")
   };

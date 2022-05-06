@@ -13,6 +13,7 @@ container.bind<Client>(TYPES.Client).toConstantValue(new Client());
 container.bind<string>(TYPES.Token).toConstantValue(process.env.TOKEN);
 container.bind<string>(TYPES.ApiToken).toConstantValue(process.env.NGSToken);
 container.bind<string>(TYPES.MongConection).toConstantValue(process.env.MongoURL);
+container.bind<string>(TYPES.BotCommand).toConstantValue(process.env.BotCommand);
 
 export default container;
 
