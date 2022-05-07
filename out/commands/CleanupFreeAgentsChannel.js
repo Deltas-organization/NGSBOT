@@ -25,8 +25,8 @@ class CleanupFreeAgentsChannel {
                 return;
             Globals_1.Globals.log("notifying users of messages about to be deleted");
             for (let container of messagesToDelete) {
+                const message = container.Message;
                 try {
-                    const message = container.Message;
                     if (container.DaysOld != exactDayCount)
                         continue;
                     if (!message.author) {
@@ -37,7 +37,7 @@ class CleanupFreeAgentsChannel {
                     yield message.author.send("In 5 days your free agent posting on the NGS Discord Server will be deleted, you will need to repost it if you are still looking for a team. \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                 }
                 catch (e) {
-                    Globals_1.Globals.log("there was a problem notifying user about a message being deleted soon", e);
+                    Globals_1.Globals.log("there was a problem notifying user about a message being deleted soon. User: " + message.author.username, e);
                 }
             }
         });
