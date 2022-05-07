@@ -24,12 +24,7 @@ export class CleanupFreeAgentsChannel {
                 }
                 if (!message.deletable)
                     continue;
-                await message.author.send({
-                    embed: {
-                        color: 0,
-                        description: "In 5 days your free agent posting on the NGS Discord Server will be deleted, you will need to repost it if you are still looking for a team. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.  \n \n **I cannot read, relay, or reply to any message you send to me in this chat.**"
-                    }
-                });
+                await message.author.send("In 5 days your free agent posting on the NGS Discord Server will be deleted, you will need to repost it if you are still looking for a team. \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
             }
             catch (e) {
                 Globals.log("there was a problem notifying user about a message being deleted soon", e);
@@ -50,22 +45,22 @@ export class CleanupFreeAgentsChannel {
                     Globals.log("unable to delete message.");
                     continue;
                 }
-                await message.author.send({
-                    embed: {
-                        color: 0,
-                        description: "Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.  \n \n **I cannot read, relay, or reply to any message you send to me in this chat.**"
-                    }
-                });
-                await message.author.send({
-                    embed: {
-                        color: 0,
-                        description: message.content
-                    }
-                });
+                await message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
+                try {
+                    await message.author.send({
+                        embed: {
+                            color: 0,
+                            description: message.content
+                        }
+                    });
+                }
+                catch (e) {
+                    Globals.log("Unable to inform a user of their deleted post.", e);
+                }
                 await message.delete();
             }
             catch (e) {
-                Globals.log("there was a problem deleting a message", e);
+                Globals.log("There was a problem deleting a message.", e);
             }
         }
     }

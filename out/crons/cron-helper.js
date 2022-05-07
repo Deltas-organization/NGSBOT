@@ -131,6 +131,11 @@ let CronHelper = /** @class */ (() => {
                 yield this.client.login(this.token);
                 try {
                     yield this.cleanupFreeAgentsChannel.NotifyUsersOfDelete(60);
+                }
+                catch (e) {
+                    Globals_1.Globals.log(e);
+                }
+                try {
                     yield this.cleanupFreeAgentsChannel.DeleteOldMessages(65);
                 }
                 catch (e) {

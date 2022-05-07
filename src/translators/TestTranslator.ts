@@ -15,7 +15,6 @@ export class TestTranslator extends DeltaTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
-        // const worker = new ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
-        // await worker.Begin(commands);
+        // await messageSender.SendBasicMessage("hello test \n \n this is new line?");
     }
 }

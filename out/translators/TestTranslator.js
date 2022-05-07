@@ -20,8 +20,7 @@ class TestTranslator extends deltaTranslatorBase_1.DeltaTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const worker = new ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
-            // await worker.Begin(commands);
+            // await messageSender.SendBasicMessage("hello test \n \n this is new line?");
         });
     }
 }

@@ -117,6 +117,11 @@ export class CronHelper {
         await this.client.login(this.token);
         try {
             await this.cleanupFreeAgentsChannel.NotifyUsersOfDelete(60);
+        }
+        catch (e) {
+            Globals.log(e);
+        }
+        try {
             await this.cleanupFreeAgentsChannel.DeleteOldMessages(65);
         }
         catch (e) {
