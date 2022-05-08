@@ -2,6 +2,7 @@ import { Client, Message, TextChannel } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
 import moment = require("moment-timezone");
 import { Globals } from "../Globals";
+import { MessageSender } from "../helpers/MessageSender";
 
 export class CleanupFreeAgentsChannel {
     constructor(private client: Client) {
@@ -45,8 +46,8 @@ export class CleanupFreeAgentsChannel {
                     Globals.log("unable to delete message.");
                     continue;
                 }
-                await message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                 try {
+                    await message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                     await message.author.send({
                         embed: {
                             color: 0,
@@ -55,12 +56,14 @@ export class CleanupFreeAgentsChannel {
                     });
                 }
                 catch (e) {
-                    Globals.log("Unable to inform a user of their deleted post.", e);
+                    MessageSender.SendMessageToChannelThroughClient(this.client, "Unable to inform a user of their deleted post.", DiscordChannels.DeltaPmChannel);
+                    MessageSender.SendMessageToChannelThroughClient(this.client, e, DiscordChannels.DeltaPmChannel);
                 }
                 await message.delete();
             }
             catch (e) {
-                Globals.log("There was a problem deleting a message.", e);
+                MessageSender.SendMessageToChannelThroughClient(this.client, "There was a problem deleting a message.", DiscordChannels.DeltaPmChannel);
+                MessageSender.SendMessageToChannelThroughClient(this.client, e, DiscordChannels.DeltaPmChannel);
             }
         }
     }

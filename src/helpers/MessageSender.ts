@@ -99,7 +99,13 @@ export class MessageSender {
     }
 
     public static async SendMessageToChannel(dependencies: CommandDependencies, message: string, channelID: string) {
-        var myChannel = dependencies.client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
+        var sentMessage = await this.SendMessageToChannelThroughClient(dependencies.client, message, channelID);
+        if (sentMessage)
+            dependencies.messageStore.AddMessage(sentMessage);
+    }
+
+    public static async SendMessageToChannelThroughClient(client: Client, message: string, channelID: string) {
+        var myChannel = client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
         if (myChannel != null) {
             var sentMessage = await myChannel.send({
                 embed: {
@@ -107,7 +113,6 @@ export class MessageSender {
                     description: message
                 }
             });
-            dependencies.messageStore.AddMessage(sentMessage);
             return sentMessage;
         }
     }

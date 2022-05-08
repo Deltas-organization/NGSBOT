@@ -13,6 +13,7 @@ exports.CleanupFreeAgentsChannel = void 0;
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const moment = require("moment-timezone");
 const Globals_1 = require("../Globals");
+const MessageSender_1 = require("../helpers/MessageSender");
 class CleanupFreeAgentsChannel {
     constructor(client) {
         this.client = client;
@@ -55,8 +56,8 @@ class CleanupFreeAgentsChannel {
                         Globals_1.Globals.log("unable to delete message.");
                         continue;
                     }
-                    yield message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                     try {
+                        yield message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                         yield message.author.send({
                             embed: {
                                 color: 0,
@@ -65,12 +66,14 @@ class CleanupFreeAgentsChannel {
                         });
                     }
                     catch (e) {
-                        Globals_1.Globals.log("Unable to inform a user of their deleted post.", e);
+                        MessageSender_1.MessageSender.SendMessageToChannelThroughClient(this.client, "Unable to inform a user of their deleted post.", DiscordChannels_1.DiscordChannels.DeltaPmChannel);
+                        MessageSender_1.MessageSender.SendMessageToChannelThroughClient(this.client, e, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
                     }
                     yield message.delete();
                 }
                 catch (e) {
-                    Globals_1.Globals.log("There was a problem deleting a message.", e);
+                    MessageSender_1.MessageSender.SendMessageToChannelThroughClient(this.client, "There was a problem deleting a message.", DiscordChannels_1.DiscordChannels.DeltaPmChannel);
+                    MessageSender_1.MessageSender.SendMessageToChannelThroughClient(this.client, e, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
                 }
             }
         });

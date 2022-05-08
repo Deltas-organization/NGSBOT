@@ -107,7 +107,14 @@ class MessageSender {
     }
     static SendMessageToChannel(dependencies, message, channelID) {
         return __awaiter(this, void 0, void 0, function* () {
-            var myChannel = dependencies.client.channels.cache.find(channel => channel.id == channelID);
+            var sentMessage = yield this.SendMessageToChannelThroughClient(dependencies.client, message, channelID);
+            if (sentMessage)
+                dependencies.messageStore.AddMessage(sentMessage);
+        });
+    }
+    static SendMessageToChannelThroughClient(client, message, channelID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var myChannel = client.channels.cache.find(channel => channel.id == channelID);
             if (myChannel != null) {
                 var sentMessage = yield myChannel.send({
                     embed: {
@@ -115,7 +122,6 @@ class MessageSender {
                         description: message
                     }
                 });
-                dependencies.messageStore.AddMessage(sentMessage);
                 return sentMessage;
             }
         });
