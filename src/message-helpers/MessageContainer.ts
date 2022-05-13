@@ -64,7 +64,6 @@ export class MessageGroup {
     public AsString() {
         return this._lines.map(s => s.AsString()).join("\n");
     }
-
 }
 
 class DetailedLine {

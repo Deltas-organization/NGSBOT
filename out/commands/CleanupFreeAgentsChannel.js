@@ -13,7 +13,7 @@ exports.CleanupFreeAgentsChannel = void 0;
 const DiscordChannels_1 = require("../enums/DiscordChannels");
 const moment = require("moment-timezone");
 const Globals_1 = require("../Globals");
-const MessageSender_1 = require("../helpers/MessageSender");
+const MessageSender_1 = require("../helpers/messageSenders/MessageSender");
 class CleanupFreeAgentsChannel {
     constructor(client) {
         this.client = client;

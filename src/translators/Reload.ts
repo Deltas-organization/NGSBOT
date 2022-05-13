@@ -1,4 +1,5 @@
-import { MessageSender } from "../helpers/MessageSender";
+import { MessageSender } from "../helpers/messageSenders/MessageSender";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 
 export class Reload extends DeltaTranslatorBase {
@@ -11,7 +12,7 @@ export class Reload extends DeltaTranslatorBase {
         return "Will reload the user, teams, and divisions stored in the cache";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         this.dataStore.Clear();
         await this.dataStore.GetDivisions();
         let message = await messageSender.SendMessage("Reloaded 1/4");

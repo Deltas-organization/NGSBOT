@@ -1,16 +1,12 @@
-import { Guild } from "discord.js";
-import { ContainerModule } from "inversify";
-import { DiscordChannels } from "../../enums/DiscordChannels";
-import { ClientHelper } from "../../helpers/ClientHelper";
-import { MessageSender } from "../../helpers/MessageSender";
 import { Mongohelper } from "../../helpers/Mongohelper";
+import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { IMongoAssignRolesRequest } from "../../mongo/models/role-assign-request";
 import { WorkerBase } from "../Bases/WorkerBase";
 
 export class SelfAssignRolesRemoverWorker extends WorkerBase {
 
-    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender) {
+    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         super(workerDependencies, detailed, messageSender)
     }
 

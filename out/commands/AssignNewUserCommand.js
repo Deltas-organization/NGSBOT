@@ -13,8 +13,8 @@ exports.AssignNewUserCommand = void 0;
 const DiscordGuilds_1 = require("../enums/DiscordGuilds");
 const NGSRoles_1 = require("../enums/NGSRoles");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
-const MessageHelper_1 = require("../helpers/MessageHelper");
 const RoleHelper_1 = require("../helpers/RoleHelper");
+const MessageContainer_1 = require("../message-helpers/MessageContainer");
 class AssignNewUserCommand {
     constructor(dependencies) {
         this.client = dependencies.client;
@@ -23,24 +23,25 @@ class AssignNewUserCommand {
     AssignUser(guildMember) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.Setup(guildMember);
-            const messageOptions = new MessageHelper_1.MessageHelper("NewUsers");
+            const messageGroup = new MessageContainer_1.MessageGroup();
             if (guildMember.guild.id != DiscordGuilds_1.DiscordGuilds.NGS)
-                return;
-            messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
+                return null;
+            messageGroup.AddOnNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
             const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dataStore.GetUsers());
-            if (!ngsUser)
-                return messageOptions;
-            const team = yield this.dataStore.LookForRegisteredTeam(ngsUser);
-            if (team) {
-                messageOptions.Options.FoundTeam = true;
-                messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);
-                const rolesResult = yield this.AssignValidRoles(team, guildMember, ngsUser);
-                messageOptions.Append(rolesResult);
+            var foundTeam = false;
+            if (ngsUser) {
+                const team = yield this.dataStore.LookForRegisteredTeam(ngsUser);
+                if (team) {
+                    foundTeam = true;
+                    messageGroup.AddOnNewLine(`Found new users team: **${team.teamName}**`);
+                    const rolesResult = yield this.AssignValidRoles(team, guildMember, ngsUser);
+                    messageGroup.Combine(rolesResult);
+                }
+                else {
+                    messageGroup.AddOnNewLine(`did not find a team for user.`);
+                }
             }
-            else {
-                messageOptions.AddNewLine(`did not find a team for user.`);
-            }
-            return messageOptions;
+            return { MessageGroup: messageGroup, FoundTeam: foundTeam };
         });
     }
     Setup(guildMember) {
@@ -53,24 +54,23 @@ class AssignNewUserCommand {
         return __awaiter(this, void 0, void 0, function* () {
             const teamName = team.teamName;
             const teamRoleOnDiscord = yield this.FindTeamRole(teamName);
-            let result = new MessageHelper_1.MessageHelper(guildMember.displayName);
+            let result = new MessageContainer_1.MessageGroup();
             if (!teamRoleOnDiscord) {
                 return;
             }
             else {
-                result.AddNewLine(`Assigned team role`);
+                result.AddOnNewLine(`Assigned team role`);
                 yield guildMember.roles.add(teamRoleOnDiscord);
             }
             const roleRsponse = this._serverRoleHelper.FindDivRole(team.divisionDisplayName);
             const divRoleOnDiscord = roleRsponse.div == NGSRoles_1.NGSRoles.Storm ? null : roleRsponse.role;
             if (divRoleOnDiscord) {
-                result.Options.FoundDiv = true;
-                result.AddNewLine(`Assigned div role`);
+                result.AddOnNewLine(`Assigned div role`);
                 yield guildMember.roles.add(divRoleOnDiscord);
             }
             if (ngsUser.IsCaptain || ngsUser.IsAssistantCaptain) {
                 if (this._captainRole) {
-                    result.AddNewLine(`Assigned Captain role`);
+                    result.AddOnNewLine(`Assigned Captain role`);
                     yield guildMember.roles.add(this._captainRole);
                 }
             }

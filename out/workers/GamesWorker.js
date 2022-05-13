@@ -34,11 +34,6 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
                 if (messages.length > 0)
                     yield this._multiMessageCommand(messages);
                 else {
-                    // var random1 = Math.round(Math.random() * 99) + 1;
-                    // if (random1 == 65) {
-                    //     await this._messageCommand("Borntoshine has been notified of your failings.");
-                    // }
-                    // else {
                     yield this._messageCommand("Nothing scheduled yet.");
                     //}
                 }

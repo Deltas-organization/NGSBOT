@@ -1,14 +1,13 @@
-import { ITranslate } from "../../interfaces/ITranslator";
-import { Client, TextChannel, Message, MessageMentions } from "discord.js";
-import { MessageSender } from "../../helpers/MessageSender";
-import { MessageStore } from "../../MessageStore";
-import { CommandDependencies } from "../../helpers/TranslatorDependencies";
-import { LiveDataStore } from "../../LiveDataStore";
-import { INGSTeam, INGSUser } from "../../interfaces";
+import { Client, Message } from "discord.js";
 import { DiscordMembers } from "../../enums/DiscordMembers";
-import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { Globals } from "../../Globals";
+import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
+import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { Mongohelper } from "../../helpers/Mongohelper";
+import { CommandDependencies } from "../../helpers/TranslatorDependencies";
+import { INGSUser } from "../../interfaces";
+import { ITranslate } from "../../interfaces/ITranslator";
+import { MessageStore } from "../../MessageStore";
 
 export abstract class TranslatorBase implements ITranslate {
     public abstract get commandBangs(): string[];
@@ -61,7 +60,7 @@ export abstract class TranslatorBase implements ITranslate {
 
         if (foundBang) {
             let commands = this.RetrieveCommands(messageText);
-            let messageSender = new MessageSender(this.client, message, this.messageStore);
+            let messageSender = new RespondToMessageSender(this.client, message, this.messageStore);
             await this.Interpret(commands, detailed, messageSender);
             Globals.log("Might be done running", this.constructor.name);
 
@@ -99,7 +98,7 @@ export abstract class TranslatorBase implements ITranslate {
         return true;
     }
 
-    protected abstract Interpret(commands: string[], detailed: boolean, messageSender: MessageSender)
+    protected abstract Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender)
 
     protected async SearchForPlayers(searchTerm: string): Promise<INGSUser[]> {
         const users = await this.dataStore.GetUsers();

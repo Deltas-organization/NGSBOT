@@ -14,7 +14,6 @@ import { TeamNameChecker } from "./translators/TeamChecker";
 import { AssignRoles } from "./translators/AssignRoles";
 import { RegisteredCount } from "./translators/RegisteredCount";
 import { Purge } from "./translators/Purge";
-import { SendChannelMessage } from "./helpers/SendChannelMessage";
 import { DiscordChannels } from "./enums/DiscordChannels";
 import { Reload } from "./translators/Reload";
 import { GamesCommand } from "./translators/GamesCommand";
@@ -34,6 +33,8 @@ import { CoinFlip } from "./translators/CoinFlip";
 import { RandomTranslator } from "./translators/Random";
 import { TestTranslator } from "./translators/TestTranslator";
 import { CleanupTranslator } from "./translators/Cleanup";
+import { MessageContainer } from "./message-helpers/MessageContainer";
+import { ChannelMessageSender } from "./helpers/messageSenders/ChannelMessageSender";
 
 @injectable()
 export class Bot {
@@ -41,7 +42,7 @@ export class Bot {
     private exclamationTranslators: ITranslate[] = [];
     private scheduleLister: ScheduleLister;
     private dependencies: CommandDependencies;
-    private messageSender: SendChannelMessage;
+    private messageSender: ChannelMessageSender;
     private botCommand: string;
 
     constructor(
@@ -52,7 +53,7 @@ export class Bot {
         @inject(TYPES.BotCommand) botCommand: string
     ) {
         this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken, mongoConnection);
-        this.messageSender = new SendChannelMessage(client, this.dependencies.messageStore);
+        this.messageSender = new ChannelMessageSender(client, this.dependencies.messageStore);
         this.botCommand = botCommand;
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
@@ -100,11 +101,13 @@ export class Bot {
             let newUserCommand = new AssignNewUserCommand(this.dependencies);
             let message = await newUserCommand.AssignUser(member);
             if (message) {
-                const stringMessage = message.CreateStringMessage();
-                if (message.Options.FoundTeam) {
-                    await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.NGSDiscord);
+                var messageGroup = message.MessageGroup;
+                var messageContainer = new MessageContainer();
+                messageContainer.Append(messageGroup);
+                if (message.FoundTeam) {
+                    await this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels.NGSDiscord);
                 }
-                await this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels.DeltaServer);
+                await this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels.DeltaServer);
             }
         });
     }
@@ -126,7 +129,7 @@ export class Bot {
         this.checkTranslators(message);
 
         if (message.channel.type == "dm" && message.author.bot == false) {
-            await this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels.DeltaPmChannel);
+            await this.messageSender.SendToDiscordChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels.DeltaPmChannel);
         }
     }
 

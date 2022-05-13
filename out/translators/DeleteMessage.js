@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteMessage = void 0;
-const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const DeleteMessageWorker_1 = require("../workers/DeleteMessageWorker");
+const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 class DeleteMessage extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["delete", "del"];

@@ -1,5 +1,4 @@
-import { MessageSender } from "../helpers/MessageSender";
-import { AssignRolesWorker } from "../workers/AssignRolesWorker";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { NonNGSTranslatorBase } from "./bases/nonNGSTranslatorBase";
 
 
@@ -12,7 +11,7 @@ export class CoinFlip extends NonNGSTranslatorBase {
         return "Will Flip a coin";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         const x = (Math.floor(Math.random() * 2) == 0);
         if (x) {
             await messageSender.SendBasicMessage(`${messageSender.GuildMember} heads`);

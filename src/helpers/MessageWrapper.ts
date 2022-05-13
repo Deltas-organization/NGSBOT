@@ -1,5 +1,5 @@
 import { EmojiIdentifierResolvable, Message } from "discord.js";
-import { MessageSender } from "./MessageSender";
+import { MessageSender } from "./messageSenders/MessageSender";
 
 export class MessageWrapper {
 

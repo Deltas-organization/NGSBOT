@@ -1,6 +1,5 @@
 import { Client } from "discord.js";
 import { inject, injectable } from "inversify";
-import moment = require("moment");
 import { CheckFlexMatches } from "../commands/CheckFlexMatches";
 import { CheckReportedGames } from "../commands/CheckReportedGames";
 import { CheckUnscheduledGamesForWeek } from "../commands/CheckUnscheduledGamesForWeek";
@@ -9,21 +8,19 @@ import { DiscordChannels } from "../enums/DiscordChannels";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { Globals } from "../Globals";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
-import { MessageHelper } from "../helpers/MessageHelper";
+import { ChannelMessageSender } from "../helpers/messageSenders/ChannelMessageSender";
 import { Mongohelper } from "../helpers/Mongohelper";
 import { ScheduleHelper } from "../helpers/ScheduleHelper";
-import { SendChannelMessage } from "../helpers/SendChannelMessage";
-import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { TYPES } from "../inversify/types";
 import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { HistoryDisplay } from "../scheduled/HistoryDisplay";
-import { ScheduleLister } from "../translators/ScheduleLister";
+import moment = require("moment");
 
 @injectable()
 export class CronHelper {
     private dataStore: DataStoreWrapper;
-    private messageSender: SendChannelMessage;
+    private messageSender: ChannelMessageSender;
     private historyDisplay: HistoryDisplay;
     private cleanupFreeAgentsChannel: CleanupFreeAgentsChannel;
     private mongoHelper: Mongohelper;
@@ -40,7 +37,7 @@ export class CronHelper {
         this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
         this.mongoHelper = new Mongohelper(mongoConnection);
 
-        this.messageSender = new SendChannelMessage(this.client, new MessageStore());
+        this.messageSender = new ChannelMessageSender(this.client, new MessageStore());
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
         this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);
@@ -54,8 +51,8 @@ export class CronHelper {
         if (games.length > 0) {
             const messages = await ScheduleHelper.GetMessages(games);
             for (var index = 0; index < messages.length; index++) {
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHype);
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
+                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.NGSHype);
+                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.DeltaServer);
             }
         }
     }
@@ -77,7 +74,7 @@ export class CronHelper {
         const messages = await ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
         if (messages) {
             for (var index = 0; index < messages.length; index++) {
-                await this.messageSender.SendMessageToChannel(messages[index], channel);
+                await this.messageSender.SendToDiscordChannel(messages[index], channel);
             }
         }
     }
@@ -107,8 +104,8 @@ export class CronHelper {
         const messages = await this.historyDisplay.GetRecentHistory(1);
         if (messages) {
             for (var index = 0; index < messages.length; index++) {
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.DeltaServer);
-                await this.messageSender.SendMessageToChannel(messages[index], DiscordChannels.NGSHistory);
+                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.DeltaServer);
+                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.NGSHistory);
             }
         }
     }
@@ -134,10 +131,10 @@ export class CronHelper {
         const messages = await this.checkReportedGames.Check();
         try {
             for (const message of messages.CaptainMessages) {
-                await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSCaptains);
+                await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSCaptains);
             }
             for (const message of messages.ModMessages) {
-                await this.messageSender.SendMessageToChannel(message, DiscordChannels.NGSMods);
+                await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSMods);
             }
         }
         catch (e) {
@@ -153,7 +150,7 @@ export class CronHelper {
         const messages = await this.checkUnscheduledGamesForWeek.Check();
         try {
             for (const message of messages) {
-                await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.NGSMods, true);
+                await this.messageSender.SendToDiscordChannelAsBasic(message.CreateStringMessage(), DiscordChannels.NGSMods);
             }
         }
         catch (e) {
@@ -163,11 +160,9 @@ export class CronHelper {
 
     public async CheckFlexMatches() {
         await this.client.login(this.token);
-        const messages = await this.checkFlexMatches.Check();
+        const container = await this.checkFlexMatches.Check();
         try {
-            for (const message of messages) {
-                await this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels.NGSMods, true);
-            }
+            await this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels.NGSMods);
         }
         catch (e) {
             console.log(e);

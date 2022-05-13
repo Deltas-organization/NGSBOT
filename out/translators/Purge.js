@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Purge = void 0;
-const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const PurgeWorker_1 = require("../workers/PurgeWorker");
+const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const fs = require('fs');
 class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     get commandBangs() {

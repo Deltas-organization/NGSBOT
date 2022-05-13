@@ -1,15 +1,10 @@
-import { Client, Guild, GuildChannel, GuildMember, Message } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
-import { NGSDivisions } from "../enums/NGSDivisions";
 import { ClientHelper } from "../helpers/ClientHelper";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
-import { RoleHelper } from "../helpers/RoleHelper";
 import { ScheduleHelper, ScheduleInformation } from "../helpers/ScheduleHelper";
-import { TeamHelper } from "../helpers/TeamHelper";
-import { INGSSchedule, INGSUser } from "../interfaces";
-import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class CheckReportedGames {
     private guildMembers: GuildMember[];

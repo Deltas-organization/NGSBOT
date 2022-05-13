@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnUsedRoles = void 0;
-const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const DisplayUnusedRoles_1 = require("../workers/DisplayUnusedRoles");
+const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const fs = require('fs');
 class UnUsedRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     get commandBangs() {

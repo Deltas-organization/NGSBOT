@@ -1,4 +1,4 @@
-import { MessageSender } from "../helpers/MessageSender";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { LeaveWorker } from "../workers/LeaveWorker";
 import { NGSOnlyTranslatorBase } from "./bases/ngsOnlyTranslatorBase";
 
@@ -15,7 +15,7 @@ export class Leave extends NGSOnlyTranslatorBase {
         return "Will prompt user for role removals.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         const worker = new LeaveWorker(this.translatorDependencies, detailed, messageSender);
         await worker.Begin(commands);
     }

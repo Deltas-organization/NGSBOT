@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { MessageSender } from "../helpers/MessageSender";
+import { MessageSender } from "../helpers/messageSenders/MessageSender";
 
 export interface ITranslate {
     commandBangs: string[];

@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RandomTranslator = void 0;
-const translatorBase_1 = require("./bases/translatorBase");
 const RandomWorker_1 = require("../workers/RandomWorker");
+const translatorBase_1 = require("./bases/translatorBase");
 const fs = require('fs');
 class RandomTranslator extends translatorBase_1.TranslatorBase {
     get commandBangs() {

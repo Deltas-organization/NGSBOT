@@ -10,23 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageSender = void 0;
-const Globals_1 = require("../Globals");
 const MessageWrapper_1 = require("./MessageWrapper");
 class MessageSender {
-    constructor(client, originalMessage, messageStore) {
+    constructor(client, channel, messageStore) {
         this.client = client;
-        this.originalMessage = originalMessage;
+        this.channel = channel;
         this.messageStore = messageStore;
         this.maxLength = 2000;
-    }
-    get TextChannel() {
-        return this.originalMessage.channel;
-    }
-    get GuildMember() {
-        return this.originalMessage.member;
-    }
-    get Requester() {
-        return this.GuildMember.user;
     }
     SendBasicMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,6 +49,11 @@ class MessageSender {
                 result.push(yield this.SendMessage(message, storeMessage));
             }
             return result;
+        });
+    }
+    SendFiles(files) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.channel.send({ files: files });
         });
     }
     DMMessages(messages) {
@@ -94,7 +89,7 @@ class MessageSender {
     }
     SendFields(description, fields) {
         return __awaiter(this, void 0, void 0, function* () {
-            var sentMessage = yield this.TextChannel.send({
+            var sentMessage = yield this.channel.send({
                 embed: {
                     color: 0,
                     description: description,
@@ -126,41 +121,6 @@ class MessageSender {
             }
         });
     }
-    SendReactionMessage(message, authentication, yesReaction, noReaction = () => { }, storeMessage = true) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var sentMessage = yield this.TextChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
-            if (storeMessage)
-                this.messageStore.AddMessage(sentMessage);
-            yield sentMessage.react('✅');
-            yield sentMessage.react('❌');
-            const members = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
-            const filter = (reaction, user) => {
-                let member = members.find(mem => mem.id == user.id);
-                return ['✅', '❌'].includes(reaction.emoji.name) && authentication(member);
-            };
-            let response = null;
-            try {
-                var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-                if (collectedReactions.first().emoji.name === '✅') {
-                    yield yesReaction();
-                    response = true;
-                }
-                if (collectedReactions.first().emoji.name === '❌') {
-                    yield noReaction();
-                    response = false;
-                }
-            }
-            catch (err) {
-                Globals_1.Globals.log(`There was a problem with reaction message: ${message}. Error: ${err}`);
-            }
-            return { message: sentMessage, response: response };
-        });
-    }
     SendMessageFromContainer(container, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
             var messages = container.MultiMessages(this.maxLength);
@@ -174,8 +134,8 @@ class MessageSender {
     JustSendIt(message, basic) {
         return __awaiter(this, void 0, void 0, function* () {
             if (basic)
-                return yield this.TextChannel.send(message);
-            return yield this.TextChannel.send({
+                return yield this.channel.send(message);
+            return yield this.channel.send({
                 embed: {
                     color: 0,
                     description: message

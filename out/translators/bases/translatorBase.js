@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslatorBase = void 0;
-const MessageSender_1 = require("../../helpers/MessageSender");
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
 const Globals_1 = require("../../Globals");
+const RespondToMessageSender_1 = require("../../helpers/messageSenders/RespondToMessageSender");
 const Mongohelper_1 = require("../../helpers/Mongohelper");
 class TranslatorBase {
     constructor(translatorDependencies) {
@@ -52,7 +52,7 @@ class TranslatorBase {
             });
             if (foundBang) {
                 let commands = this.RetrieveCommands(messageText);
-                let messageSender = new MessageSender_1.MessageSender(this.client, message, this.messageStore);
+                let messageSender = new RespondToMessageSender_1.RespondToMessageSender(this.client, message, this.messageStore);
                 yield this.Interpret(commands, detailed, messageSender);
                 Globals_1.Globals.log("Might be done running", this.constructor.name);
             }

@@ -1,8 +1,5 @@
-import { MessageSender } from "../helpers/MessageSender";
-import { ngsTranslatorBase } from "./bases/ngsTranslatorBase";
-import { AssignRolesWorker } from "../workers/AssignRolesWorker";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { AssignFreeAgentRoleWorker } from "../workers/AssignFreeAgentRoleWorker";
-import { TranslatorBase } from "./bases/translatorBase";
 import { NGSOnlyTranslatorBase } from "./bases/ngsOnlyTranslatorBase";
 
 export class ToggleFreeAgentRole extends NGSOnlyTranslatorBase {
@@ -14,7 +11,7 @@ export class ToggleFreeAgentRole extends NGSOnlyTranslatorBase {
         return "Will assign or unassign free agent role";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         if (commands.length <= 0)
             return;
 

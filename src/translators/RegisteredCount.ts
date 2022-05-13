@@ -1,4 +1,4 @@
-import { MessageSender } from "../helpers/MessageSender";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 
 export class RegisteredCount extends AdminTranslatorBase {
@@ -11,10 +11,10 @@ export class RegisteredCount extends AdminTranslatorBase {
         return "Will Return number of registered teams and users.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, message: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, message: RespondToMessageSender) {
         const numberOfTeams = (await this.dataStore.GetTeams()).length;
         const numberOfPlayers = (await this.dataStore.GetUsers()).length;
 
-        await message.SendMessage(`Registered Team Count: ${numberOfTeams} \n Number of users on said teams: ${numberOfPlayers}`);
+        await message.SendBasicMessage(`Registered Team Count: ${numberOfTeams} \n Number of users on said teams: ${numberOfPlayers}`);
     }
 }

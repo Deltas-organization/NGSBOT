@@ -1,13 +1,7 @@
-import { MessageSender } from "../helpers/MessageSender";
-import { Client } from "discord.js";
-import { execFile } from "child_process";
-import { ITranslate } from "../interfaces/ITranslator";
-import { TranslatorBase } from "./bases/translatorBase";
-import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
-import { LiveDataStore } from "../LiveDataStore";
-import { MessageStore } from "../MessageStore";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { DeleteMessageWorker } from "../workers/DeleteMessageWorker";
+import { AdminTranslatorBase } from "./bases/adminTranslatorBase";
 
 export class DeleteMessage extends AdminTranslatorBase {
 
@@ -23,7 +17,7 @@ export class DeleteMessage extends AdminTranslatorBase {
         super(translatorDependencies);
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         const worker = new DeleteMessageWorker(this.translatorDependencies, detailed, messageSender);
         await worker.Begin(commands);
     }

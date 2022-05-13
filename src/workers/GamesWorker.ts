@@ -30,11 +30,6 @@ export class GamesWorker extends WorkerBase {
             if (messages.length > 0)
                 await this._multiMessageCommand(messages);
             else {
-                // var random1 = Math.round(Math.random() * 99) + 1;
-                // if (random1 == 65) {
-                //     await this._messageCommand("Borntoshine has been notified of your failings.");
-                // }
-                // else {
                 await this._messageCommand("Nothing scheduled yet.");
                 //}
             }

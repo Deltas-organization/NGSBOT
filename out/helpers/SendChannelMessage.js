@@ -1,74 +1,54 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SendChannelMessage = void 0;
-class SendChannelMessage {
-    constructor(client, messageStore) {
-        this.client = client;
-        this.messageStore = messageStore;
-    }
-    SendMessageToChannel(message, channelToSendTo, basic = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const myChannel = yield this.client.channels.fetch(channelToSendTo);
-            let sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendMessage(channel, message); });
-            if (basic)
-                sendMessage = (channel, message) => __awaiter(this, void 0, void 0, function* () { return yield this.SendBasicMessage(channel, message); });
-            var result = [];
-            if (myChannel != null) {
-                while (message.length > 2048) {
-                    let newMessage = message.slice(0, 2048);
-                    message = message.substr(2048);
-                    result.push(yield sendMessage(myChannel, newMessage));
-                }
-                result.push(yield sendMessage(myChannel, message));
-            }
-            return result;
-        });
-    }
-    OverwriteMessage(newMessageText, messageId, messageChannel, basic = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const myChannel = yield this.client.channels.fetch(messageChannel);
-            const message = yield myChannel.messages.fetch(messageId);
-            if (basic) {
-                yield message.edit(newMessageText);
-            }
-            else {
-                yield message.edit({
-                    embed: {
-                        color: 0,
-                        description: newMessageText
-                    }
-                });
-            }
-        });
-    }
-    SendMessage(myChannel, message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var sentMessage = yield myChannel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
-            });
-            this.messageStore.AddMessage(sentMessage);
-            return sentMessage;
-        });
-    }
-    SendBasicMessage(myChannel, message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var sentMessage = yield myChannel.send(message);
-            this.messageStore.AddMessage(sentMessage);
-            return sentMessage;
-        });
-    }
-}
-exports.SendChannelMessage = SendChannelMessage;
+// import { Client, Message, TextChannel } from "discord.js";
+// import { DiscordChannels } from "../enums/DiscordChannels";
+// import { MessageStore } from "../MessageStore";
+// export class SendChannelMessage {
+//     constructor(public client: Client, public messageStore: MessageStore) {
+//     }
+//     public async SendMessageToChannel(message: string, channelToSendTo: DiscordChannels | string, basic = false): Promise<Message[]> {
+//         const myChannel = await this.client.channels.fetch(channelToSendTo) as TextChannel;
+//         let sendMessage = async (channel, message) => await this.SendMessage(channel, message);
+//         if (basic)
+//             sendMessage = async (channel, message) => await this.SendBasicMessage(channel, message);
+//         var result: Message[] = [];
+//         if (myChannel != null) {
+//             while (message.length > 2048) {
+//                 let newMessage = message.slice(0, 2048);
+//                 message = message.substr(2048);
+//                 result.push(await sendMessage(myChannel, newMessage));
+//             }
+//             result.push(await sendMessage(myChannel, message));
+//         }
+//         return result;
+//     }
+//     public async OverwriteMessage(newMessageText: string, messageId: string, messageChannel: DiscordChannels, basic = false) {
+//         const myChannel = await this.client.channels.fetch(messageChannel) as TextChannel;
+//         const message = await myChannel.messages.fetch(messageId);
+//         if (basic) {
+//             await message.edit(newMessageText);
+//         }
+//         else {
+//             await message.edit({
+//                 embed: {
+//                     color: 0,
+//                     description: newMessageText
+//                 }
+//             });
+//         }
+//     }
+//     private async SendMessage(myChannel: TextChannel, message: string) {
+//         var sentMessage = await myChannel.send({
+//             embed: {
+//                 color: 0,
+//                 description: message
+//             }
+//         });
+//         this.messageStore.AddMessage(sentMessage);
+//         return sentMessage;
+//     }
+//     private async SendBasicMessage(myChannel: TextChannel, message: string) {
+//         var sentMessage = await myChannel.send(message);
+//         this.messageStore.AddMessage(sentMessage);
+//         return sentMessage;
+//     }
+// }
 //# sourceMappingURL=SendChannelMessage.js.map

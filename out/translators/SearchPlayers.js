@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchPlayers = void 0;
-const nonNGSTranslatorBase_1 = require("./bases/nonNGSTranslatorBase");
 const SearchPlayersWorker_1 = require("../workers/SearchPlayersWorker");
+const nonNGSTranslatorBase_1 = require("./bases/nonNGSTranslatorBase");
 class SearchPlayers extends nonNGSTranslatorBase_1.NonNGSTranslatorBase {
     get commandBangs() {
         return ["name"];

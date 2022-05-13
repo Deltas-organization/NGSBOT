@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleLister = void 0;
-const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 const ScheduleWorker_1 = require("../workers/ScheduleWorker");
+const adminTranslatorBase_1 = require("./bases/adminTranslatorBase");
 class ScheduleLister extends adminTranslatorBase_1.AdminTranslatorBase {
     get commandBangs() {
         return ["Schedule", "sch"];

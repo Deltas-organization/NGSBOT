@@ -1,7 +1,8 @@
-import { MessageSender } from "../helpers/MessageSender";
+import { MessageSender } from "../helpers/messageSenders/MessageSender";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
 import { Globals } from "../Globals";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 
 export class ConfigSetter extends DeltaTranslatorBase {
 
@@ -17,7 +18,7 @@ export class ConfigSetter extends DeltaTranslatorBase {
         super(translatorDependencies);
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         var informAllState = false;
         for (var command of commands) {
             const lowerCaseCommand = command.toLowerCase();
@@ -40,11 +41,11 @@ export class ConfigSetter extends DeltaTranslatorBase {
         }
     }
 
-    private InformLogState(messageSender: MessageSender) {
-        messageSender.SendMessage(`Logging is: ${Globals.EnableLogging}`);
+    private InformLogState(messageSender: RespondToMessageSender) {
+        messageSender.SendBasicMessage(`Logging is: ${Globals.EnableLogging}`);
     }
 
-    private InformAdvancedLogState(messageSender: MessageSender) {
-        messageSender.SendMessage(`Advanced Logging is: ${Globals.EnableAdvancedLogging}`);
+    private InformAdvancedLogState(messageSender: RespondToMessageSender) {
+        messageSender.SendBasicMessage(`Advanced Logging is: ${Globals.EnableAdvancedLogging}`);
     }
 }

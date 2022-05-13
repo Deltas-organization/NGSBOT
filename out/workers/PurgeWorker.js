@@ -76,12 +76,10 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 detailedInformation: removedRoles.map(message => message.CreateJsonMessage()),
                 ignoredUsers: ignoredUsers.map(message => message.CreateJsonMessage())
             }));
-            this.messageSender.TextChannel.send({
-                files: [{
-                        attachment: './files/purgedRoles.json',
-                        name: 'purgedRoles.json'
-                    }]
-            }).catch(console.error);
+            yield this.messageSender.SendFiles([{
+                    attachment: './files/purgedRoles.json',
+                    name: 'purgedRoles.json'
+                }]).catch(console.error);
             yield this.messageSender.SendMessage(`Finished Purging Roles! \n
             Removed ${removedRoles.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`);
             yield progressMessage.Delete();

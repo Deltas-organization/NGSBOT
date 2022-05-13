@@ -47,10 +47,10 @@ class ConfigSetter extends deltaTranslatorBase_1.DeltaTranslatorBase {
         });
     }
     InformLogState(messageSender) {
-        messageSender.SendMessage(`Logging is: ${Globals_1.Globals.EnableLogging}`);
+        messageSender.SendBasicMessage(`Logging is: ${Globals_1.Globals.EnableLogging}`);
     }
     InformAdvancedLogState(messageSender) {
-        messageSender.SendMessage(`Advanced Logging is: ${Globals_1.Globals.EnableAdvancedLogging}`);
+        messageSender.SendBasicMessage(`Advanced Logging is: ${Globals_1.Globals.EnableAdvancedLogging}`);
     }
 }
 exports.ConfigSetter = ConfigSetter;

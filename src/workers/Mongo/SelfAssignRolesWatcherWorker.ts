@@ -1,16 +1,13 @@
 import { Globals } from "../../Globals";
 import { MessageHelper } from "../../helpers/MessageHelper";
-import { MessageSender } from "../../helpers/MessageSender";
 import { Mongohelper } from "../../helpers/Mongohelper";
-import { RoleHelper } from "../../helpers/RoleHelper";
+import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
-import { IMongoAssignRolesRequest } from "../../mongo/models/role-assign-request";
 import { RoleWorkerBase } from "../Bases/RoleWorkerBase";
-import { WorkerBase } from "../Bases/WorkerBase";
 
 export class SelfAssignRolesWatcherWorker extends RoleWorkerBase {
 
-    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender) {
+    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         super(workerDependencies, detailed, messageSender)
     }
 

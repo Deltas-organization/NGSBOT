@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScheduleInformation = exports.ScheduleHelper = void 0;
-const MessageHelper_1 = require("./MessageHelper");
-const moment = require("moment-timezone");
-const DateHelper_1 = require("./DateHelper");
-const TeamSorter_1 = require("./TeamSorter");
 const ScehduleContainer_1 = require("../models/ScehduleContainer");
+const DateHelper_1 = require("./DateHelper");
+const MessageHelper_1 = require("./MessageHelper");
+const TeamSorter_1 = require("./TeamSorter");
+const moment = require("moment-timezone");
 class ScheduleHelper {
     static GetTodaysGamesSorted(dataStore) {
         return __awaiter(this, void 0, void 0, function* () {

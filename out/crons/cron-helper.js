@@ -24,7 +24,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CronHelper = void 0;
 const discord_js_1 = require("discord.js");
 const inversify_1 = require("inversify");
-const moment = require("moment");
 const CheckFlexMatches_1 = require("../commands/CheckFlexMatches");
 const CheckReportedGames_1 = require("../commands/CheckReportedGames");
 const CheckUnscheduledGamesForWeek_1 = require("../commands/CheckUnscheduledGamesForWeek");
@@ -33,13 +32,14 @@ const DiscordChannels_1 = require("../enums/DiscordChannels");
 const NGSDivisions_1 = require("../enums/NGSDivisions");
 const Globals_1 = require("../Globals");
 const DataStoreWrapper_1 = require("../helpers/DataStoreWrapper");
+const ChannelMessageSender_1 = require("../helpers/messageSenders/ChannelMessageSender");
 const Mongohelper_1 = require("../helpers/Mongohelper");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
-const SendChannelMessage_1 = require("../helpers/SendChannelMessage");
 const types_1 = require("../inversify/types");
 const LiveDataStore_1 = require("../LiveDataStore");
 const MessageStore_1 = require("../MessageStore");
 const HistoryDisplay_1 = require("../scheduled/HistoryDisplay");
+const moment = require("moment");
 let CronHelper = /** @class */ (() => {
     let CronHelper = class CronHelper {
         constructor(client, token, apiToken, mongoConnection) {
@@ -47,7 +47,7 @@ let CronHelper = /** @class */ (() => {
             this.token = token;
             this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
             this.mongoHelper = new Mongohelper_1.Mongohelper(mongoConnection);
-            this.messageSender = new SendChannelMessage_1.SendChannelMessage(this.client, new MessageStore_1.MessageStore());
+            this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client, new MessageStore_1.MessageStore());
             this.historyDisplay = new HistoryDisplay_1.HistoryDisplay(this.dataStore);
             this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel_1.CleanupFreeAgentsChannel(this.client);
             this.checkReportedGames = new CheckReportedGames_1.CheckReportedGames(this.client, this.dataStore);
@@ -61,8 +61,8 @@ let CronHelper = /** @class */ (() => {
                 if (games.length > 0) {
                     const messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
                     for (var index = 0; index < messages.length; index++) {
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype);
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
+                        yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype);
+                        yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
                     }
                 }
             });
@@ -88,7 +88,7 @@ let CronHelper = /** @class */ (() => {
                 const messages = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
-                        yield this.messageSender.SendMessageToChannel(messages[index], channel);
+                        yield this.messageSender.SendToDiscordChannel(messages[index], channel);
                     }
                 }
             });
@@ -120,8 +120,8 @@ let CronHelper = /** @class */ (() => {
                 const messages = yield this.historyDisplay.GetRecentHistory(1);
                 if (messages) {
                     for (var index = 0; index < messages.length; index++) {
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
-                        yield this.messageSender.SendMessageToChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHistory);
+                        yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
+                        yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHistory);
                     }
                 }
             });
@@ -149,10 +149,10 @@ let CronHelper = /** @class */ (() => {
                 const messages = yield this.checkReportedGames.Check();
                 try {
                     for (const message of messages.CaptainMessages) {
-                        yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptains);
+                        yield this.messageSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptains);
                     }
                     for (const message of messages.ModMessages) {
-                        yield this.messageSender.SendMessageToChannel(message, DiscordChannels_1.DiscordChannels.NGSMods);
+                        yield this.messageSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.NGSMods);
                     }
                 }
                 catch (e) {
@@ -169,7 +169,7 @@ let CronHelper = /** @class */ (() => {
                 const messages = yield this.checkUnscheduledGamesForWeek.Check();
                 try {
                     for (const message of messages) {
-                        yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.NGSMods, true);
+                        yield this.messageSender.SendToDiscordChannelAsBasic(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.NGSMods);
                     }
                 }
                 catch (e) {
@@ -180,11 +180,9 @@ let CronHelper = /** @class */ (() => {
         CheckFlexMatches() {
             return __awaiter(this, void 0, void 0, function* () {
                 yield this.client.login(this.token);
-                const messages = yield this.checkFlexMatches.Check();
+                const container = yield this.checkFlexMatches.Check();
                 try {
-                    for (const message of messages) {
-                        yield this.messageSender.SendMessageToChannel(message.CreateStringMessage(), DiscordChannels_1.DiscordChannels.NGSMods, true);
-                    }
+                    yield this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels_1.DiscordChannels.NGSMods);
                 }
                 catch (e) {
                     console.log(e);

@@ -1,10 +1,7 @@
-import { MessageSender } from "../helpers/MessageSender";
-import { Client } from "discord.js";
-import { execFile } from "child_process";
 import { ITranslate } from "../interfaces/ITranslator";
 import { TranslatorBase } from "./bases/translatorBase";
-import { MessageStore } from "../MessageStore";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 
 export class CommandLister extends TranslatorBase {
 
@@ -20,7 +17,7 @@ export class CommandLister extends TranslatorBase {
         super(translatorDependencies);
     }
 
-    protected Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         let fields = [];
         this.translators.forEach(translator => {
             if (translator.Verify(messageSender.originalMessage))

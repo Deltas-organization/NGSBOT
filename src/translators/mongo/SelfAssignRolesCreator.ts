@@ -1,4 +1,4 @@
-import { MessageSender } from "../../helpers/MessageSender";
+import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { SelfAssignRolesCreatorWorker } from "../../workers/Mongo/SelfAssignRolesCreatorWorker";
 import { AdminTranslatorBase } from "../bases/adminTranslatorBase";
 
@@ -11,7 +11,7 @@ export class SelfAssignRolesCreator extends AdminTranslatorBase {
         return "Will register which roles can be self assigned for your discord. Detailed (-d) will list the current roles that can be self assigned.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         const watchWorker = new SelfAssignRolesCreatorWorker(this.CreateMongoHelper(), this.translatorDependencies, detailed, messageSender);
         await watchWorker.Begin(commands);
     }

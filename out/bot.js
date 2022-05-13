@@ -37,7 +37,6 @@ const TeamChecker_1 = require("./translators/TeamChecker");
 const AssignRoles_1 = require("./translators/AssignRoles");
 const RegisteredCount_1 = require("./translators/RegisteredCount");
 const Purge_1 = require("./translators/Purge");
-const SendChannelMessage_1 = require("./helpers/SendChannelMessage");
 const DiscordChannels_1 = require("./enums/DiscordChannels");
 const Reload_1 = require("./translators/Reload");
 const GamesCommand_1 = require("./translators/GamesCommand");
@@ -57,6 +56,8 @@ const CoinFlip_1 = require("./translators/CoinFlip");
 const Random_1 = require("./translators/Random");
 const TestTranslator_1 = require("./translators/TestTranslator");
 const Cleanup_1 = require("./translators/Cleanup");
+const MessageContainer_1 = require("./message-helpers/MessageContainer");
+const ChannelMessageSender_1 = require("./helpers/messageSenders/ChannelMessageSender");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken, mongoConnection, botCommand) {
@@ -65,7 +66,7 @@ let Bot = /** @class */ (() => {
             this.translators = [];
             this.exclamationTranslators = [];
             this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
-            this.messageSender = new SendChannelMessage_1.SendChannelMessage(client, this.dependencies.messageStore);
+            this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
             this.botCommand = botCommand;
             this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
             this.translators.push(this.scheduleLister);
@@ -107,11 +108,13 @@ let Bot = /** @class */ (() => {
                 let newUserCommand = new AssignNewUserCommand_1.AssignNewUserCommand(this.dependencies);
                 let message = yield newUserCommand.AssignUser(member);
                 if (message) {
-                    const stringMessage = message.CreateStringMessage();
-                    if (message.Options.FoundTeam) {
-                        yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
+                    var messageGroup = message.MessageGroup;
+                    var messageContainer = new MessageContainer_1.MessageContainer();
+                    messageContainer.Append(messageGroup);
+                    if (message.FoundTeam) {
+                        yield this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
                     }
-                    yield this.messageSender.SendMessageToChannel(stringMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
+                    yield this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
                 }
             }));
         }
@@ -131,7 +134,7 @@ let Bot = /** @class */ (() => {
             return __awaiter(this, void 0, void 0, function* () {
                 this.checkTranslators(message);
                 if (message.channel.type == "dm" && message.author.bot == false) {
-                    yield this.messageSender.SendMessageToChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
+                    yield this.messageSender.SendToDiscordChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
                 }
             });
         }

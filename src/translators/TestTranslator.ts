@@ -1,4 +1,4 @@
-import { MessageSender } from "../helpers/MessageSender";
+import { MessageSender } from "../helpers/messageSenders/MessageSender";
 import { TranslatorBase } from "./bases/translatorBase";
 import { RandomWorker } from "../workers/RandomWorker";
 import { ChangeCaptainNickNameWorker } from "../workers/ChangeCaptainNickNameWorker";

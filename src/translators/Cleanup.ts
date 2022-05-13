@@ -1,9 +1,6 @@
-import { MessageHelper } from "../helpers/MessageHelper";
-import { MessageSender } from "../helpers/MessageSender";
-import { AssignRolesWorker } from "../workers/AssignRolesWorker";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { CleanupRoleWorker } from "../workers/CleanupRoleWorker";
 import { DeltaTranslatorBase } from "./bases/deltaTranslatorBase";
-import { NonNGSTranslatorBase } from "./bases/nonNGSTranslatorBase";
 
 
 export class CleanupTranslator extends DeltaTranslatorBase {
@@ -15,7 +12,7 @@ export class CleanupTranslator extends DeltaTranslatorBase {
         return "Will Ask a series of questions on what you want to cleanup. Currently only delete empty roles.";
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         await messageSender.SendReactionMessage("Would you cleanup empty roles?",
             (user) => user == messageSender.GuildMember,
             async () => {

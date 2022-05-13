@@ -1,16 +1,14 @@
-import { Guild, GuildMember, Message, Role } from "discord.js";
+import { GuildMember, Role } from "discord.js";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../helpers/MessageHelper";
-import { MessageSender } from "../helpers/MessageSender";
 import { NGSQueryBuilder } from "../helpers/NGSQueryBuilder";
-import { RoleHelper } from "../helpers/RoleHelper";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam, INGSUser } from "../interfaces";
 import { AssignRolesOptions } from "../message-helpers/AssignRolesOptions";
 import { RoleWorkerBase } from "./Bases/RoleWorkerBase";
-import { WorkerBase } from "./Bases/WorkerBase";
 
 const fs = require('fs');
 
@@ -19,7 +17,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
     private _testing = false;
     private _mutedRole: Role;
 
-    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender, private apiKey: string) {
+    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string) {
         super(workerDependencies, detailed, messageSender);
     }
 
@@ -57,12 +55,10 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 updatedTeams: messagesLog.filter(this.FindUpdatedTeams).map(m => m.CreateJsonMessage()),
                 nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
             }));
-            await this.messageSender.TextChannel.send({
-                files: [{
+            await this.messageSender.SendFiles([{
                     attachment: './files/assignedRoles.json',
                     name: 'AssignRolesReport.json'
-                }]
-            }).catch(console.error);
+                }]).catch(console.error);
         }
         catch (e) {
             Globals.log(e);

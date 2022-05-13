@@ -1,5 +1,5 @@
 import { TranslatorBase } from "./translatorBase";
-import { MessageSender } from "../../helpers/MessageSender";
+import { MessageSender } from "../../helpers/messageSenders/MessageSender";
 import { GuildMember, Message, User } from "discord.js";
 import { debug } from "console";
 import { DiscordGuilds } from "../../enums/DiscordGuilds";

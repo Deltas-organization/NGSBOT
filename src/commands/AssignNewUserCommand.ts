@@ -1,16 +1,12 @@
-import { Client, Guild, GuildMember, PartialGuildMember, Role, TextChannel, User } from "discord.js";
-import { DiscordChannels } from "../enums/DiscordChannels";
+import { Client, GuildMember, PartialGuildMember, Role } from "discord.js";
 import { DiscordGuilds } from "../enums/DiscordGuilds";
 import { NGSRoles } from "../enums/NGSRoles";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
-import { MessageHelper } from "../helpers/MessageHelper";
 import { RoleHelper } from "../helpers/RoleHelper";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
-import { INGSTeam, INGSUser } from "../interfaces";
-import { LiveDataStore } from "../LiveDataStore";
-import { AssignNewUserOptions } from "../message-helpers/AssignNewUserOptions";
-import { MessageStore } from "../MessageStore";
+import { INGSTeam } from "../interfaces";
+import { MessageGroup } from "../message-helpers/MessageContainer";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class AssignNewUserCommand {
@@ -25,28 +21,28 @@ export class AssignNewUserCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async AssignUser(guildMember: GuildMember | PartialGuildMember): Promise<MessageHelper<AssignNewUserOptions>> {
+    public async AssignUser(guildMember: GuildMember | PartialGuildMember): Promise<{ MessageGroup: MessageGroup, FoundTeam: boolean }> {
         await this.Setup(guildMember);
-        const messageOptions = new MessageHelper<AssignNewUserOptions>("NewUsers");
+        const messageGroup = new MessageGroup();
         if (guildMember.guild.id != DiscordGuilds.NGS)
-            return;
+            return null;
 
-        messageOptions.AddNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
+        messageGroup.AddOnNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
         const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.dataStore.GetUsers());
-        if (!ngsUser)
-            return messageOptions;
-
-        const team = await this.dataStore.LookForRegisteredTeam(ngsUser);
-        if (team) {
-            messageOptions.Options.FoundTeam = true;
-            messageOptions.AddNewLine(`Found new users team: **${team.teamName}**`);
-            const rolesResult = await this.AssignValidRoles(team, guildMember, ngsUser);
-            messageOptions.Append(rolesResult);
+        var foundTeam = false;
+        if (ngsUser) {
+            const team = await this.dataStore.LookForRegisteredTeam(ngsUser);
+            if (team) {
+                foundTeam = true;
+                messageGroup.AddOnNewLine(`Found new users team: **${team.teamName}**`);
+                const rolesResult = await this.AssignValidRoles(team, guildMember, ngsUser);
+                messageGroup.Combine(rolesResult);
+            }
+            else {
+                messageGroup.AddOnNewLine(`did not find a team for user.`);
+            }
         }
-        else {
-            messageOptions.AddNewLine(`did not find a team for user.`);
-        }
-        return messageOptions;
+        return { MessageGroup: messageGroup, FoundTeam: foundTeam};
     }
 
     private async Setup(guildMember: GuildMember | PartialGuildMember) {
@@ -54,15 +50,15 @@ export class AssignNewUserCommand {
         this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
     }
 
-    private async AssignValidRoles(team: INGSTeam, guildMember: GuildMember | PartialGuildMember, ngsUser: AugmentedNGSUser) {
+    private async AssignValidRoles(team: INGSTeam, guildMember: GuildMember | PartialGuildMember, ngsUser: AugmentedNGSUser): Promise<MessageGroup> {
         const teamName = team.teamName;
         const teamRoleOnDiscord = await this.FindTeamRole(teamName);
-        let result = new MessageHelper<AssignNewUserOptions>(guildMember.displayName);
+        let result = new MessageGroup();
         if (!teamRoleOnDiscord) {
             return;
         }
         else {
-            result.AddNewLine(`Assigned team role`);
+            result.AddOnNewLine(`Assigned team role`);
             await guildMember.roles.add(teamRoleOnDiscord);
         }
 
@@ -70,14 +66,13 @@ export class AssignNewUserCommand {
         const divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
 
         if (divRoleOnDiscord) {
-            result.Options.FoundDiv = true;
-            result.AddNewLine(`Assigned div role`);
+            result.AddOnNewLine(`Assigned div role`);
             await guildMember.roles.add(divRoleOnDiscord);
         }
 
         if (ngsUser.IsCaptain || ngsUser.IsAssistantCaptain) {
             if (this._captainRole) {
-                result.AddNewLine(`Assigned Captain role`);
+                result.AddOnNewLine(`Assigned Captain role`);
                 await guildMember.roles.add(this._captainRole);
             }
         }

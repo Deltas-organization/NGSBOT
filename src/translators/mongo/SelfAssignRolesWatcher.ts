@@ -1,4 +1,4 @@
-import { MessageSender } from "../../helpers/MessageSender";
+import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { SelfAssignRolesWatcherWorker } from "../../workers/Mongo/SelfAssignRolesWatcherWorker";
 import { TranslatorBase } from "../bases/translatorBase";
 
@@ -16,7 +16,7 @@ export class SelfAssignRolesWatcher extends TranslatorBase {
         return ';';
     }
 
-    protected async Interpret(commands: string[], detailed: boolean, messageSender: MessageSender) {
+    protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         const watchWorker = new SelfAssignRolesWatcherWorker(this.CreateMongoHelper(), this.translatorDependencies, detailed, messageSender);
         await watchWorker.Begin(commands);
     }

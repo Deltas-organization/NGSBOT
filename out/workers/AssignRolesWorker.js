@@ -61,12 +61,10 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                     updatedTeams: messagesLog.filter(this.FindUpdatedTeams).map(m => m.CreateJsonMessage()),
                     nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
                 }));
-                yield this.messageSender.TextChannel.send({
-                    files: [{
-                            attachment: './files/assignedRoles.json',
-                            name: 'AssignRolesReport.json'
-                        }]
-                }).catch(console.error);
+                yield this.messageSender.SendFiles([{
+                        attachment: './files/assignedRoles.json',
+                        name: 'AssignRolesReport.json'
+                    }]).catch(console.error);
             }
             catch (e) {
                 Globals_1.Globals.log(e);

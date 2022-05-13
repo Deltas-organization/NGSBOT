@@ -54,12 +54,12 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
         return unsupportedCommands;
     }
     hasCapabilityToSendMessage() {
-        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.TextChannel.id).has(['SEND_MESSAGES', 'EMBED_LINKS']);
+        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS']);
     }
     createMongoRecord() {
         return __awaiter(this, void 0, void 0, function* () {
             const scheduleRequest = {
-                channelId: this.messageSender.TextChannel.id,
+                channelId: this.messageSender.Channel.id,
                 divisions: this.divisionsToWatch,
                 requestType: 'divisions'
             };

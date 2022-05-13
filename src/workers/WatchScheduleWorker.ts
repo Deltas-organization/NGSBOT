@@ -1,6 +1,6 @@
 import { NGSDivisions } from "../enums/NGSDivisions";
-import { MessageSender } from "../helpers/MessageSender";
 import { Mongohelper } from "../helpers/Mongohelper";
+import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { IMongoScheduleRequest } from "../mongo/models/schedule-request";
 import { WorkerBase } from "./Bases/WorkerBase";
@@ -9,7 +9,7 @@ export class WatchScheduleWorker extends WorkerBase {
 
     private divisionsToWatch: string[] = [];
 
-    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender) {
+    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         super(workerDependencies, detailed, messageSender)
     }
 
@@ -47,12 +47,12 @@ export class WatchScheduleWorker extends WorkerBase {
     }
 
     private hasCapabilityToSendMessage(): boolean {
-        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.TextChannel.id).has(['SEND_MESSAGES', 'EMBED_LINKS'])
+        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS'])
     }
 
     private async createMongoRecord() {
         const scheduleRequest = {
-            channelId: this.messageSender.TextChannel.id,
+            channelId: this.messageSender.Channel.id,
             divisions: this.divisionsToWatch,
             requestType: 'divisions'
         } as IMongoScheduleRequest;

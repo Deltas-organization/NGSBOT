@@ -2,7 +2,7 @@ import { Client, Message, TextChannel } from "discord.js";
 import { DiscordChannels } from "../enums/DiscordChannels";
 import moment = require("moment-timezone");
 import { Globals } from "../Globals";
-import { MessageSender } from "../helpers/MessageSender";
+import { MessageSender } from "../helpers/messageSenders/MessageSender";
 
 export class CleanupFreeAgentsChannel {
     constructor(private client: Client) {

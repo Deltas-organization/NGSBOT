@@ -1,12 +1,11 @@
+import { NGSDivisions } from "../enums/NGSDivisions";
 import { INGSSchedule } from "../interfaces";
-import { MessageHelper } from "./MessageHelper";
-import moment = require("moment-timezone");
-import { DateHelper } from "./DateHelper";
-import { TeamSorter } from "./TeamSorter";
 import { ScheduleContainer } from "../models/ScehduleContainer";
 import { DataStoreWrapper } from "./DataStoreWrapper";
-import { NGSDivisions } from "../enums/NGSDivisions";
-import { DetailedPeerCertificate } from "tls";
+import { DateHelper } from "./DateHelper";
+import { MessageHelper } from "./MessageHelper";
+import { TeamSorter } from "./TeamSorter";
+import moment = require("moment-timezone");
 
 export class ScheduleHelper {
 

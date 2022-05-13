@@ -1,6 +1,6 @@
 import { Client, Guild } from "discord.js";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
-import { MessageSender } from "../../helpers/MessageSender";
+import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { INGSTeam, INGSUser } from "../../interfaces";
 import { MessageStore } from "../../MessageStore";
@@ -12,7 +12,7 @@ export abstract class WorkerBase {
     protected readonly messageStore: MessageStore;
     protected readonly guild: Guild;
 
-    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: MessageSender) {
+    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         this.client = workerDependencies.client;
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
