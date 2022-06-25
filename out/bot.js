@@ -58,6 +58,7 @@ const TestTranslator_1 = require("./translators/TestTranslator");
 const Cleanup_1 = require("./translators/Cleanup");
 const MessageContainer_1 = require("./message-helpers/MessageContainer");
 const ChannelMessageSender_1 = require("./helpers/messageSenders/ChannelMessageSender");
+const SeasonInformation_1 = require("./translators/SeasonInformation");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken, mongoConnection, botCommand) {
@@ -89,6 +90,7 @@ let Bot = /** @class */ (() => {
             this.translators.push(new Random_1.RandomTranslator(this.dependencies));
             this.translators.push(new TestTranslator_1.TestTranslator(this.dependencies));
             this.translators.push(new Cleanup_1.CleanupTranslator(this.dependencies));
+            this.translators.push(new SeasonInformation_1.SeasonInformation(this.dependencies));
             this.translators.push(new commandLister_1.CommandLister(this.dependencies, this.translators));
             this.exclamationTranslators.push(new SelfAssignRolesWatcher_1.SelfAssignRolesWatcher(this.dependencies));
             this.exclamationTranslators.push(new CoinFlip_1.CoinFlip(this.dependencies));

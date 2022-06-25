@@ -111,6 +111,14 @@ class DataStoreWrapper {
             return users.filter(user => user.teamName == teamName);
         });
     }
+    GetGameInformationForSeason(season) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this._dataStore.GetScheduleQuery({
+                season: season,
+                forfeit: { $exists: false }
+            });
+        });
+    }
 }
 exports.DataStoreWrapper = DataStoreWrapper;
 //# sourceMappingURL=DataStoreWrapper.js.map

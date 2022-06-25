@@ -1,3 +1,4 @@
+import { UserFlags } from "discord.js";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { Globals } from "../Globals";
 import { INGSDivision, INGSSchedule, INGSTeam } from "../interfaces";
@@ -94,5 +95,12 @@ export class DataStoreWrapper {
 
         const users = await this.GetUsers();
         return users.filter(user => user.teamName == teamName);
+    }
+
+    public async GetGameInformationForSeason(season: string) {
+        return await this._dataStore.GetScheduleQuery({
+            season: season,
+            forfeit: { $exists: false }
+        });
     }
 }

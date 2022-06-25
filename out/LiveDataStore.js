@@ -47,9 +47,12 @@ let LiveDataStore = /** @class */ (() => {
         }
         GetScheduleQuery(queryItem) {
             return __awaiter(this, void 0, void 0, function* () {
+                var season = LiveDataStore.season;
+                if (queryItem[season])
+                    season = queryItem[season];
                 var postRequest = {
                     apiKey: this._apiKey,
-                    season: LiveDataStore.season
+                    season: season
                 };
                 postRequest = Object.assign(Object.assign({}, postRequest), queryItem);
                 return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder_1.NGSQueryBuilder().PostResponse('schedule/query/matches', postRequest));

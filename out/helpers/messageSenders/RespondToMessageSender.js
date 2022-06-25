@@ -104,9 +104,9 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
             return yield this.SendMessagesToChannel(messages, this.Channel, false);
         });
     }
-    SendMessageFromContainer(messageContainer) {
+    SendMessageFromContainer(messageContainer, basic = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.SendMessageFromContainerToChannel(messageContainer, this.Channel);
+            return yield this.SendMessageFromContainerToChannel(messageContainer, this.Channel, basic);
         });
     }
 }

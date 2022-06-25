@@ -40,9 +40,13 @@ export class LiveDataStore {
     }
 
     public async GetScheduleQuery(queryItem: any): Promise<INGSSchedule[]> {
+        var season = LiveDataStore.season;
+        if (queryItem[season])
+            season = queryItem[season];
+
         var postRequest = {
             apiKey: this._apiKey,
-            season: LiveDataStore.season
+            season: season
         };
         postRequest = { ...postRequest, ...queryItem }
         return this.cachedSchedule.TryGetFromCache(() => new NGSQueryBuilder().PostResponse<INGSSchedule[]>('schedule/query/matches', postRequest));

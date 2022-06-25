@@ -23,7 +23,7 @@ export class RespondToMessageSender extends MessageSender {
     constructor(client: Client, public readonly originalMessage: Message, messageStore: MessageStore) {
         super(client, messageStore)
     }
-    
+
     public async SendReactionMessage(message: string, authentication: (member: GuildMember) => boolean, yesReaction: () => Promise<any> | any, noReaction: () => Promise<any> | any = () => { }, storeMessage = true) {
         var sentMessage = await this.Channel.send({
             embed: {
@@ -60,9 +60,9 @@ export class RespondToMessageSender extends MessageSender {
     }
 
     public async SendFiles(files: (FileOptions | BufferResolvable | Stream | MessageAttachment)[]) {
-        return this.Channel.send({files: files });
+        return this.Channel.send({ files: files });
     }
-    
+
     public async SendFields(description: string, fields: { name: string, value: string }[]) {
         var sentMessage = await this.Channel.send({
             embed: {
@@ -75,30 +75,27 @@ export class RespondToMessageSender extends MessageSender {
         return sentMessage;
     }
 
-    public async SendBasicMessage(message: string)
-    {
+    public async SendBasicMessage(message: string) {
         return await this.SendBasicMessageToChannel(message, this.Channel);
     }
 
-    public async SendMessage(message: string, storeMessage: boolean = true)
-    {
+    public async SendMessage(message: string, storeMessage: boolean = true) {
         return await this.SendMessageToChannel(message, this.Channel, storeMessage);
     }
 
-    public async SendMessages(messages: string[], storeMessage = true){
+    public async SendMessages(messages: string[], storeMessage = true) {
         return await this.SendMessagesToChannel(messages, this.Channel, storeMessage);
     }
 
-    public async DMMessage(message: string)
-    {
+    public async DMMessage(message: string) {
         return await this.SendMessageToChannel(message, this.Channel, false);
     }
 
-    public async DMMessages(messages: string[]){
+    public async DMMessages(messages: string[]) {
         return await this.SendMessagesToChannel(messages, this.Channel, false);
     }
 
-    public async SendMessageFromContainer(messageContainer: MessageContainer) {
-        return await this.SendMessageFromContainerToChannel(messageContainer, this.Channel)
+    public async SendMessageFromContainer(messageContainer: MessageContainer, basic = false) {
+        return await this.SendMessageFromContainerToChannel(messageContainer, this.Channel, basic)
     }
 }

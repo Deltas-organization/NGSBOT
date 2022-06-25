@@ -85,11 +85,11 @@ class MessageSender {
             }
         });
     }
-    SendMessageFromContainerToChannel(container, channel, storeMessage = true) {
+    SendMessageFromContainerToChannel(container, channel, basicMessage = false, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
             var messages = container.MultiMessages(this.maxLength);
             for (var message of messages) {
-                var sentMessage = yield this.JustSendIt(message, channel, false);
+                var sentMessage = yield this.JustSendIt(message, channel, basicMessage);
                 if (storeMessage)
                     this.messageStore.AddMessage(sentMessage);
             }

@@ -41,6 +41,12 @@ class MessageGroup {
     get Length() {
         return this.AsString().length;
     }
+    Prepend(message) {
+        let line = new DetailedLine(message, 0);
+        if (this._lines.length > 0)
+            line.Message += this._lines.shift().Message;
+        this._lines.unshift(line);
+    }
     Add(message) {
         let line = new DetailedLine("", 0);
         if (this._lines.length > 0)

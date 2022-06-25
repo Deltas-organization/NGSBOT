@@ -14,7 +14,7 @@ export class MessageSender {
 
     }
 
-    public async SendBasicMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel) : Promise<Message[]> {
+    public async SendBasicMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel): Promise<Message[]> {
         var messagesSent: Message[] = [];
         while (message.length > this.maxLength) {
             let newMessage = message.slice(0, this.maxLength);
@@ -41,7 +41,7 @@ export class MessageSender {
         return new MessageWrapper(this, sentMessage);
     }
 
-    public async SendMessagesToChannel(messages: string[], channel: TextChannel | DMChannel | NewsChannel,  storeMessage = true) {
+    public async SendMessagesToChannel(messages: string[], channel: TextChannel | DMChannel | NewsChannel, storeMessage = true) {
         let result: MessageWrapper[] = [];
         let combinedMessages = this.CombineMultiple(messages);
         for (var message of combinedMessages) {
@@ -79,10 +79,10 @@ export class MessageSender {
         }
     }
 
-    public async SendMessageFromContainerToChannel(container: MessageContainer, channel: TextChannel | DMChannel | NewsChannel, storeMessage = true) {
+    public async SendMessageFromContainerToChannel(container: MessageContainer, channel: TextChannel | DMChannel | NewsChannel, basicMessage = false, storeMessage = true) {
         var messages = container.MultiMessages(this.maxLength);
         for (var message of messages) {
-            var sentMessage = await this.JustSendIt(message, channel, false);
+            var sentMessage = await this.JustSendIt(message, channel, basicMessage);
 
             if (storeMessage)
                 this.messageStore.AddMessage(sentMessage);

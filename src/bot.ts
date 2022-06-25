@@ -35,6 +35,7 @@ import { TestTranslator } from "./translators/TestTranslator";
 import { CleanupTranslator } from "./translators/Cleanup";
 import { MessageContainer } from "./message-helpers/MessageContainer";
 import { ChannelMessageSender } from "./helpers/messageSenders/ChannelMessageSender";
+import { SeasonInformation } from "./translators/SeasonInformation";
 
 @injectable()
 export class Bot {
@@ -77,6 +78,7 @@ export class Bot {
         this.translators.push(new RandomTranslator(this.dependencies));
         this.translators.push(new TestTranslator(this.dependencies));
         this.translators.push(new CleanupTranslator(this.dependencies));
+        this.translators.push(new SeasonInformation(this.dependencies));
 
         this.translators.push(new CommandLister(this.dependencies, this.translators));
         this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));

@@ -40,6 +40,14 @@ export class MessageGroup {
         return this.AsString().length;
     }
 
+    public Prepend(message: string) {
+        let line = new DetailedLine(message, 0);
+        if (this._lines.length > 0)
+            line.Message += this._lines.shift().Message;
+
+        this._lines.unshift(line);
+    }
+
     public Add(message: string) {
         let line = new DetailedLine("", 0);
         if (this._lines.length > 0)
