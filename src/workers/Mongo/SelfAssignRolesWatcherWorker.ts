@@ -8,7 +8,7 @@ import { RoleWorkerBase } from "../Bases/RoleWorkerBase";
 export class SelfAssignRolesWatcherWorker extends RoleWorkerBase {
 
     constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
-        super(workerDependencies, detailed, messageSender)
+        super(workerDependencies, detailed, messageSender, mongoHelper)
     }
 
     protected async Start(commands: string[]) {

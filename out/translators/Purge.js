@@ -22,7 +22,7 @@ class Purge extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const worker = new PurgeWorker_1.PurgeWorker(this.translatorDependencies, detailed, messageSender);
+            const worker = new PurgeWorker_1.PurgeWorker(this.translatorDependencies, detailed, messageSender, this.CreateMongoHelper());
             yield worker.Begin(commands);
         });
     }

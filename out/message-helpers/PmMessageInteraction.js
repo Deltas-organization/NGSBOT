@@ -9,23 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnUsedRoles = void 0;
-const DisplayUnusedRoles_1 = require("../workers/DisplayUnusedRoles");
-const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
-const fs = require('fs');
-class UnUsedRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
-    get commandBangs() {
-        return ["roles"];
+exports.PmMessageInteraction = void 0;
+const DiscordChannels_1 = require("../enums/DiscordChannels");
+const ChannelMessageSender_1 = require("../helpers/messageSenders/ChannelMessageSender");
+class PmMessageInteraction {
+    constructor(client, dependencies) {
+        this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, dependencies.messageStore);
     }
-    get description() {
-        return "Will Check all roles in the server and compare to team on the webstie.";
-    }
-    Interpret(commands, detailed, messageSender) {
+    ReceivePM(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            const rolesWorker = new DisplayUnusedRoles_1.DisplayUnusedRoles(this.translatorDependencies, detailed, messageSender, this.CreateMongoHelper());
-            yield rolesWorker.Begin(commands);
+            yield this.messageSender.SendToDiscordChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
         });
     }
 }
-exports.UnUsedRoles = UnUsedRoles;
-//# sourceMappingURL=UnusedRoles.js.map
+exports.PmMessageInteraction = PmMessageInteraction;
+//# sourceMappingURL=PmMessageInteraction.js.map

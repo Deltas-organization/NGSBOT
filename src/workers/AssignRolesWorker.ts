@@ -9,6 +9,7 @@ import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam, INGSUser } from "../interfaces";
 import { AssignRolesOptions } from "../message-helpers/AssignRolesOptions";
 import { RoleWorkerBase } from "./Bases/RoleWorkerBase";
+import { Mongohelper } from "../helpers/Mongohelper";
 
 const fs = require('fs');
 
@@ -17,8 +18,8 @@ export class AssignRolesWorker extends RoleWorkerBase {
     private _testing = false;
     private _mutedRole: Role;
 
-    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string) {
-        super(workerDependencies, detailed, messageSender);
+    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string, mongoHelper: Mongohelper) {
+        super(workerDependencies, detailed, messageSender, mongoHelper);
     }
 
     protected async Start(commands: string[]) {
@@ -56,9 +57,9 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
             }));
             await this.messageSender.SendFiles([{
-                    attachment: './files/assignedRoles.json',
-                    name: 'AssignRolesReport.json'
-                }]).catch(console.error);
+                attachment: './files/assignedRoles.json',
+                name: 'AssignRolesReport.json'
+            }]).catch(console.error);
         }
         catch (e) {
             Globals.log(e);

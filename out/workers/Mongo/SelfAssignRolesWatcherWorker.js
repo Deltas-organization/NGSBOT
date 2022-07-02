@@ -15,7 +15,7 @@ const MessageHelper_1 = require("../../helpers/MessageHelper");
 const RoleWorkerBase_1 = require("../Bases/RoleWorkerBase");
 class SelfAssignRolesWatcherWorker extends RoleWorkerBase_1.RoleWorkerBase {
     constructor(mongoHelper, workerDependencies, detailed, messageSender) {
-        super(workerDependencies, detailed, messageSender);
+        super(workerDependencies, detailed, messageSender, mongoHelper);
         this.mongoHelper = mongoHelper;
         this.detailed = detailed;
         this.messageSender = messageSender;

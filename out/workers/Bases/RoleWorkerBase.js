@@ -15,8 +15,11 @@ const Globals_1 = require("../../Globals");
 const RoleHelper_1 = require("../../helpers/RoleHelper");
 const WorkerBase_1 = require("./WorkerBase");
 class RoleWorkerBase extends WorkerBase_1.WorkerBase {
-    constructor() {
-        super(...arguments);
+    constructor(workerDependencies, detailed, messageSender, mongoConnection) {
+        super(workerDependencies, detailed, messageSender);
+        this.detailed = detailed;
+        this.messageSender = messageSender;
+        this.mongoConnection = mongoConnection;
         this.reservedRoleNames = [
             'Caster Hopefuls',
             NGSRoles_1.NGSRoles.FreeAgents,
@@ -53,21 +56,34 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             this.captainRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
             this.myBotRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.NGSBot);
             this.stormRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Storm);
-            this.reserveredRoles = this.GetReservedRoles();
+            this.reserveredRoles = yield this.GetReservedRoles();
         });
     }
     GetReservedRoles() {
-        const result = [];
-        for (var roleName of this.reservedRoleNames) {
-            let foundRole = this.roleHelper.lookForRole(roleName);
-            if (foundRole) {
-                result.push(foundRole);
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = [];
+            for (let roleName of this.reservedRoleNames) {
+                let foundRole = this.roleHelper.lookForRole(roleName);
+                if (foundRole) {
+                    result.push(foundRole);
+                }
+                else {
+                    Globals_1.Globals.logAdvanced(`didnt find role: ${roleName}`);
+                }
             }
-            else {
-                Globals_1.Globals.logAdvanced(`didnt find role: ${roleName}`);
+            var selfAssignableRoles = yield this.mongoConnection.GetAssignedRoleRequests(this.guild.id);
+            const allRoles = yield this.guild.roles.fetch();
+            for (let roleId of selfAssignableRoles) {
+                let foundRole = yield allRoles.fetch(roleId);
+                if (foundRole) {
+                    result.push(foundRole);
+                }
+                else {
+                    Globals_1.Globals.logAdvanced(`didnt find role: ${foundRole}`);
+                }
             }
-        }
-        return result;
+            return result;
+        });
     }
 }
 exports.RoleWorkerBase = RoleWorkerBase;

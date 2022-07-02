@@ -16,7 +16,7 @@ export class Leave extends NGSOnlyTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
-        const worker = new LeaveWorker(this.translatorDependencies, detailed, messageSender);
+        const worker = new LeaveWorker(this.translatorDependencies, detailed, messageSender, this.CreateMongoHelper());
         await worker.Begin(commands);
     }
 }

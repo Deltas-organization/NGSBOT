@@ -19,8 +19,8 @@ const AssignRolesOptions_1 = require("../message-helpers/AssignRolesOptions");
 const RoleWorkerBase_1 = require("./Bases/RoleWorkerBase");
 const fs = require('fs');
 class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
-    constructor(workerDependencies, detailed, messageSender, apiKey) {
-        super(workerDependencies, detailed, messageSender);
+    constructor(workerDependencies, detailed, messageSender, apiKey, mongoHelper) {
+        super(workerDependencies, detailed, messageSender, mongoHelper);
         this.detailed = detailed;
         this.messageSender = messageSender;
         this.apiKey = apiKey;

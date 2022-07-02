@@ -23,7 +23,7 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
-            const assignRolesWorker = new AssignRolesWorker_1.AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey);
+            const assignRolesWorker = new AssignRolesWorker_1.AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey, this.CreateMongoHelper());
             yield assignRolesWorker.Begin(commands);
             const worker = new ChangeCaptainNickNameWorker_1.ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
             yield worker.Begin(commands);

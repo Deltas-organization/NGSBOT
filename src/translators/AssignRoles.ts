@@ -15,7 +15,7 @@ export class AssignRoles extends ngsTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
-        const assignRolesWorker = new AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey);
+        const assignRolesWorker = new AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey, this.CreateMongoHelper());
         await assignRolesWorker.Begin(commands);
 
         const worker = new ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);

@@ -36,15 +36,15 @@ import { CleanupTranslator } from "./translators/Cleanup";
 import { MessageContainer } from "./message-helpers/MessageContainer";
 import { ChannelMessageSender } from "./helpers/messageSenders/ChannelMessageSender";
 import { SeasonInformation } from "./translators/SeasonInformation";
+import { PmMessageInteraction } from "./message-helpers/PmMessageInteraction";
+import { TranslatorService } from "./translators/core/TranslatorService";
 
 @injectable()
 export class Bot {
-    private translators: ITranslate[] = [];
-    private exclamationTranslators: ITranslate[] = [];
-    private scheduleLister: ScheduleLister;
     private dependencies: CommandDependencies;
     private messageSender: ChannelMessageSender;
-    private botCommand: string;
+    private pmMessageInteraction: PmMessageInteraction;
+    private translatorService: TranslatorService;
 
     constructor(
         @inject(TYPES.Client) public client: Client,
@@ -55,34 +55,8 @@ export class Bot {
     ) {
         this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken, mongoConnection);
         this.messageSender = new ChannelMessageSender(client, this.dependencies.messageStore);
-        this.botCommand = botCommand;
-
-        this.scheduleLister = new ScheduleLister(this.dependencies);
-        this.translators.push(this.scheduleLister);
-        this.translators.push(new DeleteMessage(this.dependencies));
-        this.translators.push(new ConfigSetter(this.dependencies));
-        this.translators.push(new SearchPlayers(this.dependencies));
-        this.translators.push(new TeamNameChecker(this.dependencies));
-        this.translators.push(new AssignRoles(this.dependencies));
-        this.translators.push(new RegisteredCount(this.dependencies));
-        this.translators.push(new Purge(this.dependencies));
-        this.translators.push(new Reload(this.dependencies));
-        this.translators.push(new GamesCommand(this.dependencies));
-        this.translators.push(new NonCastedGamesCommand(this.dependencies));
-        this.translators.push(new Leave(this.dependencies));
-        this.translators.push(new UnUsedRoles(this.dependencies));
-        this.translators.push(new UpdateCaptainsList(this.dependencies));
-        this.translators.push(new WatchSchedule(this.dependencies));
-        this.translators.push(new SelfAssignRolesCreator(this.dependencies));
-        this.translators.push(new SelfAssignRolesRemover(this.dependencies));
-        this.translators.push(new RandomTranslator(this.dependencies));
-        this.translators.push(new TestTranslator(this.dependencies));
-        this.translators.push(new CleanupTranslator(this.dependencies));
-        this.translators.push(new SeasonInformation(this.dependencies));
-
-        this.translators.push(new CommandLister(this.dependencies, this.translators));
-        this.exclamationTranslators.push(new SelfAssignRolesWatcher(this.dependencies));
-        this.exclamationTranslators.push(new CoinFlip(this.dependencies));
+        this.pmMessageInteraction = new PmMessageInteraction(client, this.dependencies);
+        this.translatorService = new TranslatorService(botCommand, this.dependencies);
     }
 
     public listen(): Promise<string> {
@@ -128,28 +102,10 @@ export class Bot {
     }
 
     private async OnMessageReceived(message: Message) {
-        this.checkTranslators(message);
+        this.translatorService.runTranslators(message);
 
         if (message.channel.type == "dm" && message.author.bot == false) {
-            await this.messageSender.SendToDiscordChannel(`Message From ${message.author.username}: \n \n ${message.content}`, DiscordChannels.DeltaPmChannel);
-        }
-    }
-
-    private checkTranslators(message: Message) {
-        let originalContent = message.content;
-        const command = this.botCommand
-        let regex = new RegExp(`^${command}`, "g");
-        if (regex.test(originalContent)) {
-            var trimmedValue = originalContent.substring(1);
-            this.translators.forEach(translator => {
-                translator.Translate(trimmedValue, message);
-            });
-        }
-        else if (/^\!/.test(originalContent)) {
-            var trimmedValue = originalContent.substring(1);
-            for (const translator of this.exclamationTranslators) {
-                translator.Translate(trimmedValue, message);
-            }
+            await this.pmMessageInteraction.ReceivePM(message);
         }
     }
 }
