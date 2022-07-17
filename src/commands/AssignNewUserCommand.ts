@@ -42,7 +42,7 @@ export class AssignNewUserCommand {
                 messageGroup.AddOnNewLine(`did not find a team for user.`);
             }
         }
-        return { MessageGroup: messageGroup, FoundTeam: foundTeam};
+        return { MessageGroup: messageGroup, FoundTeam: foundTeam };
     }
 
     private async Setup(guildMember: GuildMember | PartialGuildMember) {
@@ -63,11 +63,14 @@ export class AssignNewUserCommand {
         }
 
         const roleRsponse = this._serverRoleHelper.FindDivRole(team.divisionDisplayName);
-        const divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
-
+        let divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
+        divRoleOnDiscord = null;
         if (divRoleOnDiscord) {
             result.AddOnNewLine(`Assigned div role`);
             await guildMember.roles.add(divRoleOnDiscord);
+        }
+        else {
+            result.AddOnNewLine(`Didn't assign div role since season hasn't started`);
         }
 
         if (ngsUser.IsCaptain || ngsUser.IsAssistantCaptain) {

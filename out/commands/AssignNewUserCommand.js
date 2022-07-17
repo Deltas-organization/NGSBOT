@@ -63,10 +63,14 @@ class AssignNewUserCommand {
                 yield guildMember.roles.add(teamRoleOnDiscord);
             }
             const roleRsponse = this._serverRoleHelper.FindDivRole(team.divisionDisplayName);
-            const divRoleOnDiscord = roleRsponse.div == NGSRoles_1.NGSRoles.Storm ? null : roleRsponse.role;
+            let divRoleOnDiscord = roleRsponse.div == NGSRoles_1.NGSRoles.Storm ? null : roleRsponse.role;
+            divRoleOnDiscord = null;
             if (divRoleOnDiscord) {
                 result.AddOnNewLine(`Assigned div role`);
                 yield guildMember.roles.add(divRoleOnDiscord);
+            }
+            else {
+                result.AddOnNewLine(`Didn't assign div role since season hasn't started`);
             }
             if (ngsUser.IsCaptain || ngsUser.IsAssistantCaptain) {
                 if (this._captainRole) {
