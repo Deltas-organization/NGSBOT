@@ -43,7 +43,10 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
                         let sentMessage = yield this.messageSender.SendFields(``, teamMessage);
                         yield sentMessage.react('✅');
                         const filter = (reaction, user) => {
-                            return ['✅'].includes(reaction.emoji.name);
+                            if (user.bot)
+                                return false;
+                            console.log(user);
+                            return ['✅'].includes(reaction.emoji.name) && user;
                         };
                         var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
                         if (collectedReactions.first().emoji.name === '✅') {

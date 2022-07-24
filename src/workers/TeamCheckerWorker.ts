@@ -1,3 +1,5 @@
+import { debug } from "console";
+import { CollectorFilter } from "discord.js";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { INGSTeam, INGSUser } from "../interfaces";
 import { MessageContainer } from "../message-helpers/MessageContainer";
@@ -32,8 +34,11 @@ export class TeamCheckerWorker extends WorkerBase {
                     let teamMessage = this.GetTeamMessage(team);
                     let sentMessage = await this.messageSender.SendFields(``, teamMessage);
                     await sentMessage.react('✅');
-                    const filter = (reaction, user) => {
-                        return ['✅'].includes(reaction.emoji.name);
+                    const filter: CollectorFilter = (reaction, user) => {
+                        if (user.bot)
+                            return false;
+                        console.log(user);
+                        return ['✅'].includes(reaction.emoji.name) && user;
                     };
 
                     var collectedReactions = await sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
