@@ -11,7 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeamCheckerWorker = void 0;
 const TranslationHelpers_1 = require("../helpers/TranslationHelpers");
+const MessageContainer_1 = require("../message-helpers/MessageContainer");
 const WorkerBase_1 = require("./Bases/WorkerBase");
+const SearchPlayersWorker_1 = require("./SearchPlayersWorker");
 class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,7 +40,15 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
                             continue;
                         foundTeams.push(team);
                         let teamMessage = this.GetTeamMessage(team);
-                        yield this.messageSender.SendFields(``, teamMessage);
+                        let sentMessage = yield this.messageSender.SendFields(``, teamMessage);
+                        yield sentMessage.react('✅');
+                        const filter = (reaction, user) => {
+                            return ['✅'].includes(reaction.emoji.name);
+                        };
+                        var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
+                        if (collectedReactions.first().emoji.name === '✅') {
+                            yield this.DisplayPlayerInformation(team);
+                        }
                     }
                 }
             }
@@ -55,20 +65,37 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
         let playerLength = team.teamMembers.length;
         for (var i = 0; i < playerLength; i += 3) {
             let player = team.teamMembers[i];
-            firstValueArray.push('\u0009' + player.displayName.split("#")[0]);
+            firstValueArray.push(this.AddPlayerMessage(player));
             if (i + 1 < playerLength) {
                 player = team.teamMembers[i + 1];
-                secondValueArray.push('\u0009' + player.displayName.split("#")[0]);
+                secondValueArray.push(this.AddPlayerMessage(player));
             }
             if (i + 2 < playerLength) {
                 player = team.teamMembers[i + 2];
-                thirdValueArray.push('\u0009' + player.displayName.split("#")[0]);
+                thirdValueArray.push(this.AddPlayerMessage(player));
             }
         }
         result.push({ name: "Players", value: firstValueArray.join("\n"), inline: true });
         result.push({ name: "\u200B", value: secondValueArray.join("\n"), inline: true });
         result.push({ name: "\u200B", value: thirdValueArray.join("\n"), inline: true });
         return result;
+    }
+    AddPlayerMessage(player) {
+        return '\u0009' + player.displayName.split("#")[0];
+    }
+    DisplayPlayerInformation(team) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const users = yield this.dataStore.GetUsers();
+            const foundUsers = [];
+            for (let user of users) {
+                if (user.teamName == team.teamName)
+                    foundUsers.push(user);
+            }
+            const container = new MessageContainer_1.MessageContainer();
+            const message = SearchPlayersWorker_1.SearchPlayersWorker.CreatePlayerMessage(foundUsers, false);
+            container.Append(message);
+            yield this.messageSender.SendMessageFromContainer(container);
+        });
     }
 }
 exports.TeamCheckerWorker = TeamCheckerWorker;

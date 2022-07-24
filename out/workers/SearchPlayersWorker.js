@@ -27,7 +27,7 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
                 if (players.length <= 0)
                     container.AddSimpleGroup(`**No players found for: ${playerName}**`);
                 else
-                    container.Append(this.CreatePlayerMessage(players, this.detailed));
+                    container.Append(SearchPlayersWorker.CreatePlayerMessage(players, this.detailed));
             }
             yield this.messageSender.SendMessageFromContainer(container);
         });
@@ -37,27 +37,27 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
             return yield this.dataStore.GetUsersByApi(searchTerm);
         });
     }
-    CreatePlayerMessage(players, detailed) {
+    static CreatePlayerMessage(players, detailed) {
         var result = [];
-        players.forEach(p => {
+        players.forEach(player => {
             const message = new MessageContainer_1.MessageGroup();
-            message.AddOnNewLine(`**Name**: ${p.displayName}`);
-            if (p.teamName)
-                message.AddOnNewLine(`**TeamName**: ${TranslationHelpers_1.Translationhelpers.GetTeamURL(p.teamName)}`);
+            message.AddOnNewLine(`**Name**: ${player.displayName}`);
+            if (player.teamName)
+                message.AddOnNewLine(`**TeamName**: ${TranslationHelpers_1.Translationhelpers.GetTeamURL(player.teamName)}`);
             else
                 message.AddOnNewLine("**No Team Found**");
-            for (var rank of p.verifiedRankHistory.sort(this.RankHistorySort)) {
+            for (var rank of player.verifiedRankHistory.sort(SearchPlayersWorker.RankHistorySort)) {
                 if (rank.status == 'verified')
                     message.AddOnNewLine(`${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}**`);
             }
             if (detailed) {
-                message.Combine(this.CreateDetailedMessage(p));
+                message.Combine(SearchPlayersWorker.CreateDetailedMessage(player));
             }
             result.push(message);
         });
         return result;
     }
-    CreateDetailedMessage(player) {
+    static CreateDetailedMessage(player) {
         let message = new MessageContainer_1.MessageGroup();
         for (var history of player.history.sort((h1, h2) => h2.timestamp - h1.timestamp)) {
             if (history.season) {
@@ -74,7 +74,7 @@ class SearchPlayersWorker extends WorkerBase_1.WorkerBase {
         }
         return message;
     }
-    RankHistorySort(history1, history2) {
+    static RankHistorySort(history1, history2) {
         if (history1.year > history2.year)
             return -1;
         else if (history1.year < history2.year)

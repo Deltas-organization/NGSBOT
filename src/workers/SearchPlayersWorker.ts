@@ -17,7 +17,7 @@ export class SearchPlayersWorker extends WorkerBase {
             if (players.length <= 0)
                 container.AddSimpleGroup(`**No players found for: ${playerName}**`);
             else
-                container.Append(this.CreatePlayerMessage(players, this.detailed))
+                container.Append(SearchPlayersWorker.CreatePlayerMessage(players, this.detailed))
         }
         await this.messageSender.SendMessageFromContainer(container);
     }
@@ -26,29 +26,29 @@ export class SearchPlayersWorker extends WorkerBase {
         return await this.dataStore.GetUsersByApi(searchTerm);
     }
 
-    private CreatePlayerMessage(players: INGSUser[], detailed: boolean): MessageGroup[] {
+    public static CreatePlayerMessage(players: INGSUser[], detailed: boolean): MessageGroup[] {
         var result: MessageGroup[] = [];
-        players.forEach(p => {
+        players.forEach(player => {
             const message = new MessageGroup();
-            message.AddOnNewLine(`**Name**: ${p.displayName}`);
-            if (p.teamName)
-                message.AddOnNewLine(`**TeamName**: ${Translationhelpers.GetTeamURL(p.teamName)}`);
+            message.AddOnNewLine(`**Name**: ${player.displayName}`);
+            if (player.teamName)
+                message.AddOnNewLine(`**TeamName**: ${Translationhelpers.GetTeamURL(player.teamName)}`);
             else
                 message.AddOnNewLine("**No Team Found**");
 
-            for (var rank of p.verifiedRankHistory.sort(this.RankHistorySort)) {
+            for (var rank of player.verifiedRankHistory.sort(SearchPlayersWorker.RankHistorySort)) {
                 if (rank.status == 'verified')
                     message.AddOnNewLine(`${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}**`);
             }
             if (detailed) {
-                message.Combine(this.CreateDetailedMessage(p))
+                message.Combine(SearchPlayersWorker.CreateDetailedMessage(player))
             }
             result.push(message);
         });
         return result;
     }
 
-    private CreateDetailedMessage(player: INGSUser): MessageGroup {
+    private static CreateDetailedMessage(player: INGSUser): MessageGroup {
         let message = new MessageGroup()
         for (var history of player.history.sort((h1, h2) => h2.timestamp - h1.timestamp)) {
             if (history.season) {
@@ -66,7 +66,7 @@ export class SearchPlayersWorker extends WorkerBase {
         return message;
     }
 
-    private RankHistorySort(history1: INGSRank, history2: INGSRank): number {
+    private static RankHistorySort(history1: INGSRank, history2: INGSRank): number {
         if (history1.year > history2.year)
             return -1;
         else if (history1.year < history2.year)
