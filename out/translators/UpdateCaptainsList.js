@@ -15,6 +15,7 @@ const DiscordChannels_1 = require("../enums/DiscordChannels");
 const NGSDivisions_1 = require("../enums/NGSDivisions");
 const Globals_1 = require("../Globals");
 const ChannelMessageSender_1 = require("../helpers/messageSenders/ChannelMessageSender");
+const LiveDataStore_1 = require("../LiveDataStore");
 const ngsTranslatorBase_1 = require("./bases/ngsTranslatorBase");
 const fs = require('fs');
 class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
@@ -26,16 +27,17 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
+            var season = +LiveDataStore_1.LiveDataStore.season;
             const updateCaptainsList = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.translatorDependencies);
             const channelSender = new ChannelMessageSender_1.ChannelMessageSender(this.client, this.messageStore);
             const message = yield messageSender.SendMessage("Updating captains list now");
             for (var value in NGSDivisions_1.NGSDivisions) {
                 const division = NGSDivisions_1.NGSDivisions[value];
                 try {
-                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, 13, division);
+                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, season, division);
                 }
                 catch (_a) {
-                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, 13, division);
+                    yield this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, season, division);
                 }
             }
             message.Edit("Captains list has been updated");

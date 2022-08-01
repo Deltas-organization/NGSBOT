@@ -10,6 +10,7 @@ import { Mongohelper } from "../helpers/Mongohelper";
 import { RoleHelper } from "../helpers/RoleHelper";
 import { ScheduleHelper, ScheduleInformation } from "../helpers/ScheduleHelper";
 import { INGSSchedule, INGSUser } from "../interfaces";
+import { LiveDataStore } from "../LiveDataStore";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class CheckUnscheduledGamesForWeek {
@@ -20,8 +21,9 @@ export class CheckUnscheduledGamesForWeek {
     }
 
     public async Check(): Promise<MessageHelper<void>[]> {
+        var season: number = +LiveDataStore.season;
         try {
-            var information = await this.mongoHelper.GetNgsInformation(13);
+            var information = await this.mongoHelper.GetNgsInformation(season);
             var result: MessageHelper<void>[] = [];
             for (var value in NGSDivisions) {
                 var division = NGSDivisions[value];
@@ -33,7 +35,7 @@ export class CheckUnscheduledGamesForWeek {
                     Globals.log(`problem reporting matches by round for division: ${division}`, e);
                 }
             }
-            await this.mongoHelper.UpdateSeasonRound(13);
+            await this.mongoHelper.UpdateSeasonRound(season);
             var successfulDivisions = new MessageHelper<void>();
             successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`))
             successfulDivisions.AddNewLine(division.join(", "))

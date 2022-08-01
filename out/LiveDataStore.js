@@ -152,7 +152,7 @@ let LiveDataStore = /** @class */ (() => {
             });
         }
     }
-    LiveDataStore.season = '13';
+    LiveDataStore.season = '14';
     return LiveDataStore;
 })();
 exports.LiveDataStore = LiveDataStore;

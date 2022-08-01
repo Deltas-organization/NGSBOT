@@ -13,6 +13,7 @@ exports.ReportedGamesContainer = exports.CheckUnscheduledGamesForWeek = void 0;
 const NGSDivisions_1 = require("../enums/NGSDivisions");
 const Globals_1 = require("../Globals");
 const MessageHelper_1 = require("../helpers/MessageHelper");
+const LiveDataStore_1 = require("../LiveDataStore");
 class CheckUnscheduledGamesForWeek {
     constructor(mongoHelper, dataStore) {
         this.mongoHelper = mongoHelper;
@@ -21,8 +22,9 @@ class CheckUnscheduledGamesForWeek {
     }
     Check() {
         return __awaiter(this, void 0, void 0, function* () {
+            var season = +LiveDataStore_1.LiveDataStore.season;
             try {
-                var information = yield this.mongoHelper.GetNgsInformation(13);
+                var information = yield this.mongoHelper.GetNgsInformation(season);
                 var result = [];
                 for (var value in NGSDivisions_1.NGSDivisions) {
                     var division = NGSDivisions_1.NGSDivisions[value];
@@ -34,7 +36,7 @@ class CheckUnscheduledGamesForWeek {
                         Globals_1.Globals.log(`problem reporting matches by round for division: ${division}`, e);
                     }
                 }
-                yield this.mongoHelper.UpdateSeasonRound(13);
+                yield this.mongoHelper.UpdateSeasonRound(season);
                 var successfulDivisions = new MessageHelper_1.MessageHelper();
                 successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`));
                 successfulDivisions.AddNewLine(division.join(", "));
