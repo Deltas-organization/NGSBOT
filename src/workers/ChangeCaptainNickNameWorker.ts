@@ -27,7 +27,7 @@ export class ChangeCaptainNickNameWorker extends WorkerBase {
     private async ReNameCaptains() {
         var captains = this._users.filter(u => u.IsCaptain);
         for (var captain of captains) {
-            var discordUser = DiscordFuzzySearch.FindGuildMember(captain, this._guildUsers)?.member;
+            var discordUser = (await DiscordFuzzySearch.FindGuildMember(captain, this._guildUsers))?.member;
             if (discordUser) {
                 await this.AssignNamePrefix(discordUser, "(C)");
             }
@@ -40,7 +40,7 @@ export class ChangeCaptainNickNameWorker extends WorkerBase {
     private async ReNameAssistantCaptains() {
         var assistantCaptains = this._users.filter(u => u.IsAssistantCaptain);
         for (var assitantCaptain of assistantCaptains) {
-            var discordUser = DiscordFuzzySearch.FindGuildMember(assitantCaptain, this._guildUsers)?.member;
+            var discordUser = (await DiscordFuzzySearch.FindGuildMember(assitantCaptain, this._guildUsers))?.member;
             if (discordUser) {
                 await this.AssignNamePrefix(discordUser, "(aC)");
             }
@@ -54,7 +54,7 @@ export class ChangeCaptainNickNameWorker extends WorkerBase {
         for (var user of this._guildUsers) {
             try {
                 for (var ngsUser of this._users) {
-                    var discordUser = DiscordFuzzySearch.FindGuildMember(ngsUser, this._guildUsers)?.member;
+                    var discordUser = (await DiscordFuzzySearch.FindGuildMember(ngsUser, this._guildUsers))?.member;
                     if (!discordUser)
                         continue;
 

@@ -40,14 +40,14 @@ export class UpdateCaptainsListCommand {
                 let hasAssistant = false;
                 for (let user of users.sort((user1, user2) => this.userSort(user1, user2))) {
                     if (user.IsCaptain) {
-                        let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                        let guildMember = await DiscordFuzzySearch.FindGuildMember(user, guildMembers);
                         if (guildMember)
                             messageHelper.AddNew(` - captain ${guildMember.member}`)
                         else
                             messageHelper.AddNew(` - captain ${user.displayName}`)
                     }
                     if (user.IsAssistantCaptain) {
-                        let guildMember = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                        let guildMember = await DiscordFuzzySearch.FindGuildMember(user, guildMembers);
                         if (hasAssistant) {
                             if (guildMember)
                                 messageHelper.AddNew(` and ${guildMember.member}`)

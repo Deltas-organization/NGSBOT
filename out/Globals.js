@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Globals = void 0;
+const DiscordChannels_1 = require("./enums/DiscordChannels");
 let Globals = /** @class */ (() => {
     class Globals {
         static log(message, ...optionalParams) {
@@ -18,6 +19,9 @@ let Globals = /** @class */ (() => {
                 else
                     console.log(message);
             }
+        }
+        static InformDelta(message) {
+            this.ChannelSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
         }
     }
     Globals.EnableLogging = true;

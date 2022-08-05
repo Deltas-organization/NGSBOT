@@ -40,7 +40,7 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             var captains = this._users.filter(u => u.IsCaptain);
             for (var captain of captains) {
-                var discordUser = (_a = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this._guildUsers)) === null || _a === void 0 ? void 0 : _a.member;
+                var discordUser = (_a = (yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this._guildUsers))) === null || _a === void 0 ? void 0 : _a.member;
                 if (discordUser) {
                     yield this.AssignNamePrefix(discordUser, "(C)");
                 }
@@ -55,7 +55,7 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             var assistantCaptains = this._users.filter(u => u.IsAssistantCaptain);
             for (var assitantCaptain of assistantCaptains) {
-                var discordUser = (_a = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(assitantCaptain, this._guildUsers)) === null || _a === void 0 ? void 0 : _a.member;
+                var discordUser = (_a = (yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(assitantCaptain, this._guildUsers))) === null || _a === void 0 ? void 0 : _a.member;
                 if (discordUser) {
                     yield this.AssignNamePrefix(discordUser, "(aC)");
                 }
@@ -71,7 +71,7 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
             for (var user of this._guildUsers) {
                 try {
                     for (var ngsUser of this._users) {
-                        var discordUser = (_a = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(ngsUser, this._guildUsers)) === null || _a === void 0 ? void 0 : _a.member;
+                        var discordUser = (_a = (yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(ngsUser, this._guildUsers))) === null || _a === void 0 ? void 0 : _a.member;
                         if (!discordUser)
                             continue;
                         if (discordUser.id == user.id) {

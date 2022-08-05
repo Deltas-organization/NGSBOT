@@ -1,5 +1,7 @@
 import { Client, Guild } from "discord.js";
+import { DiscordChannels } from "../../enums/DiscordChannels";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
+import { ChannelMessageSender } from "../../helpers/messageSenders/ChannelMessageSender";
 import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { INGSTeam, INGSUser } from "../../interfaces";
@@ -11,12 +13,14 @@ export abstract class WorkerBase {
     protected readonly client: Client;
     protected readonly messageStore: MessageStore;
     protected readonly guild: Guild;
+    private _channelMessageSender: ChannelMessageSender;
 
     constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         this.client = workerDependencies.client;
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
         this.guild = messageSender.originalMessage.guild;
+        this._channelMessageSender = new ChannelMessageSender(this.client, this.messageStore);
     }
 
     public async Begin(commands: string[]) {
@@ -38,5 +42,9 @@ export abstract class WorkerBase {
         const users = await this.dataStore.GetUsers();
         const searchRegex = new RegExp(searchTerm, 'i');
         return users.filter(p => searchRegex.test(p.displayName));
+    }
+
+    protected async SendMessageToDelta(message: string) {
+        await this._channelMessageSender.SendToDiscordChannel(message, DiscordChannels.DeltaPmChannel);
     }
 }

@@ -146,7 +146,7 @@ export class CheckReportedGames {
         const teamMembers = await teamHelper.FindUsersOnTeam(teamName);
         const captains = teamMembers.filter(mem => mem.IsCaptain);
         for (var captain of captains) {
-            const guildMember = DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
+            const guildMember = await DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
             if (guildMember)
                 return guildMember.member;
         }
@@ -158,7 +158,7 @@ export class CheckReportedGames {
         const captains = teamMembers.filter(mem => mem.IsAssistantCaptain);
         const result: GuildMember[] = [];
         for (var captain of captains) {
-            const guildMember = DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers)
+            const guildMember = await DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers)
             if (guildMember)
                 result.push(guildMember.member)
         }

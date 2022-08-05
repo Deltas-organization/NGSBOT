@@ -37,6 +37,7 @@ const MessageContainer_1 = require("./message-helpers/MessageContainer");
 const ChannelMessageSender_1 = require("./helpers/messageSenders/ChannelMessageSender");
 const PmMessageInteraction_1 = require("./message-helpers/PmMessageInteraction");
 const TranslatorService_1 = require("./translators/core/TranslatorService");
+const Globals_1 = require("./Globals");
 let Bot = /** @class */ (() => {
     let Bot = class Bot {
         constructor(client, token, apiToken, mongoConnection, botCommand) {
@@ -46,6 +47,7 @@ let Bot = /** @class */ (() => {
             this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
             this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
             this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
+            Globals_1.Globals.ChannelSender = this.messageSender;
         }
         listen() {
             this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {

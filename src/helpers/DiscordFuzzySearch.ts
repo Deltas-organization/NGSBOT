@@ -4,12 +4,16 @@ import { INGSUser } from "../interfaces";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class DiscordFuzzySearch {
-    public static FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): { member: GuildMember, updateDiscordId: boolean } {
+    public static async FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): Promise<FuzzySearchResult> {
         const ngsDiscordId = user.discordId;
+        let returnResult: FuzzySearchResult = null;
+        let foundById = false;
         if (ngsDiscordId) {
             let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
-            if (members.length == 1)
-                return { member: members[0], updateDiscordId: false };
+            if (members.length == 1) {
+                foundById = true;
+                returnResult = { member: members[0], updateDiscordId: false };
+            }
         }
 
         const ngsDiscordTag = user.discordTag?.replace(' ', '').toLowerCase();
@@ -17,10 +21,18 @@ export class DiscordFuzzySearch {
             return null;
 
         var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
-        if (member)
+        if (member) {
+            if (foundById) {
+                if (returnResult.member.id != member.id) {
+                    await Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`)
+                    return null;
+                }
+            }
             return { member: member, updateDiscordId: true };
-        else
+        }
+        else {
             return null;
+        }
     }
 
     private static FindByDiscordTag(ngsDiscordTag: string, guildMembers: GuildMember[]): GuildMember {
@@ -102,3 +114,5 @@ export class DiscordFuzzySearch {
         return null;
     }
 }
+
+export type FuzzySearchResult = { member: GuildMember, updateDiscordId: boolean };

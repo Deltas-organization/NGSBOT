@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkerBase = void 0;
+const DiscordChannels_1 = require("../../enums/DiscordChannels");
+const ChannelMessageSender_1 = require("../../helpers/messageSenders/ChannelMessageSender");
 class WorkerBase {
     constructor(workerDependencies, detailed, messageSender) {
         this.detailed = detailed;
@@ -18,6 +20,7 @@ class WorkerBase {
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
         this.guild = messageSender.originalMessage.guild;
+        this._channelMessageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client, this.messageStore);
     }
     Begin(commands) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,6 +42,11 @@ class WorkerBase {
             const users = yield this.dataStore.GetUsers();
             const searchRegex = new RegExp(searchTerm, 'i');
             return users.filter(p => searchRegex.test(p.displayName));
+        });
+    }
+    SendMessageToDelta(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._channelMessageSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
         });
     }
 }

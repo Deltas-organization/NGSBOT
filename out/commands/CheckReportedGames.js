@@ -156,7 +156,7 @@ class CheckReportedGames {
             const teamMembers = yield teamHelper.FindUsersOnTeam(teamName);
             const captains = teamMembers.filter(mem => mem.IsCaptain);
             for (var captain of captains) {
-                const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
+                const guildMember = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
                 if (guildMember)
                     return guildMember.member;
             }
@@ -169,7 +169,7 @@ class CheckReportedGames {
             const captains = teamMembers.filter(mem => mem.IsAssistantCaptain);
             const result = [];
             for (var captain of captains) {
-                const guildMember = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
+                const guildMember = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(captain, this.guildMembers);
                 if (guildMember)
                     result.push(guildMember.member);
             }

@@ -38,6 +38,7 @@ import { ChannelMessageSender } from "./helpers/messageSenders/ChannelMessageSen
 import { SeasonInformation } from "./translators/SeasonInformation";
 import { PmMessageInteraction } from "./message-helpers/PmMessageInteraction";
 import { TranslatorService } from "./translators/core/TranslatorService";
+import { Globals } from "./Globals";
 
 @injectable()
 export class Bot {
@@ -57,6 +58,7 @@ export class Bot {
         this.messageSender = new ChannelMessageSender(client, this.dependencies.messageStore);
         this.pmMessageInteraction = new PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService(botCommand, this.dependencies);
+        Globals.ChannelSender = this.messageSender;
     }
 
     public listen(): Promise<string> {

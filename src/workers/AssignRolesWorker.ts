@@ -20,6 +20,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
 
     constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string, mongoHelper: Mongohelper) {
         super(workerDependencies, detailed, messageSender, mongoHelper);
+
     }
 
     protected async Start(commands: string[]) {
@@ -160,8 +161,9 @@ export class AssignRolesWorker extends RoleWorkerBase {
         messageTracker.AddNewLine("**Team Name**");;
         messageTracker.AddNewLine(teamName);
         messageTracker.AddNewLine("**Users**");
+
         for (let user of teamUsers) {
-            var searchResult = DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+            var searchResult = await DiscordFuzzySearch.FindGuildMember(user, guildMembers);
             messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
             if (searchResult) {
                 const guildMember = searchResult.member;

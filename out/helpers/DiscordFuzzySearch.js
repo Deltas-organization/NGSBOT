@@ -14,20 +14,34 @@ const Globals_1 = require("../Globals");
 class DiscordFuzzySearch {
     static FindGuildMember(user, guildMembers) {
         var _a;
-        const ngsDiscordId = user.discordId;
-        if (ngsDiscordId) {
-            let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
-            if (members.length == 1)
-                return { member: members[0], updateDiscordId: false };
-        }
-        const ngsDiscordTag = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
-        if (!ngsDiscordTag)
-            return null;
-        var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
-        if (member)
-            return { member: member, updateDiscordId: true };
-        else
-            return null;
+        return __awaiter(this, void 0, void 0, function* () {
+            const ngsDiscordId = user.discordId;
+            let returnResult = null;
+            let foundById = false;
+            if (ngsDiscordId) {
+                let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
+                if (members.length == 1) {
+                    foundById = true;
+                    returnResult = { member: members[0], updateDiscordId: false };
+                }
+            }
+            const ngsDiscordTag = (_a = user.discordTag) === null || _a === void 0 ? void 0 : _a.replace(' ', '').toLowerCase();
+            if (!ngsDiscordTag)
+                return null;
+            var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
+            if (member) {
+                if (foundById) {
+                    if (returnResult.member.id != member.id) {
+                        yield Globals_1.Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`);
+                        return null;
+                    }
+                }
+                return { member: member, updateDiscordId: true };
+            }
+            else {
+                return null;
+            }
+        });
     }
     static FindByDiscordTag(ngsDiscordTag, guildMembers) {
         const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);

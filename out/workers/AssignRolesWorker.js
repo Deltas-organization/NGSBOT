@@ -161,7 +161,7 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             messageTracker.AddNewLine(teamName);
             messageTracker.AddNewLine("**Users**");
             for (let user of teamUsers) {
-                var searchResult = DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                var searchResult = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
                 messageTracker.AddNewLine(`${user.displayName} : ${user.discordTag}`);
                 if (searchResult) {
                     const guildMember = searchResult.member;
