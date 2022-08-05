@@ -83,7 +83,7 @@ export class DiscordFuzzySearch {
             return true;
         }
         else if (guildUser.username.toLowerCase().indexOf(name) > -1) {
-            Globals.log(`FuzzySearch!! Website has: ${name}, Found: ${guildUser.username}`)
+            //Globals.log(`FuzzySearch!! Website has: ${name}, Found: ${guildUser.username}`)
             return true;
         }
         return false;

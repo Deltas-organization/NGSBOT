@@ -79,7 +79,7 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
                                 if (!ngsUser.IsAssistantCaptain)
                                     yield this.RemoveFromUser(user, "(aC)");
                             }
-                            else if (this.CheckForNameValue(user, "(C)")) {
+                            if (this.CheckForNameValue(user, "(C)")) {
                                 if (!ngsUser.IsCaptain)
                                     yield this.RemoveFromUser(user, "(C)");
                             }
@@ -115,15 +115,15 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
             if (this.CheckForNameValue(discordUser, prefix) == false) {
                 var newName = `${prefix} ${discordUser.displayName}`;
                 if (newName.length > 32) {
-                    this._usersNamesUnableToUpdate.push(discordUser.displayName);
+                    this._usersNamesUnableToUpdate.push(discordUser.displayName + " - Name too long \n");
                 }
                 else {
                     try {
                         yield discordUser.setNickname(newName, "Changing name to include captain prefix");
                         this._usersNamesUpdated.push(newName);
                     }
-                    catch (_a) {
-                        this._usersNamesUnableToUpdate.push(discordUser.displayName);
+                    catch (e) {
+                        this._usersNamesUnableToUpdate.push(discordUser.displayName + ` - ${e} \n`);
                     }
                 }
             }

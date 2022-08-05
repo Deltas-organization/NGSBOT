@@ -29,7 +29,7 @@ class DisplayUnusedRoles extends RoleWorkerBase_1.RoleWorkerBase {
                     if (this.myBotRole.comparePositionTo(role) > 0) {
                         let color = role.hexColor;
                         const roleName = RoleHelper_1.RoleHelper.GroomRoleNameAsLowerCase(role.name);
-                        let found = TeamHelper.LookForTeamByRole(roleName);
+                        let found = yield TeamHelper.LookForTeamByRole(roleName);
                         if (!found) {
                             unusedRoles.push(color + ":" + role.name);
                         }

@@ -64,7 +64,6 @@ export class AssignNewUserCommand {
 
         const roleRsponse = this._serverRoleHelper.FindDivRole(team.divisionDisplayName);
         let divRoleOnDiscord = roleRsponse.div == NGSRoles.Storm ? null : roleRsponse.role;
-        divRoleOnDiscord = null;
         if (divRoleOnDiscord) {
             result.AddOnNewLine(`Assigned div role`);
             await guildMember.roles.add(divRoleOnDiscord);
