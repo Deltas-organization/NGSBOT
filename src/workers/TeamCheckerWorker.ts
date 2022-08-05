@@ -1,5 +1,5 @@
 import { debug } from "console";
-import { CollectorFilter } from "discord.js";
+import { CollectorFilter, Message } from "discord.js";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { INGSTeam, INGSUser } from "../interfaces";
 import { MessageContainer } from "../message-helpers/MessageContainer";
@@ -9,6 +9,7 @@ import { SearchPlayersWorker } from "./SearchPlayersWorker";
 export class TeamCheckerWorker extends WorkerBase {
     protected async Start(commands: string[]) {
         const foundTeams = [];
+        var reactionsWaiting: Promise<void>[] = [];
         var number = parseInt(commands[0]);
         var searchMethod = (term: string) => this.SearchForRegisteredTeams(term);
         if (!isNaN(number)) {
@@ -33,20 +34,26 @@ export class TeamCheckerWorker extends WorkerBase {
                     foundTeams.push(team);
                     let teamMessage = this.GetTeamMessage(team);
                     let sentMessage = await this.messageSender.SendFields(``, teamMessage);
-                    await sentMessage.react('✅');
-                    const filter: CollectorFilter = (reaction, user) => {
-                        if (user.bot)
-                            return false;
-                        console.log(user);
-                        return ['✅'].includes(reaction.emoji.name) && user;
-                    };
-
-                    var collectedReactions = await sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-                    if (collectedReactions.first().emoji.name === '✅') {
-                        await this.DisplayPlayerInformation(team);
-                    }
+                    var reactionPromise = this.reactToMessage(sentMessage, team);
+                    reactionsWaiting.push(reactionPromise);
                 }
             }
+        }
+        await Promise.all(reactionsWaiting);
+    }
+
+    private async reactToMessage(sentMessage: Message, team: INGSTeam) {
+        await sentMessage.react('✅');
+        const filter: CollectorFilter = (reaction, user) => {
+            if (user.bot)
+                return false;
+            console.log(user);
+            return ['✅'].includes(reaction.emoji.name) && user;
+        };
+
+        var collectedReactions = await sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
+        if (collectedReactions.first().emoji.name === '✅') {
+            await this.DisplayPlayerInformation(team);
         }
     }
 

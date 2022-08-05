@@ -18,6 +18,7 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundTeams = [];
+            var reactionsWaiting = [];
             var number = parseInt(commands[0]);
             var searchMethod = (term) => this.SearchForRegisteredTeams(term);
             if (!isNaN(number)) {
@@ -41,19 +42,26 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
                         foundTeams.push(team);
                         let teamMessage = this.GetTeamMessage(team);
                         let sentMessage = yield this.messageSender.SendFields(``, teamMessage);
-                        yield sentMessage.react('✅');
-                        const filter = (reaction, user) => {
-                            if (user.bot)
-                                return false;
-                            console.log(user);
-                            return ['✅'].includes(reaction.emoji.name) && user;
-                        };
-                        var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-                        if (collectedReactions.first().emoji.name === '✅') {
-                            yield this.DisplayPlayerInformation(team);
-                        }
+                        var reactionPromise = this.reactToMessage(sentMessage, team);
+                        reactionsWaiting.push(reactionPromise);
                     }
                 }
+            }
+            yield Promise.all(reactionsWaiting);
+        });
+    }
+    reactToMessage(sentMessage, team) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield sentMessage.react('✅');
+            const filter = (reaction, user) => {
+                if (user.bot)
+                    return false;
+                console.log(user);
+                return ['✅'].includes(reaction.emoji.name) && user;
+            };
+            var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
+            if (collectedReactions.first().emoji.name === '✅') {
+                yield this.DisplayPlayerInformation(team);
             }
         });
     }

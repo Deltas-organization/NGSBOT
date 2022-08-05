@@ -25,8 +25,10 @@ class AssignRoles extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             const assignRolesWorker = new AssignRolesWorker_1.AssignRolesWorker(this.translatorDependencies, detailed, messageSender, this.apiKey, this.CreateMongoHelper());
             yield assignRolesWorker.Begin(commands);
-            const worker = new ChangeCaptainNickNameWorker_1.ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
-            yield worker.Begin(commands);
+            yield messageSender.SendReactionMessage("Should I attempt to update nicknames?", (user) => user == messageSender.GuildMember, () => __awaiter(this, void 0, void 0, function* () {
+                const worker = new ChangeCaptainNickNameWorker_1.ChangeCaptainNickNameWorker(this.translatorDependencies, detailed, messageSender);
+                yield worker.Begin(commands);
+            }));
         });
     }
 }
