@@ -36,7 +36,7 @@ class DiscordFuzzySearch {
                         return null;
                     }
                 }
-                return { member: member, updateDiscordId: true };
+                return { member: member, updateDiscordId: !foundById };
             }
             else {
                 return null;
@@ -57,7 +57,7 @@ class DiscordFuzzySearch {
                 return member;
             }
             else if (member.user.username.toLowerCase().indexOf(name) > -1) {
-                Globals_1.Globals.log(`FuzzySearch!! Website has: ${name}, Found: ${member.user.username}`);
+                //Globals.log(`FuzzySearch!! Website has: ${name}, Found: ${member.user.username}`)
                 possibleMembers.push(member);
             }
         }
