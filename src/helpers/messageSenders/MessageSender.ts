@@ -44,6 +44,7 @@ export class MessageSender {
     public async SendMessagesToChannel(messages: string[], channel: TextChannel | DMChannel | NewsChannel, storeMessage = true) {
         let result: MessageWrapper[] = [];
         let combinedMessages = this.CombineMultiple(messages);
+
         for (var message of combinedMessages) {
             result.push(await this.SendMessageToChannel(message, channel, storeMessage));
         }

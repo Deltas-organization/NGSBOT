@@ -88,14 +88,16 @@ export class RespondToMessageSender extends MessageSender {
     }
 
     public async DMMessage(message: string) {
-        return await this.SendMessageToChannel(message, this.Channel, false);
+        var channel = await this.GuildMember.createDM();
+        return await this.SendMessageToChannel(message, channel, false);
     }
 
     public async DMMessages(messages: string[]) {
-        return await this.SendMessagesToChannel(messages, this.Channel, false);
+        var channel = await this.GuildMember.createDM();
+        return await this.SendMessagesToChannel(messages, channel, false);
     }
 
     public async SendMessageFromContainer(messageContainer: MessageContainer, basic = false) {
-        return await this.SendMessageFromContainerToChannel(messageContainer, this.Channel, basic)
+        return await this.SendMessageFromContainerToChannel(messageContainer, this.Channel, basic);
     }
 }

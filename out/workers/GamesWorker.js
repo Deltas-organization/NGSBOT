@@ -35,7 +35,6 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
                     yield this._multiMessageCommand(messages);
                 else {
                     yield this._messageCommand("Nothing scheduled yet.");
-                    //}
                 }
                 if (!this.detailed) {
                     this.messageSender.originalMessage.delete();
@@ -87,7 +86,7 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
     }
     GetScheduleMessages(ngsTeam) {
         return __awaiter(this, void 0, void 0, function* () {
-            let games = ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames());
+            let games = ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames(), 99);
             games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
             return yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
         });

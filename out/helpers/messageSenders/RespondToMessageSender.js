@@ -96,12 +96,14 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
     }
     DMMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.SendMessageToChannel(message, this.Channel, false);
+            var channel = yield this.GuildMember.createDM();
+            return yield this.SendMessageToChannel(message, channel, false);
         });
     }
     DMMessages(messages) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.SendMessagesToChannel(messages, this.Channel, false);
+            var channel = yield this.GuildMember.createDM();
+            return yield this.SendMessagesToChannel(messages, channel, false);
         });
     }
     SendMessageFromContainer(messageContainer, basic = false) {

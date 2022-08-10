@@ -31,7 +31,6 @@ export class GamesWorker extends WorkerBase {
                 await this._multiMessageCommand(messages);
             else {
                 await this._messageCommand("Nothing scheduled yet.");
-                //}
             }
             if (!this.detailed) {
                 this.messageSender.originalMessage.delete();
@@ -84,7 +83,7 @@ export class GamesWorker extends WorkerBase {
     }
 
     private async GetScheduleMessages(ngsTeam: INGSTeam) {
-        let games = ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames());
+        let games = ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames(), 99);
         games = games.filter(game => game.home.teamName == ngsTeam.teamName || game.away.teamName == ngsTeam.teamName);
         return await ScheduleHelper.GetMessages(games);
     }
