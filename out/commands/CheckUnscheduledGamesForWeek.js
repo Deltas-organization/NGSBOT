@@ -30,7 +30,9 @@ class CheckUnscheduledGamesForWeek {
                     var division = NGSDivisions_1.NGSDivisions[value];
                     try {
                         //We do +1 since the round hasn't been incremented yet and we are looking at next weeks scheduled games.
-                        result.push(yield this.SendMessageForDivision(division, information.round + 1));
+                        var message = yield this.SendMessageForDivision(division, information.round + 1);
+                        if (message)
+                            result.push(message);
                     }
                     catch (e) {
                         Globals_1.Globals.log(`problem reporting matches by round for division: ${division}`, e);
@@ -39,7 +41,7 @@ class CheckUnscheduledGamesForWeek {
                 yield this.mongoHelper.UpdateSeasonRound(season);
                 var successfulDivisions = new MessageHelper_1.MessageHelper();
                 successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`));
-                successfulDivisions.AddNewLine(division.join(", "));
+                successfulDivisions.AddNewLine(this._divisionsWithAllGamesScheduled.join(", "));
                 result.push(successfulDivisions);
                 return result;
             }
@@ -59,17 +61,18 @@ class CheckUnscheduledGamesForWeek {
                     continue;
                 unscheduledGames.push(match);
             }
-            var messageToSend = new MessageHelper_1.MessageHelper();
             if (unscheduledGames.length < 1) {
                 this._divisionsWithAllGamesScheduled.push(division);
+                return null;
             }
             else {
+                var messageToSend = new MessageHelper_1.MessageHelper();
                 messageToSend.AddNew(`Found some unschedule games for Division: **${division}**`);
                 for (var unscheduledGame of unscheduledGames) {
                     messageToSend.AddNewLine(`**${unscheduledGame.home.teamName}** VS **${unscheduledGame.away.teamName}**`);
                 }
+                return messageToSend;
             }
-            return messageToSend;
         });
     }
 }

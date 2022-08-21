@@ -29,7 +29,9 @@ export class CheckUnscheduledGamesForWeek {
                 var division = NGSDivisions[value];
                 try {
                     //We do +1 since the round hasn't been incremented yet and we are looking at next weeks scheduled games.
-                    result.push(await this.SendMessageForDivision(division, information.round + 1));
+                    var message = await this.SendMessageForDivision(division, information.round + 1);
+                    if (message)
+                        result.push(message);
                 }
                 catch (e) {
                     Globals.log(`problem reporting matches by round for division: ${division}`, e);
@@ -38,7 +40,7 @@ export class CheckUnscheduledGamesForWeek {
             await this.mongoHelper.UpdateSeasonRound(season);
             var successfulDivisions = new MessageHelper<void>();
             successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`))
-            successfulDivisions.AddNewLine(division.join(", "))
+            successfulDivisions.AddNewLine(this._divisionsWithAllGamesScheduled.join(", "))
             result.push(successfulDivisions);
             return result;
         }
@@ -62,17 +64,18 @@ export class CheckUnscheduledGamesForWeek {
 
         }
 
-        var messageToSend = new MessageHelper<void>();
         if (unscheduledGames.length < 1) {
             this._divisionsWithAllGamesScheduled.push(division);
+            return null;
         }
         else {
+            var messageToSend = new MessageHelper<void>();
             messageToSend.AddNew(`Found some unschedule games for Division: **${division}**`);
             for (var unscheduledGame of unscheduledGames) {
                 messageToSend.AddNewLine(`**${unscheduledGame.home.teamName}** VS **${unscheduledGame.away.teamName}**`);
             }
+            return messageToSend;
         }
-        return messageToSend;
     }
 }
 
