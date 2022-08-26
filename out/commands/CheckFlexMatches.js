@@ -20,12 +20,12 @@ class CheckFlexMatches {
     Check() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                var result;
+                var result = new MessageContainer_1.MessageContainer();
                 var unscheduledFlexMatch = [];
                 var unscheduledFlexMatch = yield this.dataStore.GetUnScheduledFlexMatches();
                 unscheduledFlexMatch = unscheduledFlexMatch.sort((i1, i2) => TeamSorter_1.TeamSorter.SortByDivisionConcat(i1.divisionConcat, i2.divisionConcat));
-                var lastDivision;
-                var currentDivisionMessage;
+                var lastDivision = null;
+                var currentDivisionMessage = null;
                 for (var match of unscheduledFlexMatch) {
                     if (!match.divisionConcat)
                         continue;
@@ -36,7 +36,7 @@ class CheckFlexMatches {
                             result.Append(currentDivisionMessage);
                             lastDivision = match.divisionConcat;
                         }
-                        currentDivisionMessage.AddOnNewLine(`**${match.home.teamName}** vs **${match.away.teamName}**`);
+                        currentDivisionMessage === null || currentDivisionMessage === void 0 ? void 0 : currentDivisionMessage.AddOnNewLine(`**${match.home.teamName}** vs **${match.away.teamName}**`);
                     }
                     catch (e) {
                         Globals_1.Globals.log("Problem", match, e);

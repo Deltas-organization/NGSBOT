@@ -12,7 +12,10 @@ export class DisplayUnusedRoles extends RoleWorkerBase {
         const TeamHelper = await this.dataStore.GetTeams();
         const unusedRoles: string[] = [];
         try {
-            let allRoles = (await this.messageSender.originalMessage.guild.roles.fetch()).cache.map((mem, _, __) => mem);
+            if (!this.messageSender.originalMessage.guild)
+                return;
+
+            let allRoles = (await this.messageSender.originalMessage.guild.roles.fetch()).map((mem, _, __) => mem);
             for (var role of allRoles.sort((r1, r2) => r2.position - r1.position)) {
                 if (this.myBotRole.comparePositionTo(role) > 0) {
                     let color = role.hexColor

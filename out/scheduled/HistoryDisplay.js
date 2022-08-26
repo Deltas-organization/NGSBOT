@@ -128,8 +128,11 @@ class HistoryContainer {
         let currentMessage = new MessageHelper_1.MessageHelper('HistoryContainer');
         currentMessage.AddNewLine(`**[${this.Team.divisionDisplayName}] - ${this.Team.teamName}**`);
         for (var mapkey of this.Information.keys()) {
-            for (var historyInformaiton of this.Information.get(mapkey)) {
-                currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
+            let key = this.Information.get(mapkey);
+            if (key) {
+                for (var historyInformaiton of key) {
+                    currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
+                }
             }
         }
         currentMessage.AddNewLine('');

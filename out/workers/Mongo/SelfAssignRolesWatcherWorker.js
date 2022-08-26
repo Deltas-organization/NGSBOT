@@ -28,7 +28,8 @@ class SelfAssignRolesWatcherWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 }
                 else {
                     const resultMessage = yield this.AssignOrUnassignRolesFromUser(commands);
-                    this.messageSender.SendMessage(resultMessage.CreateStringMessage());
+                    if (resultMessage)
+                        this.messageSender.SendMessage(resultMessage.CreateStringMessage());
                 }
             }
             catch (e) {
@@ -42,7 +43,7 @@ class SelfAssignRolesWatcherWorker extends RoleWorkerBase_1.RoleWorkerBase {
             const allRoles = yield this.guild.roles.fetch();
             const roleNames = [];
             for (var roleNameWatching of currentRolesToWatch) {
-                let role = yield allRoles.fetch(roleNameWatching);
+                let role = yield allRoles.find(r => r.id == roleNameWatching);
                 if (role)
                     roleNames.push(role.name);
             }
@@ -53,10 +54,11 @@ class SelfAssignRolesWatcherWorker extends RoleWorkerBase_1.RoleWorkerBase {
     AssignOrUnassignRolesFromUser(commands) {
         return __awaiter(this, void 0, void 0, function* () {
             const currentRolesToWatch = yield this.mongoHelper.GetAssignedRoleRequests(this.guild.id);
-            const allRoles = yield this.guild.roles.fetch();
             const assignedRoles = [];
             const removedRoles = [];
-            var rolesOfMember = this.messageSender.GuildMember.roles.cache.map((role, _, __) => role);
+            var rolesOfMember = yield this.GetUserRoles();
+            if (!rolesOfMember || !this.messageSender.GuildMember)
+                return;
             for (const command of commands) {
                 const commandName = command.toLowerCase();
                 for (const roleNameWatching of currentRolesToWatch) {

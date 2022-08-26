@@ -47,11 +47,13 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             const messageId = yield this.GetSavedMessage(season, division);
             const message = yield captainsListCommand.CreateDivisionList(division, DiscordChannels_1.DiscordChannels.NGSDiscord);
-            if (messageId)
-                yield channelSender.OverwriteBasicMessage(message, messageId, DiscordChannels_1.DiscordChannels.NGSCaptainList);
-            else {
-                var messages = yield channelSender.SendToDiscordChannelAsBasic(message, DiscordChannels_1.DiscordChannels.NGSCaptainList);
-                yield this.CreateMongoRecord(messages, season, division);
+            if (message) {
+                if (messageId)
+                    yield channelSender.OverwriteBasicMessage(message, messageId, DiscordChannels_1.DiscordChannels.NGSCaptainList);
+                else {
+                    var messages = yield channelSender.SendToDiscordChannelAsBasic(message, DiscordChannels_1.DiscordChannels.NGSCaptainList);
+                    yield this.CreateMongoRecord(messages, season, division);
+                }
             }
         });
     }

@@ -30,8 +30,9 @@ class TranslatorBase {
     Init() {
     }
     Translate(messageText, message) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.user.id != DiscordMembers_1.DiscordMembers.Delta) {
+            if (((_a = message.member) === null || _a === void 0 ? void 0 : _a.user.id) != DiscordMembers_1.DiscordMembers.Delta) {
                 //not enough permissions
                 if ((yield this.Verify(message)) == false)
                     return;

@@ -53,10 +53,10 @@ export class DataStoreWrapper {
         this._dataStore.Clear();
     }
 
-    public async LookForRegisteredTeam(ngsUser: AugmentedNGSUser): Promise<INGSTeam> {
+    public async LookForRegisteredTeam(ngsUser: AugmentedNGSUser): Promise<INGSTeam | undefined> {
         try {
             let validTeams = await this.SearchForRegisteredTeams(ngsUser.teamName);
-            if (validTeams.length == 1) {
+            if (validTeams?.length == 1) {
                 return validTeams[0];
             }
         }
@@ -65,11 +65,11 @@ export class DataStoreWrapper {
         }
     }
 
-    public async SearchForRegisteredTeams(searchTerm: string): Promise<INGSTeam[]> {
+    public async SearchForRegisteredTeams(searchTerm: string): Promise<INGSTeam[] | undefined> {
         return (await this.GetTeams()).SearchForTeam(searchTerm);
     }
 
-    public async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[]> {
+    public async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[] | undefined> {
         try {
             const allTeams = await this.GetTeamsBySeason(season);
             const searchRegex = new RegExp(searchTerm, 'i');

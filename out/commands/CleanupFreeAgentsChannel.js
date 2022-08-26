@@ -59,10 +59,10 @@ class CleanupFreeAgentsChannel {
                     try {
                         yield message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                         yield message.author.send({
-                            embed: {
-                                color: 0,
-                                description: message.content
-                            }
+                            embeds: [{
+                                    color: 0,
+                                    description: message.content
+                                }]
                         });
                     }
                     catch (e) {
@@ -106,7 +106,7 @@ class CleanupFreeAgentsChannel {
     }
     GetChannel(channelId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.client.channels.fetch(channelId, false));
+            return (yield this.client.channels.fetch(channelId));
         });
     }
 }

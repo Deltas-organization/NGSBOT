@@ -22,8 +22,8 @@ export class AssignFreeAgentRoleWorker extends RoleWorkerBase {
         try {
             const guildMember = (await this.messageSender.GuildMember);
             let freeAgentRole = this.roleHelper.lookForRole(NGSRoles.FreeAgents);
-            var rolesOfUser = guildMember.roles.cache.map((role, _, __) => role);
-            if (freeAgentRole != null) {
+            var rolesOfUser = await this.GetUserRoles();
+            if (freeAgentRole != null && rolesOfUser) {
                 if (!this.HasRole(rolesOfUser, freeAgentRole)) {
                     await this.AssignRole(guildMember, freeAgentRole);
                     message = "Assigned Free Agent Role";
@@ -41,12 +41,14 @@ export class AssignFreeAgentRoleWorker extends RoleWorkerBase {
         await this.messageSender.SendMessage(message);
     }
 
-    private async AssignRole(guildMember: GuildMember, divRole: Role) {
-        await guildMember.roles.add(divRole);
+    private async AssignRole(guildMember: GuildMember | null, divRole: Role) {
+        if (guildMember)
+            await guildMember.roles.add(divRole);
     }
 
-    private async RemoveRole(guildMember: GuildMember, role: Role) {
-        await guildMember.roles.remove(role);
+    private async RemoveRole(guildMember: GuildMember | null, role: Role) {
+        if (guildMember)
+            await guildMember.roles.remove(role);
     }
 
     private HasRole(rolesOfUser: Role[], roleToLookFor: Role) {

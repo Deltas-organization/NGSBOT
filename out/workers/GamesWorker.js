@@ -44,6 +44,8 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
     }
     GetMessagesForMessageSender() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.messageSender.Requester)
+                return;
             const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(this.messageSender.Requester, yield this.dataStore.GetUsers());
             if (!ngsUser) {
                 yield this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.");
@@ -64,7 +66,7 @@ class GamesWorker extends WorkerBase_1.WorkerBase {
     GetMessagesForTeam(teamSearchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             let teams = yield this.SearchForRegisteredTeams(teamSearchTerm);
-            if (teams.length < 1)
+            if (!teams || teams.length < 1)
                 return ["No team found"];
             else if (teams.length > 1)
                 return ["More then one team returned."];

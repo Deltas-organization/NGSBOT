@@ -30,7 +30,7 @@ class DiscordFuzzySearch {
                 return null;
             var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
             if (member) {
-                if (foundById) {
+                if (foundById && returnResult) {
                     if (returnResult.member.id != member.id) {
                         yield Globals_1.Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`);
                         return null;

@@ -18,8 +18,9 @@ export class MessageHelper<T> {
 
     public AddNew(message: string) {
         let line = new DetailedLine("", 0);
-        if (this._lines.length > 0)
-            line = this._lines.pop();
+        var popedLine = this._lines.pop();
+        if (popedLine)
+            line = popedLine
 
         line.Message += message;
         this._lines.push(line);

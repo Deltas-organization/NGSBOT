@@ -13,7 +13,7 @@ export class CheckReportedGames {
 
     }
 
-    public async Check(): Promise<ReportedGamesContainer> {
+    public async Check(): Promise<ReportedGamesContainer | undefined> {
         try {
             this.guildMembers = await ClientHelper.GetMembers(this.client, DiscordChannels.NGSDiscord);
             return await this.GetMessages();
@@ -49,18 +49,20 @@ export class CheckReportedGames {
             message.AddNew(`Your game yesterday, **${schedule.home.teamName}** vs **${schedule.away.teamName}** has not been reported.`);
             message.AddNewLine(`If you won the game please report it on the website.`);
             message.AddEmptyLine();
-            await homeCaptains.send({
-                embed: {
-                    color: 0,
-                    description: message.CreateStringMessage()
-                }
-            });
-            await awayCaptain.send({
-                embed: {
-                    color: 0,
-                    description: message.CreateStringMessage()
-                }
-            });
+            if (homeCaptains)
+                await homeCaptains.send({
+                    embeds: [{
+                        color: 0,
+                        description: message.CreateStringMessage()
+                    }]
+                });
+            if (awayCaptain)
+                await awayCaptain.send({
+                    embeds: [{
+                        color: 0,
+                        description: message.CreateStringMessage()
+                    }]
+                });
         }
     }
 
@@ -141,7 +143,7 @@ export class CheckReportedGames {
         return messages.map(messages => messages.CreateStringMessage());
     }
 
-    private async GetCaptain(teamName: string): Promise<GuildMember> {
+    private async GetCaptain(teamName: string): Promise<GuildMember | undefined> {
         var teamHelper = await this.dataStore.GetTeams();
         const teamMembers = await teamHelper.FindUsersOnTeam(teamName);
         const captains = teamMembers.filter(mem => mem.IsCaptain);

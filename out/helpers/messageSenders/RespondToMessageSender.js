@@ -24,20 +24,23 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
         return this.originalMessage.member;
     }
     get Requester() {
-        return this.GuildMember.user;
+        var _a;
+        return (_a = this.GuildMember) === null || _a === void 0 ? void 0 : _a.user;
     }
     SendReactionMessage(message, authentication, yesReaction, noReaction = () => { }, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
             var sentMessage = yield this.Channel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
+                embeds: [{
+                        color: 'DEFAULT',
+                        description: message
+                    }]
             });
             if (storeMessage)
                 this.messageStore.AddMessage(sentMessage);
             yield sentMessage.react('✅');
             yield sentMessage.react('❌');
+            if (!this.originalMessage.guild)
+                return;
             const guildMembers = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
             const filter = (reaction, user) => {
                 let member = guildMembers.find(mem => mem.id == user.id);
@@ -45,14 +48,17 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
             };
             let response = null;
             try {
-                var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-                if (collectedReactions.first().emoji.name === '✅') {
-                    yield yesReaction();
-                    response = true;
-                }
-                if (collectedReactions.first().emoji.name === '❌') {
-                    yield noReaction();
-                    response = false;
+                var collectedReactions = yield sentMessage.awaitReactions({ filter, max: 1, time: 3e4, errors: ['time'] });
+                var first = collectedReactions.first();
+                if (first) {
+                    if (first.emoji.name === '✅') {
+                        yield yesReaction();
+                        response = true;
+                    }
+                    if (first.emoji.name === '❌') {
+                        yield noReaction();
+                        response = false;
+                    }
                 }
             }
             catch (err) {
@@ -69,11 +75,11 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
     SendFields(description, fields) {
         return __awaiter(this, void 0, void 0, function* () {
             var sentMessage = yield this.Channel.send({
-                embed: {
-                    color: 0,
-                    description: description,
-                    fields: fields
-                }
+                embeds: [{
+                        color: "DEFAULT",
+                        description: description,
+                        fields: fields
+                    }]
             });
             this.messageStore.AddMessage(sentMessage);
             return sentMessage;
@@ -96,14 +102,18 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
     }
     DMMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            var channel = yield this.GuildMember.createDM();
-            return yield this.SendMessageToChannel(message, channel, false);
+            if (this.GuildMember) {
+                var channel = yield this.GuildMember.createDM();
+                return yield this.SendMessageToChannel(message, channel, false);
+            }
         });
     }
     DMMessages(messages) {
         return __awaiter(this, void 0, void 0, function* () {
-            var channel = yield this.GuildMember.createDM();
-            return yield this.SendMessagesToChannel(messages, channel, false);
+            if (this.GuildMember) {
+                var channel = yield this.GuildMember.createDM();
+                return yield this.SendMessagesToChannel(messages, channel, false);
+            }
         });
     }
     SendMessageFromContainer(messageContainer, basic = false) {

@@ -17,11 +17,15 @@ export class DeleteMessageWorker extends WorkerBase {
             return ['✅'].includes(reaction.emoji.name) && user.id === this.messageSender.originalMessage.author.id;
         };
 
-        var collectedReactions = await message.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-        if (collectedReactions.first().emoji.name === '✅') {
+        try {
+            await message.awaitReactions({ filter, max: 1, time: 3e4 });
             this.messageStore.DeleteMessage(amountToDelete);
+            message.delete();
+            this.messageSender.originalMessage.delete();
         }
-        message.delete();
-        this.messageSender.originalMessage.delete();
+        catch
+        {
+
+        }
     }
 }

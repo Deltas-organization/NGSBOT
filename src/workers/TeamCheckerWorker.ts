@@ -1,5 +1,5 @@
 import { debug } from "console";
-import { CollectorFilter, Message } from "discord.js";
+import { Collection, CollectorFilter, Message, MessageReaction, User } from "discord.js";
 import { Translationhelpers } from "../helpers/TranslationHelpers";
 import { INGSTeam, INGSUser } from "../interfaces";
 import { MessageContainer } from "../message-helpers/MessageContainer";
@@ -8,7 +8,7 @@ import { SearchPlayersWorker } from "./SearchPlayersWorker";
 
 export class TeamCheckerWorker extends WorkerBase {
     protected async Start(commands: string[]) {
-        const foundTeams = [];
+        const foundTeams: INGSTeam[] = [];
         var reactionsWaiting: Promise<void>[] = [];
         var number = parseInt(commands[0]);
         var searchMethod = (term: string) => this.SearchForRegisteredTeams(term);
@@ -19,10 +19,10 @@ export class TeamCheckerWorker extends WorkerBase {
                 await this.messageSender.SendMessage("invalid search");
         }
         for (var i = 0; i < commands.length; i++) {
-            const fields = [];
+            const fields: { name: string, value: string }[] = [];
             const searchTerm = commands[i];
             const teams = await searchMethod(searchTerm);
-            if (teams.length <= 0) {
+            if (!teams || teams.length <= 0) {
                 fields.push({ name: `No teams found for  \n`, value: searchTerm });
                 await this.messageSender.SendFields(``, fields);
             }
@@ -44,27 +44,34 @@ export class TeamCheckerWorker extends WorkerBase {
 
     private async reactToMessage(sentMessage: Message, team: INGSTeam) {
         await sentMessage.react('✅');
-        const filter: CollectorFilter = (reaction, user) => {
+        const filter: CollectorFilter<[MessageReaction, User]> = (reaction, user) => {
             if (user.bot)
                 return false;
-            console.log(user);
-            return ['✅'].includes(reaction.emoji.name) && user;
+            if (reaction.emoji.name) {
+                if (['✅'].includes(reaction.emoji.name))
+                    return true;
+            }
+            return false;
         };
 
-        var collectedReactions = await sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-        if (collectedReactions.first().emoji.name === '✅') {
-            await this.DisplayPlayerInformation(team);
+        try {
+            await sentMessage.awaitReactions({ filter, max: 1, time: 3e4 });
+            this.DisplayPlayerInformation(team);
+        }
+        catch
+        {
+
         }
     }
 
     private GetTeamMessage(team: INGSTeam): any[] {
-        let result = [];
+        let result: { name: string, value: string, inline: boolean }[] = [];
         result.push({ name: "TeamName", value: `\u0009 ${Translationhelpers.GetTeamURL(team.teamName)}`, inline: true });
         result.push({ name: "Division", value: `\u0009 ${team.divisionDisplayName}`, inline: true });
         result.push({ name: "Description", value: `\u0009 ${team.descriptionOfTeam} -`, inline: true });
-        let firstValueArray = [];
-        let secondValueArray = [];
-        let thirdValueArray = [];
+        let firstValueArray: string[] = [];
+        let secondValueArray: string[] = [];
+        let thirdValueArray: string[] = [];
         let playerLength = team.teamMembers.length;
         for (var i = 0; i < playerLength; i += 3) {
             let player = team.teamMembers[i];
@@ -85,7 +92,7 @@ export class TeamCheckerWorker extends WorkerBase {
     }
 
 
-    private AddPlayerMessage(player: { displayName: string; }): any {
+    private AddPlayerMessage(player: { displayName: string; }): string {
         return '\u0009' + player.displayName.split("#")[0];
     }
 

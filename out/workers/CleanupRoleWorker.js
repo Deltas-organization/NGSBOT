@@ -10,23 +10,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CleanupRoleWorker = void 0;
-const WorkerBase_1 = require("./Bases/WorkerBase");
-class CleanupRoleWorker extends WorkerBase_1.WorkerBase {
-    constructor() {
-        super(...arguments);
-        this._roles = [];
-    }
+const RoleWorkerBase_1 = require("./Bases/RoleWorkerBase");
+class CleanupRoleWorker extends RoleWorkerBase_1.RoleWorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._roles = yield this.messageSender.GuildMember.guild.roles.cache.map((role, _, __) => role);
             yield this.removeRolesWithNoOneAssigned();
         });
     }
     removeRolesWithNoOneAssigned() {
         return __awaiter(this, void 0, void 0, function* () {
-            for (var role of this._roles) {
-                if (role.members.size == 0) {
-                    yield role.delete("No one assigned");
+            var roles = yield this.GetGuildRoles();
+            if (roles) {
+                for (var role of roles) {
+                    if (role.members.size == 0) {
+                        yield role.delete("No one assigned");
+                    }
                 }
             }
         });

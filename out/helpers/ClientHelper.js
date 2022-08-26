@@ -13,7 +13,7 @@ exports.ClientHelper = void 0;
 class ClientHelper {
     static GetGuild(client, channelId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const channel = (yield client.channels.fetch(channelId, false));
+            const channel = (yield client.channels.fetch(channelId));
             return channel.guild;
         });
     }

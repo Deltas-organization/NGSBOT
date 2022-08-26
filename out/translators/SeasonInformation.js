@@ -17,7 +17,7 @@ class SeasonInformation extends deltaTranslatorBase_1.DeltaTranslatorBase {
         return ["season"];
     }
     get description() {
-        return "Will return basic season information";
+        return "Will return basic season information like banned maps and picked maps";
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {

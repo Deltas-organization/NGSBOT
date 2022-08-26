@@ -39,7 +39,7 @@ class SelfAssignRolesRemoverWorker extends WorkerBase_1.WorkerBase {
             for (const command of commands) {
                 if (command.startsWith('<@&') && command.endsWith('>')) {
                     const commandName = command.slice(3, -1);
-                    const existingRole = yield allRoles.fetch(commandName);
+                    const existingRole = yield allRoles.find(r => r.id == commandName);
                     if (existingRole) {
                         rolesToWatch.push(commandName);
                     }

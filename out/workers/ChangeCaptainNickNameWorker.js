@@ -154,9 +154,12 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
                 .replace("(", "\\(")
                 .replace(")", "\\)");
             var newName = (_b = user.nickname) === null || _b === void 0 ? void 0 : _b.replace(new RegExp(valueToRemove, "i"), "");
+            if (!newName)
+                return;
             try {
                 yield user.setNickname(newName, "This person is no longer a captain or AC");
-                this._usersNamesRemovedTitle.push(user.nickname);
+                if (user.nickname)
+                    this._usersNamesRemovedTitle.push(user.nickname);
             }
             catch (_c) {
                 this._usersNamesUnableToUpdate.push(user.displayName);

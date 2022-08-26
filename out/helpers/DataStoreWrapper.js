@@ -67,7 +67,7 @@ class DataStoreWrapper {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let validTeams = yield this.SearchForRegisteredTeams(ngsUser.teamName);
-                if (validTeams.length == 1) {
+                if ((validTeams === null || validTeams === void 0 ? void 0 : validTeams.length) == 1) {
                     return validTeams[0];
                 }
             }

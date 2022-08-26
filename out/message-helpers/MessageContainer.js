@@ -43,14 +43,16 @@ class MessageGroup {
     }
     Prepend(message) {
         let line = new DetailedLine(message, 0);
-        if (this._lines.length > 0)
-            line.Message += this._lines.shift().Message;
+        const shiftedMessage = this._lines.shift();
+        if (shiftedMessage)
+            line.Message += shiftedMessage.Message;
         this._lines.unshift(line);
     }
     Add(message) {
         let line = new DetailedLine("", 0);
-        if (this._lines.length > 0)
-            line = this._lines.pop();
+        const poppedMessage = this._lines.pop();
+        if (poppedMessage)
+            line = poppedMessage;
         line.Message += message;
         this._lines.push(line);
     }

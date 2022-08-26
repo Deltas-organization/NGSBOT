@@ -8,8 +8,8 @@ import { MessageSender } from "./MessageSender";
 
 export class RespondToMessageSender extends MessageSender {
 
-    public get Channel() {
-        return this.originalMessage.channel;
+    public get Channel(): TextChannel | DMChannel | NewsChannel {
+        return <TextChannel | DMChannel | NewsChannel><any>this.originalMessage.channel;
     }
 
     public get GuildMember() {
@@ -17,40 +17,45 @@ export class RespondToMessageSender extends MessageSender {
     }
 
     public get Requester() {
-        return this.GuildMember.user;
+        return this.GuildMember?.user;
     }
 
     constructor(client: Client, public readonly originalMessage: Message, messageStore: MessageStore) {
         super(client, messageStore)
     }
 
-    public async SendReactionMessage(message: string, authentication: (member: GuildMember) => boolean, yesReaction: () => Promise<any> | any, noReaction: () => Promise<any> | any = () => { }, storeMessage = true) {
+    public async SendReactionMessage(message: string, authentication: (member: GuildMember | undefined) => boolean, yesReaction: () => Promise<any> | any, noReaction: () => Promise<any> | any = () => { }, storeMessage = true): Promise<{ message: Message, response: boolean | null } | undefined> {
         var sentMessage = await this.Channel.send({
-            embed: {
-                color: 0,
+            embeds: [{
+                color: 'DEFAULT',
                 description: message
-            }
+            }]
         });
         if (storeMessage)
             this.messageStore.AddMessage(sentMessage);
 
         await sentMessage.react('✅');
         await sentMessage.react('❌');
+        if (!this.originalMessage.guild)
+            return;
         const guildMembers = this.originalMessage.guild.members.cache.map((mem, _, __) => mem);
         const filter = (reaction, user: User) => {
             let member = guildMembers.find(mem => mem.id == user.id);
             return ['✅', '❌'].includes(reaction.emoji.name) && authentication(member);
         };
-        let response = null;
+        let response: boolean | null = null;
         try {
-            var collectedReactions = await sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-            if (collectedReactions.first().emoji.name === '✅') {
-                await yesReaction();
-                response = true;
-            }
-            if (collectedReactions.first().emoji.name === '❌') {
-                await noReaction();
-                response = false;
+            var collectedReactions = await sentMessage.awaitReactions({ filter, max: 1, time: 3e4, errors: ['time'] });
+            var first = collectedReactions.first();
+            if (first) {
+                if (first.emoji.name === '✅') {
+                    await yesReaction();
+                    response = true;
+                }
+                if (first.emoji.name === '❌') {
+                    await noReaction();
+                    response = false;
+                }
             }
         }
         catch (err) {
@@ -65,11 +70,11 @@ export class RespondToMessageSender extends MessageSender {
 
     public async SendFields(description: string, fields: { name: string, value: string }[]) {
         var sentMessage = await this.Channel.send({
-            embed: {
-                color: 0,
+            embeds: [{
+                color: "DEFAULT",
                 description: description,
                 fields: fields
-            }
+            }]
         });
         this.messageStore.AddMessage(sentMessage);
         return sentMessage;
@@ -88,13 +93,17 @@ export class RespondToMessageSender extends MessageSender {
     }
 
     public async DMMessage(message: string) {
-        var channel = await this.GuildMember.createDM();
-        return await this.SendMessageToChannel(message, channel, false);
+        if (this.GuildMember) {
+            var channel = await this.GuildMember.createDM();
+            return await this.SendMessageToChannel(message, channel, false);
+        }
     }
 
     public async DMMessages(messages: string[]) {
-        var channel = await this.GuildMember.createDM();
-        return await this.SendMessagesToChannel(messages, channel, false);
+        if (this.GuildMember) {
+            var channel = await this.GuildMember.createDM();
+            return await this.SendMessagesToChannel(messages, channel, false);
+        }
     }
 
     public async SendMessageFromContainer(messageContainer: MessageContainer, basic = false) {

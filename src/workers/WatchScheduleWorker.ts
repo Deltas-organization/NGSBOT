@@ -20,7 +20,7 @@ export class WatchScheduleWorker extends WorkerBase {
         }
         else {
             let createdRecord = await this.createMongoRecord();
-            if (this.hasCapabilityToSendMessage()) {
+            if (this.hasCapabilityToSendMessage() && createdRecord?.divisions) {
                 await this.messageSender.SendMessage(`You are now watching divisions: ${createdRecord.divisions.join(',')}`);
             }
             else {
@@ -47,7 +47,11 @@ export class WatchScheduleWorker extends WorkerBase {
     }
 
     private hasCapabilityToSendMessage(): boolean {
-        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS'])
+        if (this.messageSender.originalMessage.guild?.me) {
+            var me = this.messageSender.originalMessage.guild.me;
+            return me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS'])
+        }
+        return false;
     }
 
     private async createMongoRecord() {

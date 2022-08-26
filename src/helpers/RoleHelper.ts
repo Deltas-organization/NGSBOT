@@ -11,7 +11,7 @@ export class RoleHelper {
 
     public static async CreateFrom(guild: Guild) {
         const roleInformation = await guild.roles.fetch();
-        const roles = roleInformation.cache.map((role, _, __) => role);
+        const roles = roleInformation.map((role, _, __) => role);
         const roleHelper = new RoleHelper(roles);
         return roleHelper;
     }
@@ -20,8 +20,8 @@ export class RoleHelper {
         return await this.CreateFrom(await ClientHelper.GetGuild(client, channelId));
     }
 
-    public FindDivRole(divisionDisplayName: string): { div: NGSRoles, role: Role } {
-        let divRoleName: NGSRoles;
+    public FindDivRole(divisionDisplayName: string): { div: NGSRoles | null, role: Role | null } {
+        let divRoleName: NGSRoles | null = null;
         switch (divisionDisplayName.toLowerCase()) {
             case "a west":
             case "a east":
@@ -61,7 +61,10 @@ export class RoleHelper {
         return { div: divRoleName, role: this.lookForRole(divRoleName) };
     }
 
-    public lookForRole(roleName: string): Role {
+    public lookForRole(roleName: string | null): Role | null {
+        if (!roleName)
+            return null;
+
         let groomedRoleName = RoleHelper.GroomRoleNameAsLowerCase(roleName);
         for (const role of this.roles) {
             let groomedServerRole = RoleHelper.GroomRoleNameAsLowerCase(role.name);

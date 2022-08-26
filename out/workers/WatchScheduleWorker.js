@@ -28,7 +28,7 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
             }
             else {
                 let createdRecord = yield this.createMongoRecord();
-                if (this.hasCapabilityToSendMessage()) {
+                if (this.hasCapabilityToSendMessage() && (createdRecord === null || createdRecord === void 0 ? void 0 : createdRecord.divisions)) {
                     yield this.messageSender.SendMessage(`You are now watching divisions: ${createdRecord.divisions.join(',')}`);
                 }
                 else {
@@ -54,7 +54,12 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
         return unsupportedCommands;
     }
     hasCapabilityToSendMessage() {
-        return this.messageSender.originalMessage.guild.me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS']);
+        var _a;
+        if ((_a = this.messageSender.originalMessage.guild) === null || _a === void 0 ? void 0 : _a.me) {
+            var me = this.messageSender.originalMessage.guild.me;
+            return me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS']);
+        }
+        return false;
     }
     createMongoRecord() {
         return __awaiter(this, void 0, void 0, function* () {

@@ -18,7 +18,7 @@ export class UpdateCaptainsListCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string> {
+    public async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string | undefined> {
         try {
             const guild = await this.GetGuild(channelToUserForGuildRetrieval);
             const roleHelper = await RoleHelper.CreateFrom(guild);
@@ -80,7 +80,7 @@ export class UpdateCaptainsListCommand {
     }
 
     private async GetGuild(channelId: string) {
-        const channel = (await this.client.channels.fetch(channelId, false)) as GuildChannel;
+        const channel = (await this.client.channels.fetch(channelId)) as GuildChannel;
         return channel.guild;
     }
 

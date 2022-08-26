@@ -4,7 +4,7 @@ import { DiscordChannels } from "../enums/DiscordChannels";
 export class ClientHelper {
 
     public static async GetGuild(client: Client, channelId: DiscordChannels) {
-        const channel = (await client.channels.fetch(channelId, false)) as GuildChannel;
+        const channel = (await client.channels.fetch(channelId)) as GuildChannel;
         return channel.guild;
     }
 

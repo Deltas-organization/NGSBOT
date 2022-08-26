@@ -30,8 +30,10 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             if (commands.length > 0)
                 this._testing = true;
+            const mutedRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
+            if (mutedRole)
+                this._mutedRole = mutedRole;
             yield this.BeginAssigning();
-            this._mutedRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
         });
     }
     BeginAssigning() {
@@ -41,7 +43,9 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             yield progressMessage.Edit("Loading Discord Members.");
             const messagesLog = [];
             try {
-                const guildMembers = (yield this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
+                const guildMembers = yield this.GetGuildMembers();
+                if (!guildMembers)
+                    return;
                 yield progressMessage.Edit("Members loaded. \n Assigning Now.");
                 let count = 0;
                 let progressCount = 1;
@@ -115,9 +119,10 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
             let messageTracker = new MessageHelper_1.MessageHelper(team.teamName);
             const teamRoleOnDiscord = yield this.CreateOrFindTeamRole(messageTracker, teamName);
             try {
+                let divRoleOnDiscord = null;
                 if (team.divisionDisplayName) {
                     const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
-                    var divRoleOnDiscord = roleResponse.role; // roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
+                    divRoleOnDiscord = roleResponse.role;
                 }
                 yield this.AssignUsersToRoles(team, guildMembers, messageTracker, teamRoleOnDiscord, divRoleOnDiscord);
             }
@@ -137,13 +142,11 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 teamName = teamName.slice(0, indexOfWidthdrawn).trim();
             }
             let teamRoleOnDiscord = this.roleHelper.lookForRole(teamName);
-            if (!teamRoleOnDiscord) {
+            if (!teamRoleOnDiscord && this.messageSender.originalMessage.guild) {
                 teamRoleOnDiscord = yield this.messageSender.originalMessage.guild.roles.create({
-                    data: {
-                        name: teamName,
-                        mentionable: true,
-                        hoist: true
-                    },
+                    name: teamName,
+                    mentionable: true,
+                    hoist: true,
                     reason: 'needed a new team role added'
                 });
                 messageTracker.Options.CreatedTeamRole = true;

@@ -27,8 +27,10 @@ export class AssignRolesWorker extends RoleWorkerBase {
         if (commands.length > 0)
             this._testing = true;
 
+        const mutedRole = this.roleHelper.lookForRole(NGSRoles.Muted);
+        if (mutedRole)
+            this._mutedRole = mutedRole;
         await this.BeginAssigning();
-        this._mutedRole = this.roleHelper.lookForRole(NGSRoles.Muted);
     }
 
     private async BeginAssigning() {
@@ -37,7 +39,10 @@ export class AssignRolesWorker extends RoleWorkerBase {
         await progressMessage.Edit("Loading Discord Members.");
         const messagesLog: MessageHelper<AssignRolesOptions>[] = [];
         try {
-            const guildMembers = (await this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
+            const guildMembers = await this.GetGuildMembers();
+            if (!guildMembers)
+                return;
+
             await progressMessage.Edit("Members loaded. \n Assigning Now.");
             let count = 0;
             let progressCount = 1;
@@ -75,8 +80,8 @@ export class AssignRolesWorker extends RoleWorkerBase {
         messageHelper.AddNewLine(`Assigned ${messagesLog.filter(m => m.Options.AssignedTeamCount != null).map(m => m.Options.AssignedTeamCount).reduce((m1, m2) => m1 + m2, 0)} Team Roles`);
         messageHelper.AddNewLine(`Assigned ${messagesLog.filter(m => m.Options.AssignedTeamCount != null).map(m => m.Options.AssignedDivCount).reduce((m1, m2) => m1 + m2, 0)} Div Roles`);
         messageHelper.AddNewLine(`Assigned ${messagesLog.filter(m => m.Options.AssignedTeamCount != null).map(m => m.Options.AssignedCaptainCount).reduce((m1, m2) => m1 + m2, 0)} Captain Roles `);
-        const teamsWithNoValidCaptain = [];
-        const teamsWithLessThen3People = [];
+        const teamsWithNoValidCaptain: string[] = [];
+        const teamsWithLessThen3People: string[] = [];
         for (var message of messagesLog) {
             if (!message.Options.HasCaptain) {
                 teamsWithNoValidCaptain.push(message.Options.TeamName);
@@ -115,9 +120,10 @@ export class AssignRolesWorker extends RoleWorkerBase {
         let messageTracker = new MessageHelper<AssignRolesOptions>(team.teamName);
         const teamRoleOnDiscord = await this.CreateOrFindTeamRole(messageTracker, teamName);
         try {
+            let divRoleOnDiscord: Role | null = null;
             if (team.divisionDisplayName) {
                 const roleResponse = this.roleHelper.FindDivRole(team.divisionDisplayName);
-                var divRoleOnDiscord = roleResponse.role;// roleResponse.div == NGSRoles.Storm ? null : roleResponse.role;
+                divRoleOnDiscord = roleResponse.role;
             }
             await this.AssignUsersToRoles(team, guildMembers, messageTracker, teamRoleOnDiscord, divRoleOnDiscord);
         }
@@ -137,14 +143,13 @@ export class AssignRolesWorker extends RoleWorkerBase {
         }
 
         let teamRoleOnDiscord = this.roleHelper.lookForRole(teamName);
-        if (!teamRoleOnDiscord) {
+        if (!teamRoleOnDiscord && this.messageSender.originalMessage.guild) {
             teamRoleOnDiscord = await this.messageSender.originalMessage.guild.roles.create({
-                data: {
-                    name: teamName,
-                    mentionable: true,
-                    hoist: true
-                },
+                name: teamName,
+                mentionable: true,
+                hoist: true,
                 reason: 'needed a new team role added'
+
             });
 
             messageTracker.Options.CreatedTeamRole = true;
@@ -153,7 +158,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
         return teamRoleOnDiscord;
     }
 
-    private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], messageTracker: MessageHelper<AssignRolesOptions>, teamRole: Role, divRole: Role): Promise<MessageHelper<AssignRolesOptions>> {
+    private async AssignUsersToRoles(team: INGSTeam, guildMembers: GuildMember[], messageTracker: MessageHelper<AssignRolesOptions>, teamRole: Role | null, divRole: Role | null): Promise<MessageHelper<AssignRolesOptions>> {
         const teamName = team.teamName;
         const teamUsers = await this.dataStore.GetUsersOnTeam(teamName);
 

@@ -19,7 +19,8 @@ export abstract class WorkerBase {
         this.client = workerDependencies.client;
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
-        this.guild = messageSender.originalMessage.guild;
+        if (messageSender.originalMessage.guild)
+            this.guild = messageSender.originalMessage.guild;
         this._channelMessageSender = new ChannelMessageSender(this.client, this.messageStore);
     }
 
@@ -30,11 +31,11 @@ export abstract class WorkerBase {
     protected abstract Start(commands: string[]);
 
 
-    protected async SearchForRegisteredTeams(searchTerm: string): Promise<INGSTeam[]> {
+    protected async SearchForRegisteredTeams(searchTerm: string): Promise<INGSTeam[] | undefined> {
         return this.dataStore.SearchForRegisteredTeams(searchTerm);
     }
 
-    protected async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[]> {
+    protected async SearchForTeamBySeason(season: number, searchTerm: string): Promise<INGSTeam[] | undefined> {
         return this.dataStore.SearchForTeamBySeason(season, searchTerm);
     }
 

@@ -86,7 +86,8 @@ export class CronHelper {
             try {
                 if (schedule.requestType == "divisions") {
                     try {
-                        await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
+                        if (schedule.divisions)
+                            await this.sendScheduleByDivision(schedule.channelId, ...schedule.divisions);
                     }
                     catch (e) {
                         Globals.log(`unable to send schedule: ${e}`)
@@ -130,11 +131,13 @@ export class CronHelper {
         await this.client.login(this.token);
         const messages = await this.checkReportedGames.Check();
         try {
-            for (const message of messages.CaptainMessages) {
-                await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSCaptains);
-            }
-            for (const message of messages.ModMessages) {
-                await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSMods);
+            if (messages) {
+                for (const message of messages.CaptainMessages) {
+                    await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSCaptains);
+                }
+                for (const message of messages.ModMessages) {
+                    await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSMods);
+                }
             }
         }
         catch (e) {
@@ -149,8 +152,10 @@ export class CronHelper {
         await this.client.login(this.token);
         const messages = await this.checkUnscheduledGamesForWeek.Check();
         try {
-            for (const message of messages) {
-                await this.messageSender.SendToDiscordChannelAsBasic(message.CreateStringMessage(), DiscordChannels.NGSMods);
+            if (messages) {
+                for (const message of messages) {
+                    await this.messageSender.SendToDiscordChannelAsBasic(message.CreateStringMessage(), DiscordChannels.NGSMods);
+                }
             }
         }
         catch (e) {
@@ -162,7 +167,8 @@ export class CronHelper {
         await this.client.login(this.token);
         const container = await this.checkFlexMatches.Check();
         try {
-            await this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels.NGSMods);
+            if (container)
+                await this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels.NGSMods);
         }
         catch (e) {
             console.log(e);

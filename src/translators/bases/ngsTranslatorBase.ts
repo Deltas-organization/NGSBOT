@@ -6,9 +6,8 @@ import { DiscordGuilds } from "../../enums/DiscordGuilds";
 
 export abstract class ngsTranslatorBase extends TranslatorBase {
 
-    public async Verify(message: Message)
-    {        
-        if((message.member.permissions.has('ADMINISTRATOR') && message.guild.id == DiscordGuilds.NGS))
+    public async Verify(message: Message) {
+        if ((message.member?.permissions.has('ADMINISTRATOR') && message.guild?.id == DiscordGuilds.NGS))
             return true;
 
         return false;

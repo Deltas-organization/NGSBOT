@@ -18,10 +18,10 @@ export class CommandLister extends TranslatorBase {
     }
 
     protected Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
-        let fields = [];
+        let fields: { name: string, value: string }[] = [];
         this.translators.forEach(translator => {
             if (translator.Verify(messageSender.originalMessage))
-                fields.push({ name: translator.commandBangs.map(c => c += " "), value: translator.description });
+                fields.push({ name: translator.commandBangs.join(" "), value: translator.description });
         });
         messageSender.SendFields(`Available Commands. \n appending -d will perform the command but return more detail if available \n Ex: >games-d`, fields);
     }

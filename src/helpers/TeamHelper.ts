@@ -17,7 +17,7 @@ export class TeamHelper {
         this.length = teams.length;
     }
 
-    public async FindUserInTeam(guildUser: User): Promise<AugmentedNGSUser> {
+    public async FindUserInTeam(guildUser: User): Promise<AugmentedNGSUser | null> {
         for (var team of this.teams) {
             const teamName = team.teamName;
             const allUsers = await this.dataStore.GetUsers();

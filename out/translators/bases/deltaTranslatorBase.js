@@ -14,8 +14,9 @@ const translatorBase_1 = require("./translatorBase");
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
 class DeltaTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.user.id == DiscordMembers_1.DiscordMembers.Delta)
+            if (((_a = message.member) === null || _a === void 0 ? void 0 : _a.user.id) == DiscordMembers_1.DiscordMembers.Delta)
                 return true;
             return false;
         });

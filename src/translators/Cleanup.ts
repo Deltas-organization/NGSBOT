@@ -16,7 +16,7 @@ export class CleanupTranslator extends DeltaTranslatorBase {
         await messageSender.SendReactionMessage("Would you cleanup empty roles?",
             (user) => user == messageSender.GuildMember,
             async () => {
-                var cleanupRoleWorker = new CleanupRoleWorker(this.translatorDependencies, detailed, messageSender);
+                var cleanupRoleWorker = new CleanupRoleWorker(this.translatorDependencies, detailed, messageSender, this.CreateMongoHelper());
                 await cleanupRoleWorker.Begin(commands);
             })
     }

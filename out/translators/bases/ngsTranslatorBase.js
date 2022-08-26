@@ -14,8 +14,9 @@ const translatorBase_1 = require("./translatorBase");
 const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 class ngsTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            if ((message.member.permissions.has('ADMINISTRATOR') && message.guild.id == DiscordGuilds_1.DiscordGuilds.NGS))
+            if ((((_a = message.member) === null || _a === void 0 ? void 0 : _a.permissions.has('ADMINISTRATOR')) && ((_b = message.guild) === null || _b === void 0 ? void 0 : _b.id) == DiscordGuilds_1.DiscordGuilds.NGS))
                 return true;
             return false;
         });

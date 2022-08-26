@@ -22,7 +22,7 @@ class CleanupTranslator extends deltaTranslatorBase_1.DeltaTranslatorBase {
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
             yield messageSender.SendReactionMessage("Would you cleanup empty roles?", (user) => user == messageSender.GuildMember, () => __awaiter(this, void 0, void 0, function* () {
-                var cleanupRoleWorker = new CleanupRoleWorker_1.CleanupRoleWorker(this.translatorDependencies, detailed, messageSender);
+                var cleanupRoleWorker = new CleanupRoleWorker_1.CleanupRoleWorker(this.translatorDependencies, detailed, messageSender, this.CreateMongoHelper());
                 yield cleanupRoleWorker.Begin(commands);
             }));
         });

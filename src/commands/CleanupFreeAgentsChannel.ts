@@ -49,10 +49,10 @@ export class CleanupFreeAgentsChannel {
                 try {
                     await message.author.send("Your free agent posting is being deleted for being older then 65 days. Here is the original message. \n \n If you have any questions or concerns please bring them up in the discord you can mention DeltaSniper in the comment.");
                     await message.author.send({
-                        embed: {
+                        embeds: [{
                             color: 0,
                             description: message.content
-                        }
+                        }]
                     });
                 }
                 catch (e) {
@@ -97,7 +97,7 @@ export class CleanupFreeAgentsChannel {
     }
 
     private async GetChannel(channelId: string) {
-        return (await this.client.channels.fetch(channelId, false)) as TextChannel;
+        return (await this.client.channels.fetch(channelId)) as TextChannel;
     }
 
 }

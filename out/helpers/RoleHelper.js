@@ -21,7 +21,7 @@ class RoleHelper {
     static CreateFrom(guild) {
         return __awaiter(this, void 0, void 0, function* () {
             const roleInformation = yield guild.roles.fetch();
-            const roles = roleInformation.cache.map((role, _, __) => role);
+            const roles = roleInformation.map((role, _, __) => role);
             const roleHelper = new RoleHelper(roles);
             return roleHelper;
         });
@@ -32,7 +32,7 @@ class RoleHelper {
         });
     }
     FindDivRole(divisionDisplayName) {
-        let divRoleName;
+        let divRoleName = null;
         switch (divisionDisplayName.toLowerCase()) {
             case "a west":
             case "a east":
@@ -72,6 +72,8 @@ class RoleHelper {
         return { div: divRoleName, role: this.lookForRole(divRoleName) };
     }
     lookForRole(roleName) {
+        if (!roleName)
+            return null;
         let groomedRoleName = RoleHelper.GroomRoleNameAsLowerCase(roleName);
         for (const role of this.roles) {
             let groomedServerRole = RoleHelper.GroomRoleNameAsLowerCase(role.name);

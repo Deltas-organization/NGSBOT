@@ -63,7 +63,7 @@ class CheckUnscheduledGamesForWeek {
             }
             if (unscheduledGames.length < 1) {
                 this._divisionsWithAllGamesScheduled.push(division);
-                return null;
+                return;
             }
             else {
                 var messageToSend = new MessageHelper_1.MessageHelper();

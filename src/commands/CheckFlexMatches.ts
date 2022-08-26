@@ -10,14 +10,14 @@ export class CheckFlexMatches {
 
     }
 
-    public async Check(): Promise<MessageContainer> {
+    public async Check(): Promise<MessageContainer | undefined> {
         try {
-            var result: MessageContainer;
+            var result: MessageContainer = new MessageContainer();
             var unscheduledFlexMatch: INGSSchedule[] = [];
             var unscheduledFlexMatch = await this.dataStore.GetUnScheduledFlexMatches();
             unscheduledFlexMatch = unscheduledFlexMatch.sort((i1, i2) => TeamSorter.SortByDivisionConcat(i1.divisionConcat, i2.divisionConcat))
-            var lastDivision: string;
-            var currentDivisionMessage: MessageGroup;
+            var lastDivision: string | null = null;
+            var currentDivisionMessage: MessageGroup | null = null;
             for (var match of unscheduledFlexMatch) {
                 if (!match.divisionConcat)
                     continue;
@@ -29,7 +29,7 @@ export class CheckFlexMatches {
                         result.Append(currentDivisionMessage);
                         lastDivision = match.divisionConcat;
                     }
-                    currentDivisionMessage.AddOnNewLine(`**${match.home.teamName}** vs **${match.away.teamName}**`);
+                    currentDivisionMessage?.AddOnNewLine(`**${match.home.teamName}** vs **${match.away.teamName}**`);
                 }
                 catch (e) {
                     Globals.log("Problem", match, e);

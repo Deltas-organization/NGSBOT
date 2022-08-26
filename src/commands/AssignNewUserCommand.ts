@@ -21,11 +21,11 @@ export class AssignNewUserCommand {
         this.dataStore = dependencies.dataStore;
     }
 
-    public async AssignUser(guildMember: GuildMember | PartialGuildMember): Promise<{ MessageGroup: MessageGroup, FoundTeam: boolean }> {
+    public async AssignUser(guildMember: GuildMember | PartialGuildMember): Promise<{ MessageGroup: MessageGroup, FoundTeam: boolean } | undefined> {
         await this.Setup(guildMember);
         const messageGroup = new MessageGroup();
         if (guildMember.guild.id != DiscordGuilds.NGS)
-            return null;
+            return;
 
         messageGroup.AddOnNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
         const ngsUser = await DiscordFuzzySearch.GetNGSUser(guildMember.user, await this.dataStore.GetUsers());
@@ -36,7 +36,8 @@ export class AssignNewUserCommand {
                 foundTeam = true;
                 messageGroup.AddOnNewLine(`Found new users team: **${team.teamName}**`);
                 const rolesResult = await this.AssignValidRoles(team, guildMember, ngsUser);
-                messageGroup.Combine(rolesResult);
+                if (rolesResult)
+                    messageGroup.Combine(rolesResult);
             }
             else {
                 messageGroup.AddOnNewLine(`did not find a team for user.`);
@@ -47,10 +48,12 @@ export class AssignNewUserCommand {
 
     private async Setup(guildMember: GuildMember | PartialGuildMember) {
         this._serverRoleHelper = await RoleHelper.CreateFrom(guildMember.guild);
-        this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
+        var captain = this._serverRoleHelper.lookForRole(NGSRoles.Captain);
+        if (captain)
+            this._captainRole = captain;
     }
 
-    private async AssignValidRoles(team: INGSTeam, guildMember: GuildMember | PartialGuildMember, ngsUser: AugmentedNGSUser): Promise<MessageGroup> {
+    private async AssignValidRoles(team: INGSTeam, guildMember: GuildMember | PartialGuildMember, ngsUser: AugmentedNGSUser): Promise<MessageGroup | undefined> {
         const teamName = team.teamName;
         const teamRoleOnDiscord = await this.FindTeamRole(teamName);
         let result = new MessageGroup();

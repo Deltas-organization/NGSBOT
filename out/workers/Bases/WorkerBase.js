@@ -19,7 +19,8 @@ class WorkerBase {
         this.client = workerDependencies.client;
         this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
-        this.guild = messageSender.originalMessage.guild;
+        if (messageSender.originalMessage.guild)
+            this.guild = messageSender.originalMessage.guild;
         this._channelMessageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client, this.messageStore);
     }
     Begin(commands) {

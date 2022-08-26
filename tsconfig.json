@@ -20,7 +20,8 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "resolveJsonModule": true,
-        "outDir": "out"
+        "outDir": "out",
+        "strictNullChecks": true
     },
     "exclude": [
         "node_modules"

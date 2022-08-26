@@ -20,7 +20,7 @@ export class CheckUnscheduledGamesForWeek {
 
     }
 
-    public async Check(): Promise<MessageHelper<void>[]> {
+    public async Check(): Promise<MessageHelper<void>[] | undefined> {
         var season: number = +LiveDataStore.season;
         try {
             var information = await this.mongoHelper.GetNgsInformation(season);
@@ -49,7 +49,7 @@ export class CheckUnscheduledGamesForWeek {
         }
     }
 
-    private async SendMessageForDivision(division: string, roundNumber: number): Promise<MessageHelper<void>> {
+    private async SendMessageForDivision(division: string, roundNumber: number): Promise<MessageHelper<void> | undefined> {
         var unscheduledGames: INGSSchedule[] = [];
 
         var divisions = await this.dataStore.GetDivisions();
@@ -66,7 +66,7 @@ export class CheckUnscheduledGamesForWeek {
 
         if (unscheduledGames.length < 1) {
             this._divisionsWithAllGamesScheduled.push(division);
-            return null;
+            return;
         }
         else {
             var messageToSend = new MessageHelper<void>();

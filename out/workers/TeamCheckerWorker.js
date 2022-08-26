@@ -31,7 +31,7 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
                 const fields = [];
                 const searchTerm = commands[i];
                 const teams = yield searchMethod(searchTerm);
-                if (teams.length <= 0) {
+                if (!teams || teams.length <= 0) {
                     fields.push({ name: `No teams found for  \n`, value: searchTerm });
                     yield this.messageSender.SendFields(``, fields);
                 }
@@ -56,12 +56,17 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
             const filter = (reaction, user) => {
                 if (user.bot)
                     return false;
-                console.log(user);
-                return ['✅'].includes(reaction.emoji.name) && user;
+                if (reaction.emoji.name) {
+                    if (['✅'].includes(reaction.emoji.name))
+                        return true;
+                }
+                return false;
             };
-            var collectedReactions = yield sentMessage.awaitReactions(filter, { max: 1, time: 3e4, errors: ['time'] });
-            if (collectedReactions.first().emoji.name === '✅') {
-                yield this.DisplayPlayerInformation(team);
+            try {
+                yield sentMessage.awaitReactions({ filter, max: 1, time: 3e4 });
+                this.DisplayPlayerInformation(team);
+            }
+            catch (_a) {
             }
         });
     }

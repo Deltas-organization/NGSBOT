@@ -13,8 +13,9 @@ exports.AdminTranslatorBase = void 0;
 const translatorBase_1 = require("./translatorBase");
 class AdminTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (message.member.permissions.has('ADMINISTRATOR'))
+            if ((_a = message.member) === null || _a === void 0 ? void 0 : _a.permissions.has('ADMINISTRATOR'))
                 return true;
             return false;
         });

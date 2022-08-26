@@ -93,7 +93,7 @@ export class ScheduleHelper {
     public static GetMessages(scheduledMatches: INGSSchedule[]): Promise<string[]> {
         return new Promise<string[]>((resolver, rejector) => {
             let messagesToSend: string[] = [];
-            let scheduleContainer: ScheduleContainer = null;
+            let scheduleContainer: ScheduleContainer | null = null;
             let currentTime = '';
             let schedulesByDay: ScheduleContainer[] = [];
             let currentDay = '';
@@ -118,7 +118,8 @@ export class ScheduleHelper {
                 if (currentTime != formattedTime) {
                     currentTime = formattedTime;
                     let timeSection = `**__${pacificDate.format('h:mma')} P | ${mountainDate.format('h:mma')} M | ${centralDate.format('h:mma')} C | ${easternDate.format('h:mma')} E __**`;
-                    scheduleContainer.AddNewTimeSection(timeSection);
+                    if (scheduleContainer)
+                        scheduleContainer.AddNewTimeSection(timeSection);
                 }
 
                 let scheduleMessage = new MessageHelper<any>('scheduleMessage');
@@ -137,7 +138,8 @@ export class ScheduleHelper {
 
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
-                scheduleContainer.AddSchedule(scheduleMessage);
+                if (scheduleContainer)
+                    scheduleContainer.AddSchedule(scheduleMessage);
             }
 
             for (var daySchedule of schedulesByDay) {

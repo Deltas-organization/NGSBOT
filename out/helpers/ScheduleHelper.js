@@ -117,7 +117,8 @@ class ScheduleHelper {
                 if (currentTime != formattedTime) {
                     currentTime = formattedTime;
                     let timeSection = `**__${pacificDate.format('h:mma')} P | ${mountainDate.format('h:mma')} M | ${centralDate.format('h:mma')} C | ${easternDate.format('h:mma')} E __**`;
-                    scheduleContainer.AddNewTimeSection(timeSection);
+                    if (scheduleContainer)
+                        scheduleContainer.AddNewTimeSection(timeSection);
                 }
                 let scheduleMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
                 if (m.divisionDisplayName)
@@ -133,7 +134,8 @@ class ScheduleHelper {
                     }
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
-                scheduleContainer.AddSchedule(scheduleMessage);
+                if (scheduleContainer)
+                    scheduleContainer.AddSchedule(scheduleMessage);
             }
             for (var daySchedule of schedulesByDay) {
                 daySchedule.GetAsStringArray().forEach(item => {

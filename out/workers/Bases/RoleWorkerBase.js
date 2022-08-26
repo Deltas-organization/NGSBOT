@@ -49,14 +49,43 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             yield this.Start(commands);
         });
     }
+    GetUserRoles() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.messageSender.GuildMember)
+                return yield this.messageSender.GuildMember.roles.cache.map((role, _, __) => role);
+        });
+    }
+    GetGuildRoles() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.messageSender.GuildMember)
+                return yield this.messageSender.GuildMember.guild.roles.cache.map((role, _, __) => role);
+        });
+    }
+    GetGuildMembers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.messageSender.originalMessage.guild)
+                return (yield this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
+        });
+    }
     Setup() {
         return __awaiter(this, void 0, void 0, function* () {
             this.dataStore.Clear();
-            this.roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(this.messageSender.originalMessage.guild);
-            this.captainRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
-            this.myBotRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.NGSBot);
-            this.stormRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Storm);
-            this.reserveredRoles = yield this.GetReservedRoles();
+            if (this.messageSender.originalMessage.guild) {
+                this.roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(this.messageSender.originalMessage.guild);
+                var captainRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
+                if (captainRole)
+                    this.captainRole = captainRole;
+                var botRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.NGSBot);
+                if (botRole)
+                    this.myBotRole = botRole;
+                var stormRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Storm);
+                if (stormRole)
+                    this.stormRole = stormRole;
+                this.reserveredRoles = yield this.GetReservedRoles();
+            }
+            else {
+                console.log("Unable to perform role worker, guild was null");
+            }
         });
     }
     GetReservedRoles() {
@@ -74,7 +103,7 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             var selfAssignableRoles = yield this.mongoConnection.GetAssignedRoleRequests(this.guild.id);
             const allRoles = yield this.guild.roles.fetch();
             for (let roleId of selfAssignableRoles) {
-                let foundRole = yield allRoles.fetch(roleId);
+                let foundRole = yield allRoles.find(item => item.id == roleId);
                 if (foundRole) {
                     result.push(foundRole);
                 }

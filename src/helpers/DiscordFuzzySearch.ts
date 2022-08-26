@@ -4,9 +4,9 @@ import { INGSUser } from "../interfaces";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
 
 export class DiscordFuzzySearch {
-    public static async FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): Promise<FuzzySearchResult> {
+    public static async FindGuildMember(user: INGSUser, guildMembers: GuildMember[]): Promise<FuzzySearchResult | null> {
         const ngsDiscordId = user.discordId;
-        let returnResult: FuzzySearchResult = null;
+        let returnResult: FuzzySearchResult | null = null;
         let foundById = false;
         if (ngsDiscordId) {
             let members = guildMembers.filter(member => member.user.id == ngsDiscordId);
@@ -22,7 +22,7 @@ export class DiscordFuzzySearch {
 
         var member = DiscordFuzzySearch.FindByDiscordTag(ngsDiscordTag, guildMembers);
         if (member) {
-            if (foundById) {
+            if (foundById && returnResult) {
                 if (returnResult.member.id != member.id) {
                     await Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`)
                     return null;
@@ -35,7 +35,7 @@ export class DiscordFuzzySearch {
         }
     }
 
-    private static FindByDiscordTag(ngsDiscordTag: string, guildMembers: GuildMember[]): GuildMember {
+    private static FindByDiscordTag(ngsDiscordTag: string, guildMembers: GuildMember[]): GuildMember | undefined {
         const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
         if (!information || !information.discriminator || !information.name)
             return;
@@ -44,7 +44,7 @@ export class DiscordFuzzySearch {
         const name = information.name;
 
         const filteredByDiscriminator = guildMembers.filter(member => member.user.discriminator == discriminator);
-        const possibleMembers = [];
+        const possibleMembers: GuildMember[] = [];
         for (let member of filteredByDiscriminator) {
             const discordName = DiscordFuzzySearch.GetDiscordId(member.user);
             if (discordName == ngsDiscordTag) {
@@ -105,7 +105,7 @@ export class DiscordFuzzySearch {
         return `${guildUser.username}#${guildUser.discriminator}`.replace(' ', '').toLowerCase();
     }
 
-    public static async GetNGSUser(user: User, users: AugmentedNGSUser[]): Promise<AugmentedNGSUser | undefined> {
+    public static async GetNGSUser(user: User, users: AugmentedNGSUser[]): Promise<AugmentedNGSUser | null> {
         for (var ngsUser of users) {
             if (DiscordFuzzySearch.CompareGuildUser(ngsUser, user)) {
                 return ngsUser;

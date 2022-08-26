@@ -53,10 +53,10 @@ export class MessageSender {
 
     public async Edit(message: Message, newContent: string) {
         return await message.edit({
-            embed: {
+            embeds: [{
                 color: 0,
                 description: newContent
-            }
+            }]
         });
     }
 
@@ -71,10 +71,10 @@ export class MessageSender {
         var myChannel = client.channels.cache.find(channel => channel.id == channelID) as TextChannel;
         if (myChannel != null) {
             var sentMessage = await myChannel.send({
-                embed: {
+                embeds: [{
                     color: 0,
                     description: message
-                }
+                }]
             });
             return sentMessage;
         }
@@ -95,10 +95,10 @@ export class MessageSender {
             return await channel.send(message);
 
         return await channel.send({
-            embed: {
+            embeds: [{
                 color: 0,
                 description: message
-            }
+            }]
         });
 
     }

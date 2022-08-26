@@ -11,7 +11,9 @@ class ScheduleContainer {
         this._timeAndSchedules.set(sectionTitle, []);
     }
     AddSchedule(scheduleMessage) {
-        this._timeAndSchedules.get(this._currentSection).push(scheduleMessage);
+        const section = this._timeAndSchedules.get(this._currentSection);
+        if (section)
+            section.push(scheduleMessage);
     }
     GetAsStringArray() {
         let result = [];
@@ -21,7 +23,10 @@ class ScheduleContainer {
             let timeMessage = '';
             timeMessage += key;
             timeMessage += "\n";
-            for (var schedule of this._timeAndSchedules.get(key)) {
+            const section = this._timeAndSchedules.get(key);
+            if (!section)
+                break;
+            for (var schedule of section) {
                 timeMessage += schedule.CreateStringMessage();
                 timeMessage += "\n";
             }

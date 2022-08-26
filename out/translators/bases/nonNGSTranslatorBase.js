@@ -15,6 +15,8 @@ const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 class NonNGSTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!message.guild)
+                return false;
             switch (message.guild.id) {
                 case DiscordGuilds_1.DiscordGuilds.NGS:
                     return false;

@@ -57,10 +57,10 @@ class MessageSender {
     Edit(message, newContent) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield message.edit({
-                embed: {
-                    color: 0,
-                    description: newContent
-                }
+                embeds: [{
+                        color: 0,
+                        description: newContent
+                    }]
             });
         });
     }
@@ -76,10 +76,10 @@ class MessageSender {
             var myChannel = client.channels.cache.find(channel => channel.id == channelID);
             if (myChannel != null) {
                 var sentMessage = yield myChannel.send({
-                    embed: {
-                        color: 0,
-                        description: message
-                    }
+                    embeds: [{
+                            color: 0,
+                            description: message
+                        }]
                 });
                 return sentMessage;
             }
@@ -100,10 +100,10 @@ class MessageSender {
             if (basic)
                 return yield channel.send(message);
             return yield channel.send({
-                embed: {
-                    color: 0,
-                    description: message
-                }
+                embeds: [{
+                        color: 0,
+                        description: message
+                    }]
             });
         });
     }

@@ -82,7 +82,7 @@ class UpdateCaptainsListCommand {
     }
     GetGuild(channelId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const channel = (yield this.client.channels.fetch(channelId, false));
+            const channel = (yield this.client.channels.fetch(channelId));
             return channel.guild;
         });
     }

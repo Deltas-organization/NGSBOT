@@ -51,7 +51,7 @@ export class HistoryDisplay {
         const teams = await this.dataStore.GetTeams();
         const beginningMessage = "**New Teams this season** \n"
         let message = beginningMessage;
-        let messages = [];
+        let messages: string[] = [];
         for (let team of teams.GetTeamsSortedByTeamNames()) {
             for (let history of team.history) {
                 if (history.action == HistoryActions.CreatedTeam) {
@@ -88,7 +88,7 @@ export class HistoryDisplay {
     }
 
     private FormatMessages(histories: HistoryContainer[]): string[] {
-        let result = [];
+        let result: string[] = [];
         let rollingMessage = "";
         for (var history of histories) {
             let currentMessage = history.GetMessage().CreateStringMessage();
@@ -132,8 +132,11 @@ class HistoryContainer {
         let currentMessage = new MessageHelper('HistoryContainer')
         currentMessage.AddNewLine(`**[${this.Team.divisionDisplayName}] - ${this.Team.teamName}**`);
         for (var mapkey of this.Information.keys()) {
-            for (var historyInformaiton of this.Information.get(mapkey)) {
-                currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
+            let key = this.Information.get(mapkey);
+            if (key) {
+                for (var historyInformaiton of key) {
+                    currentMessage.AddNewLine(historyInformaiton.GetMessage().CreateStringMessage());
+                }
             }
         }
         currentMessage.AddNewLine('');

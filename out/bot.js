@@ -38,73 +38,74 @@ const ChannelMessageSender_1 = require("./helpers/messageSenders/ChannelMessageS
 const PmMessageInteraction_1 = require("./message-helpers/PmMessageInteraction");
 const TranslatorService_1 = require("./translators/core/TranslatorService");
 const Globals_1 = require("./Globals");
-let Bot = /** @class */ (() => {
-    let Bot = class Bot {
-        constructor(client, token, apiToken, mongoConnection, botCommand) {
-            this.client = client;
-            this.token = token;
-            this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
-            this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
-            this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
-            this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
-            Globals_1.Globals.ChannelSender = this.messageSender;
-        }
-        listen() {
-            this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
-                yield this.OnMessageReceived(message);
-            }));
-            return this.client.login(this.token);
-        }
-        OnInitialize() {
-            this.WatchForUserJoin();
-            this.WatchForUserFreeAgent();
-        }
-        WatchForUserJoin() {
-            this.client.on('guildMemberAdd', (member) => __awaiter(this, void 0, void 0, function* () {
-                let newUserCommand = new AssignNewUserCommand_1.AssignNewUserCommand(this.dependencies);
-                let message = yield newUserCommand.AssignUser(member);
-                if (message) {
-                    var messageGroup = message.MessageGroup;
-                    var messageContainer = new MessageContainer_1.MessageContainer();
-                    messageContainer.Append(messageGroup);
-                    if (message.FoundTeam) {
-                        yield this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
-                    }
-                    yield this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
+let Bot = class Bot {
+    constructor(client, token, apiToken, mongoConnection, botCommand) {
+        this.client = client;
+        this.token = token;
+        this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
+        this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
+        this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
+        this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
+        //this.commandCreatorService = new CommandCreatorService(client);
+        Globals_1.Globals.ChannelSender = this.messageSender;
+    }
+    listen() {
+        this.client.on('messageCreate', (message) => __awaiter(this, void 0, void 0, function* () {
+            yield this.OnMessageReceived(message);
+        }));
+        return this.client.login(this.token);
+    }
+    OnInitialize() {
+        this.WatchForUserJoin();
+        this.WatchForUserFreeAgent();
+    }
+    WatchForUserJoin() {
+        this.client.on('guildMemberAdd', (member) => __awaiter(this, void 0, void 0, function* () {
+            let newUserCommand = new AssignNewUserCommand_1.AssignNewUserCommand(this.dependencies);
+            let message = yield newUserCommand.AssignUser(member);
+            if (message) {
+                var messageGroup = message.MessageGroup;
+                var messageContainer = new MessageContainer_1.MessageContainer();
+                messageContainer.Append(messageGroup);
+                if (message.FoundTeam) {
+                    yield this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels_1.DiscordChannels.NGSDiscord);
                 }
-            }));
-        }
-        WatchForUserFreeAgent() {
-            let freeAgentRole;
-            this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
-                if (message.channel.id == DiscordChannels_1.DiscordChannels.NGSFreeAgents) {
-                    if (freeAgentRole == null) {
+                yield this.messageSender.SendToDiscordChannel(messageContainer.SingleMessage, DiscordChannels_1.DiscordChannels.DeltaServer);
+            }
+        }));
+    }
+    WatchForUserFreeAgent() {
+        let freeAgentRole;
+        this.client.on('messageCreate', (message) => __awaiter(this, void 0, void 0, function* () {
+            if (message.channel.id == DiscordChannels_1.DiscordChannels.NGSFreeAgents) {
+                if (freeAgentRole == null) {
+                    if (message.guild) {
                         const roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(message.guild);
                         freeAgentRole = roleHelper.lookForRole(NGSRoles_1.NGSRoles.FreeAgents);
                     }
+                }
+                if (message.member)
                     message.member.roles.add(freeAgentRole);
-                }
-            }));
-        }
-        OnMessageReceived(message) {
-            return __awaiter(this, void 0, void 0, function* () {
-                this.translatorService.runTranslators(message);
-                if (message.channel.type == "dm" && message.author.bot == false) {
-                    yield this.pmMessageInteraction.ReceivePM(message);
-                }
-            });
-        }
-    };
-    Bot = __decorate([
-        inversify_1.injectable(),
-        __param(0, inversify_1.inject(types_1.TYPES.Client)),
-        __param(1, inversify_1.inject(types_1.TYPES.Token)),
-        __param(2, inversify_1.inject(types_1.TYPES.ApiToken)),
-        __param(3, inversify_1.inject(types_1.TYPES.MongConection)),
-        __param(4, inversify_1.inject(types_1.TYPES.BotCommand)),
-        __metadata("design:paramtypes", [discord_js_1.Client, String, String, String, String])
-    ], Bot);
-    return Bot;
-})();
+            }
+        }));
+    }
+    OnMessageReceived(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.translatorService.runTranslators(message);
+            if (message.channel.type == "DM" && message.author.bot == false) {
+                yield this.pmMessageInteraction.ReceivePM(message);
+            }
+        });
+    }
+};
+Bot = __decorate([
+    (0, inversify_1.injectable)(),
+    __param(0, (0, inversify_1.inject)(types_1.TYPES.Client)),
+    __param(1, (0, inversify_1.inject)(types_1.TYPES.Token)),
+    __param(2, (0, inversify_1.inject)(types_1.TYPES.ApiToken)),
+    __param(3, (0, inversify_1.inject)(types_1.TYPES.MongConection)),
+    __param(4, (0, inversify_1.inject)(types_1.TYPES.BotCommand)),
+    __metadata("design:paramtypes", [discord_js_1.Client, String, String, String, String])
+], Bot);
 exports.Bot = Bot;
 //# sourceMappingURL=bot.js.map

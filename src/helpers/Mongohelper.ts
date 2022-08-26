@@ -25,20 +25,26 @@ export class Mongohelper {
     }
 
 
-    public async AddOrUpdateScheduleRequest(request: IMongoScheduleRequest): Promise<IMongoScheduleRequest> {
+    public async AddOrUpdateScheduleRequest(request: IMongoScheduleRequest): Promise<IMongoScheduleRequest | null> {
         await this.connectedPromise;
         var collection = this.ngsDatabase.collection<IMongoScheduleRequest>("ScheduleRequest");
         var selectOneFilter = { channelId: { $eq: request.channelId } };
         const existingRecord = await collection.findOne(selectOneFilter);
         if (existingRecord) {
-            existingRecord.divisions = [...new Set<NGSDivisions>([...existingRecord.divisions, ...request.divisions])];
-            await collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
-            return existingRecord;
+            if (request.divisions) {
+                existingRecord.divisions = [...new Set<NGSDivisions>([...existingRecord.divisions, ...request.divisions])];
+                await collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+                return existingRecord;
+            }
+            else {
+                console.log("no divisions found in AddOrUpdateScheduleRequest");
+            }
         }
         else {
             await collection.insertOne(request);
             return request;
         }
+        return null;
     }
 
     public async getRequestedSchedules(): Promise<IMongoScheduleRequest[]> {
@@ -67,7 +73,7 @@ export class Mongohelper {
         }
     }
 
-    public async RemoveAssignedRoles(request: IMongoAssignRolesRequest): Promise<IMongoAssignRolesRequest> {
+    public async RemoveAssignedRoles(request: IMongoAssignRolesRequest): Promise<IMongoAssignRolesRequest | null> {
         await this.connectedPromise;
         var collection = this.ngsDatabase.collection<IMongoAssignRolesRequest>("AssignRoleRequest");
         var selectOneFilter = { guildId: { $eq: request.guildId } };
@@ -124,7 +130,15 @@ export class Mongohelper {
         await this.connectedPromise;
         var collection = this.ngsDatabase.collection<SeasonInformation>("SeasonInformation");
         var selectOneFilter = { season: { $eq: season } };
-        return await collection.findOne(selectOneFilter)
+        var result = await collection.findOne(selectOneFilter)
+        if (!result) {
+            result = {
+                season: season,
+                round: 1
+            };
+            await collection.insertOne(result);
+        }
+        return result;
     }
 
     public async UpdateSeasonRound(season: number): Promise<SeasonInformation> {

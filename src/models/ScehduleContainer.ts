@@ -14,18 +14,24 @@ export class ScheduleContainer {
     }
 
     public AddSchedule(scheduleMessage: MessageHelper<any>) {
-        this._timeAndSchedules.get(this._currentSection).push(scheduleMessage);
+        const section = this._timeAndSchedules.get(this._currentSection);
+        if (section)
+            section.push(scheduleMessage);
     }
 
     public GetAsStringArray(): string[] {
-        let result = [];
+        let result: string[] = [];
         let dateTitleString = `${this.dateTitle} \n \n`;
         let message = dateTitleString;
         for (var key of this._timeAndSchedules.keys()) {
             let timeMessage = '';
             timeMessage += key;
             timeMessage += "\n";
-            for (var schedule of this._timeAndSchedules.get(key)) {
+            const section = this._timeAndSchedules.get(key);
+            if (!section)
+                break;
+
+            for (var schedule of section) {
 
                 timeMessage += schedule.CreateStringMessage();
                 timeMessage += "\n";

@@ -17,7 +17,7 @@ export class SelfAssignRolesCreatorWorker extends WorkerBase {
                 const allRoles = await this.guild.roles.fetch();
                 const roleNames: string[] = [];
                 for (var roleNameWatching of currentRolesToWatch) {
-                    let role = await allRoles.fetch(roleNameWatching);
+                    let role = await allRoles.find(a => a.id == roleNameWatching);
                     if (role)
                         roleNames.push(role.name);
                 }
@@ -44,7 +44,7 @@ export class SelfAssignRolesCreatorWorker extends WorkerBase {
         for (const command of commands) {
             if (command.startsWith('<@&') && command.endsWith('>')) {
                 const commandName = command.slice(3, -1);
-                const existingRole = await allRoles.fetch(commandName);
+                const existingRole = await allRoles.find(r => r.id == commandName);
                 if (existingRole) {
                     rolesToWatch.push(commandName);
                 }

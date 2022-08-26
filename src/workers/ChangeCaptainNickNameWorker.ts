@@ -12,8 +12,8 @@ export class ChangeCaptainNickNameWorker extends WorkerBase {
     private _usersNamesUnableToUpdate: string[] = [];
     private _usersNamesUpdated: string[] = [];
     private _usersNotFound: AugmentedNGSUser[] = [];
-    private _usersAlreadyGoodToGo = [];
-    private _usersNamesRemovedTitle = [];
+    private _usersAlreadyGoodToGo: string[] = [];
+    private _usersNamesRemovedTitle: string[] = [];
 
     protected async Start(commands: string[]) {
         this._guildUsers = await ClientHelper.GetMembers(this.client, DiscordChannels.NGSDiscord);// (await this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
@@ -137,10 +137,13 @@ export class ChangeCaptainNickNameWorker extends WorkerBase {
             .replace(")", "\\)");
 
         var newName = user.nickname?.replace(new RegExp(valueToRemove, "i"), "");
+        if (!newName)
+            return;
 
         try {
             await user.setNickname(newName, "This person is no longer a captain or AC");
-            this._usersNamesRemovedTitle.push(user.nickname);
+            if (user.nickname)
+                this._usersNamesRemovedTitle.push(user.nickname);
         }
         catch {
             this._usersNamesUnableToUpdate.push(user.displayName);

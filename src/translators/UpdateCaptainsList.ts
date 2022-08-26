@@ -39,11 +39,13 @@ export class UpdateCaptainsList extends ngsTranslatorBase {
     private async AttemptToUpdateCaptainMessage(captainsListCommand: UpdateCaptainsListCommand, channelSender: ChannelMessageSender, season: number, division: NGSDivisions) {
         const messageId = await this.GetSavedMessage(season, division);
         const message = await captainsListCommand.CreateDivisionList(division, DiscordChannels.NGSDiscord);
-        if (messageId)
-            await channelSender.OverwriteBasicMessage(message, messageId, DiscordChannels.NGSCaptainList);
-        else {
-            var messages = await channelSender.SendToDiscordChannelAsBasic(message, DiscordChannels.NGSCaptainList);
-            await this.CreateMongoRecord(messages, season, division);
+        if (message) {
+            if (messageId)
+                await channelSender.OverwriteBasicMessage(message, messageId, DiscordChannels.NGSCaptainList);
+            else {
+                var messages = await channelSender.SendToDiscordChannelAsBasic(message, DiscordChannels.NGSCaptainList);
+                await this.CreateMongoRecord(messages, season, division);
+            }
         }
     }
 

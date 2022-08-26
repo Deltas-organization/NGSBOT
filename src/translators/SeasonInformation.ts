@@ -9,7 +9,7 @@ export class SeasonInformation extends DeltaTranslatorBase {
     }
 
     public get description(): string {
-        return "Will return basic season information";
+        return "Will return basic season information like banned maps and picked maps";
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {

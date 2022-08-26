@@ -30,14 +30,20 @@ class Mongohelper {
             var selectOneFilter = { channelId: { $eq: request.channelId } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             if (existingRecord) {
-                existingRecord.divisions = [...new Set([...existingRecord.divisions, ...request.divisions])];
-                yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
-                return existingRecord;
+                if (request.divisions) {
+                    existingRecord.divisions = [...new Set([...existingRecord.divisions, ...request.divisions])];
+                    yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
+                    return existingRecord;
+                }
+                else {
+                    console.log("no divisions found in AddOrUpdateScheduleRequest");
+                }
             }
             else {
                 yield collection.insertOne(request);
                 return request;
             }
+            return null;
         });
     }
     getRequestedSchedules() {
@@ -130,7 +136,15 @@ class Mongohelper {
             yield this.connectedPromise;
             var collection = this.ngsDatabase.collection("SeasonInformation");
             var selectOneFilter = { season: { $eq: season } };
-            return yield collection.findOne(selectOneFilter);
+            var result = yield collection.findOne(selectOneFilter);
+            if (!result) {
+                result = {
+                    season: season,
+                    round: 1
+                };
+                yield collection.insertOne(result);
+            }
+            return result;
         });
     }
     UpdateSeasonRound(season) {

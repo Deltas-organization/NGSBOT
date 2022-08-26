@@ -24,8 +24,12 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
         return __awaiter(this, void 0, void 0, function* () {
             if (commands.length > 0)
                 this._testing = true;
-            this._mutedRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
-            this._unPurgeable = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.UnPurgeable);
+            var muteRole = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.Muted);
+            if (muteRole)
+                this._mutedRole = muteRole;
+            var unpurgeable = this.roleHelper.lookForRole(NGSRoles_1.NGSRoles.UnPurgeable);
+            if (unpurgeable)
+                this._unPurgeable = unpurgeable;
             yield this.BeginPurge();
         });
     }
@@ -35,6 +39,8 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
             const teams = yield this.dataStore.GetTeams();
             yield progressMessage.Edit(`Purging STARTED... STAND BY...`);
             const messages = [];
+            if (!this.messageSender.originalMessage.guild)
+                return;
             const guildMembers = (yield this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
             let count = 0;
             let progressCount = 1;
@@ -58,7 +64,7 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                             messageHelper.AddNewLine(`No Team Found.`);
                         yield this.PurgeAllRoles(member, messageHelper);
                     }
-                    else {
+                    else if (teamInformation) {
                         messageHelper.AddNewLine(`Team Found: ** ${teamInformation.teamName} ** `);
                         yield this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
                     }

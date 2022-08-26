@@ -58,18 +58,20 @@ class CheckReportedGames {
                 message.AddNew(`Your game yesterday, **${schedule.home.teamName}** vs **${schedule.away.teamName}** has not been reported.`);
                 message.AddNewLine(`If you won the game please report it on the website.`);
                 message.AddEmptyLine();
-                yield homeCaptains.send({
-                    embed: {
-                        color: 0,
-                        description: message.CreateStringMessage()
-                    }
-                });
-                yield awayCaptain.send({
-                    embed: {
-                        color: 0,
-                        description: message.CreateStringMessage()
-                    }
-                });
+                if (homeCaptains)
+                    yield homeCaptains.send({
+                        embeds: [{
+                                color: 0,
+                                description: message.CreateStringMessage()
+                            }]
+                    });
+                if (awayCaptain)
+                    yield awayCaptain.send({
+                        embeds: [{
+                                color: 0,
+                                description: message.CreateStringMessage()
+                            }]
+                    });
             }
         });
     }

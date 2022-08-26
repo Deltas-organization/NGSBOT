@@ -7,8 +7,8 @@ import { INGSTeam } from "../interfaces";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class GamesWorker extends WorkerBase {
-    private _messageCommand: (message: string, storeMessage?: boolean) => Promise<MessageWrapper>;
-    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<MessageWrapper[]>;
+    private _messageCommand: (message: string, storeMessage?: boolean) => Promise<MessageWrapper | undefined>;
+    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<MessageWrapper[] | undefined>;
 
     protected async Start(commands: string[]) {
         this._messageCommand = (message: string, _?: boolean) => this.messageSender.DMMessage(message);
@@ -18,7 +18,7 @@ export class GamesWorker extends WorkerBase {
             this._multiMessageCommand = (messages: string[], storeMessage?: boolean) => this.messageSender.SendMessages(messages, storeMessage);
         }
 
-        let messages: string[];
+        let messages: string[] | undefined;
         if (commands.length <= 0) {
             messages = await this.GetMessagesForMessageSender();
         }
@@ -40,6 +40,8 @@ export class GamesWorker extends WorkerBase {
     }
 
     private async GetMessagesForMessageSender() {
+        if (!this.messageSender.Requester)
+            return;
         const ngsUser = await DiscordFuzzySearch.GetNGSUser(this.messageSender.Requester, await this.dataStore.GetUsers());
         if (!ngsUser) {
             await this._messageCommand("Unable to find your ngsUser, please ensure you have your discordId populated on the ngs website.")
@@ -61,7 +63,7 @@ export class GamesWorker extends WorkerBase {
 
     private async GetMessagesForTeam(teamSearchTerm: string): Promise<string[]> {
         let teams = await this.SearchForRegisteredTeams(teamSearchTerm);
-        if (teams.length < 1)
+        if (!teams || teams.length < 1)
             return ["No team found"];
         else if (teams.length > 1)
             return ["More then one team returned."];

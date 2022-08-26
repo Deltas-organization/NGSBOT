@@ -25,7 +25,7 @@ class AssignNewUserCommand {
             yield this.Setup(guildMember);
             const messageGroup = new MessageContainer_1.MessageGroup();
             if (guildMember.guild.id != DiscordGuilds_1.DiscordGuilds.NGS)
-                return null;
+                return;
             messageGroup.AddOnNewLine(`A new userHas joined NGS: **${guildMember.user.username}**`);
             const ngsUser = yield DiscordFuzzySearch_1.DiscordFuzzySearch.GetNGSUser(guildMember.user, yield this.dataStore.GetUsers());
             var foundTeam = false;
@@ -35,7 +35,8 @@ class AssignNewUserCommand {
                     foundTeam = true;
                     messageGroup.AddOnNewLine(`Found new users team: **${team.teamName}**`);
                     const rolesResult = yield this.AssignValidRoles(team, guildMember, ngsUser);
-                    messageGroup.Combine(rolesResult);
+                    if (rolesResult)
+                        messageGroup.Combine(rolesResult);
                 }
                 else {
                     messageGroup.AddOnNewLine(`did not find a team for user.`);
@@ -47,7 +48,9 @@ class AssignNewUserCommand {
     Setup(guildMember) {
         return __awaiter(this, void 0, void 0, function* () {
             this._serverRoleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(guildMember.guild);
-            this._captainRole = this._serverRoleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
+            var captain = this._serverRoleHelper.lookForRole(NGSRoles_1.NGSRoles.Captain);
+            if (captain)
+                this._captainRole = captain;
         });
     }
     AssignValidRoles(team, guildMember, ngsUser) {

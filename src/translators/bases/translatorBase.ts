@@ -12,7 +12,7 @@ import { MessageStore } from "../../MessageStore";
 export abstract class TranslatorBase implements ITranslate {
     public abstract get commandBangs(): string[];
     public abstract get description(): string;
-    public get delimiter() {
+    public get delimiter(): string | null {
         return null;
     }
 
@@ -37,7 +37,7 @@ export abstract class TranslatorBase implements ITranslate {
     }
 
     public async Translate(messageText: string, message: Message) {
-        if (message.member.user.id != DiscordMembers.Delta) {
+        if (message.member?.user.id != DiscordMembers.Delta) {
             //not enough permissions
             if (await this.Verify(message) == false)
                 return;
@@ -80,7 +80,7 @@ export abstract class TranslatorBase implements ITranslate {
         else {
             //Get and remove quoted strings as one word
             const myRegexp = /[^\s"]+|"([^"]*)"/gi;
-            let myResult = [];
+            let myResult: string[] = [];
             do {
                 var match = myRegexp.exec(command);
                 if (match != null) {

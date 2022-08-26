@@ -19,7 +19,9 @@ class LeaveWorker extends RoleWorkerBase_1.RoleWorkerBase {
     }
     BeginRemoving() {
         return __awaiter(this, void 0, void 0, function* () {
-            const rolesOfUser = this.messageSender.GuildMember.roles.cache.map((role, _, __) => role);
+            let rolesOfUser = yield this.GetUserRoles();
+            if (!rolesOfUser)
+                return;
             let foundOneRole = false;
             for (var role of rolesOfUser) {
                 if (!this.reserveredRoles.find(serverRole => role == serverRole)) {
@@ -37,8 +39,12 @@ class LeaveWorker extends RoleWorkerBase_1.RoleWorkerBase {
     }
     AskRoleRemoval(role) {
         return __awaiter(this, void 0, void 0, function* () {
-            const messageResult = yield this.messageSender.SendReactionMessage(`would you like me to remove Role: ${role.name}`, (member) => member == this.messageSender.GuildMember, () => this.RemoveRole(this.messageSender.GuildMember, role));
-            messageResult.message.delete();
+            const messageResult = yield this.messageSender.SendReactionMessage(`would you like me to remove Role: ${role.name}`, (member) => member == this.messageSender.GuildMember, () => {
+                if (this.messageSender.GuildMember)
+                    this.RemoveRole(this.messageSender.GuildMember, role);
+            });
+            if (messageResult)
+                messageResult.message.delete();
         });
     }
     RemoveRole(guildMember, role) {

@@ -16,8 +16,14 @@ export class PurgeWorker extends RoleWorkerBase {
         if (commands.length > 0)
             this._testing = true;
 
-        this._mutedRole = this.roleHelper.lookForRole(NGSRoles.Muted);
-        this._unPurgeable = this.roleHelper.lookForRole(NGSRoles.UnPurgeable);
+        var muteRole = this.roleHelper.lookForRole(NGSRoles.Muted);
+        if (muteRole)
+            this._mutedRole = muteRole;
+
+        var unpurgeable = this.roleHelper.lookForRole(NGSRoles.UnPurgeable);
+        if (unpurgeable)
+            this._unPurgeable = unpurgeable
+
         await this.BeginPurge();
     }
 
@@ -27,6 +33,8 @@ export class PurgeWorker extends RoleWorkerBase {
         const teams = await this.dataStore.GetTeams();
         await progressMessage.Edit(`Purging STARTED... STAND BY...`);
         const messages: MessageHelper<IPurgeInformation>[] = [];
+        if (!this.messageSender.originalMessage.guild)
+            return;
         const guildMembers = (await this.messageSender.originalMessage.guild.members.fetch()).map((mem, _, __) => mem);
         let count = 0;
         let progressCount = 1;
@@ -50,7 +58,7 @@ export class PurgeWorker extends RoleWorkerBase {
                         messageHelper.AddNewLine(`No Team Found.`);
                     await this.PurgeAllRoles(member, messageHelper);
                 }
-                else {
+                else if (teamInformation) {
                     messageHelper.AddNewLine(`Team Found: ** ${teamInformation.teamName} ** `);
                     await this.PurgeUnrelatedRoles(member, teamInformation, messageHelper);
                 }
@@ -72,9 +80,9 @@ export class PurgeWorker extends RoleWorkerBase {
             ignoredUsers: ignoredUsers.map(message => message.CreateJsonMessage())
         }));
         await this.messageSender.SendFiles([{
-                attachment: './files/purgedRoles.json',
-                name: 'purgedRoles.json'
-            }]).catch(console.error);
+            attachment: './files/purgedRoles.json',
+            name: 'purgedRoles.json'
+        }]).catch(console.error);
 
         await this.messageSender.SendMessage(`Finished Purging Roles! \n
             Removed ${removedRoles.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`);
@@ -82,7 +90,7 @@ export class PurgeWorker extends RoleWorkerBase {
         await progressMessage.Delete();
     }
 
-    HasRole(rolesOfUser: Role[], roleToLookFor: any): Role {
+    HasRole(rolesOfUser: Role[], roleToLookFor: any): Role | undefined {
         return rolesOfUser.find(role => role == roleToLookFor);
     }
 
