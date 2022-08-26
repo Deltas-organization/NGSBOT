@@ -39,6 +39,9 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             'HCI Player',
             'Trait Value',
             'MemberList',
+            'Heroes International',
+            'HI Caster',
+            'HI Captain',
             '@everyone'
         ];
         this.reserveredRoles = [];

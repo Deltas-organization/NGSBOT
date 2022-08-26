@@ -29,6 +29,9 @@ export abstract class RoleWorkerBase extends WorkerBase {
         'HCI Player',
         'Trait Value',
         'MemberList',
+        'Heroes International',
+        'HI Caster',
+        'HI Captain',
         '@everyone'];
 
     protected reserveredRoles: Role[] = [];
