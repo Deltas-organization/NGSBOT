@@ -62,12 +62,9 @@ class TeamCheckerWorker extends WorkerBase_1.WorkerBase {
                 }
                 return false;
             };
-            try {
-                yield sentMessage.awaitReactions({ filter, max: 1, time: 3e4 });
+            var result = yield sentMessage.awaitReactions({ filter, max: 1, time: 3e4 });
+            if (result.size > 0)
                 this.DisplayPlayerInformation(team);
-            }
-            catch (_a) {
-            }
         });
     }
     GetTeamMessage(team) {

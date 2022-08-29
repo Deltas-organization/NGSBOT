@@ -54,14 +54,9 @@ export class TeamCheckerWorker extends WorkerBase {
             return false;
         };
 
-        try {
-            await sentMessage.awaitReactions({ filter, max: 1, time: 3e4 });
-            this.DisplayPlayerInformation(team);
-        }
-        catch
-        {
-
-        }
+            var result = await sentMessage.awaitReactions({ filter, max: 1, time: 3e4 });
+            if(result.size > 0)
+                this.DisplayPlayerInformation(team);
     }
 
     private GetTeamMessage(team: INGSTeam): any[] {
