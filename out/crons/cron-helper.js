@@ -150,10 +150,10 @@ let CronHelper = class CronHelper {
             try {
                 if (messages) {
                     for (const message of messages.CaptainMessages) {
-                        yield this.messageSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.NGSCaptains);
+                        yield this.messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels_1.DiscordChannels.NGSCaptains);
                     }
                     for (const message of messages.ModMessages) {
-                        yield this.messageSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.NGSMods);
+                        yield this.messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels_1.DiscordChannels.NGSMods);
                     }
                 }
             }

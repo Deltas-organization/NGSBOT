@@ -133,10 +133,10 @@ export class CronHelper {
         try {
             if (messages) {
                 for (const message of messages.CaptainMessages) {
-                    await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSCaptains);
+                    await this.messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels.NGSCaptains);
                 }
                 for (const message of messages.ModMessages) {
-                    await this.messageSender.SendToDiscordChannel(message, DiscordChannels.NGSMods);
+                    await this.messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels.NGSMods);
                 }
             }
         }
