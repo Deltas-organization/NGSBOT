@@ -46,7 +46,7 @@ let Bot = class Bot {
         this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
         this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
-        //this.commandCreatorService = new CommandCreatorService(client);
+        // this.commandCreatorService = new CommandCreatorService(client);
         Globals_1.Globals.ChannelSender = this.messageSender;
     }
     listen() {

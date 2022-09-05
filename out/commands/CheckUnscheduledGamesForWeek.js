@@ -46,7 +46,8 @@ class CheckUnscheduledGamesForWeek {
                 return result;
             }
             catch (e) {
-                Globals_1.Globals.log(e);
+                Globals_1.Globals.log("Problem reporting unschedule games", e);
+                Globals_1.Globals.InformDelta("There was a problem with the bot reported the unscheduled games");
             }
         });
     }

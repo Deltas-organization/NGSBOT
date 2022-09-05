@@ -45,7 +45,8 @@ export class CheckUnscheduledGamesForWeek {
             return result;
         }
         catch (e) {
-            Globals.log(e);
+            Globals.log("Problem reporting unschedule games", e)
+            Globals.InformDelta("There was a problem with the bot reported the unscheduled games");
         }
     }
 
