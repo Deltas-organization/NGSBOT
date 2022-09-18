@@ -58,7 +58,7 @@ export class CheckUnscheduledGamesForWeek {
 
         var matches = await this.dataStore.GetScheduleByRoundAndDivision(divisionConcat, roundNumber);
         for (var match of matches) {
-            if (match.scheduledTime || match.reported || match.forfeit)
+            if (match.scheduledTime?.startTime || match.reported || match.forfeit)
                 continue;
 
             unscheduledGames.push(match);

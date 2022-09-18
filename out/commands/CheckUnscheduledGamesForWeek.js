@@ -52,13 +52,14 @@ class CheckUnscheduledGamesForWeek {
         });
     }
     SendMessageForDivision(division, roundNumber) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             var unscheduledGames = [];
             var divisions = yield this.dataStore.GetDivisions();
             const divisionConcat = divisions.filter(d => d.displayName == division)[0].divisionConcat;
             var matches = yield this.dataStore.GetScheduleByRoundAndDivision(divisionConcat, roundNumber);
             for (var match of matches) {
-                if (match.scheduledTime || match.reported || match.forfeit)
+                if (((_a = match.scheduledTime) === null || _a === void 0 ? void 0 : _a.startTime) || match.reported || match.forfeit)
                     continue;
                 unscheduledGames.push(match);
             }
