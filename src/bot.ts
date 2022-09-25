@@ -35,7 +35,7 @@ export class Bot {
         this.messageSender = new ChannelMessageSender(client, this.dependencies.messageStore);
         this.pmMessageInteraction = new PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService(botCommand, this.dependencies);
-        // this.commandCreatorService = new CommandCreatorService(client);
+        this.commandCreatorService = new CommandCreatorService(client, this.dependencies.dataStore);
         Globals.ChannelSender = this.messageSender;
     }
 

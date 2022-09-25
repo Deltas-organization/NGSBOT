@@ -2,37 +2,66 @@ import { debug } from "console";
 import { Client, ChatInputApplicationCommandData, BaseCommandInteraction, Interaction, CacheType } from "discord.js";
 import { ApplicationCommandTypes } from "discord.js/typings/enums";
 import { DiscordGuilds } from "../enums/DiscordGuilds";
+import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
+import { SlashCommandBase } from "./Base/SlashCommandBase";
+import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
+import { HelloWorldCommand } from "./Commands/HelloWorldCommand";
+import { GamesSlashWorker } from "./Workers/GamesSlashWorker";
 
+type guildCommandContainer = { guild: string; commands: ChatInputApplicationCommandData[]; };
 export class CommandCreatorService {
 
-    private commands: Command[] = [];
+    private commands: SlashCommandBase[] = [];
 
-    constructor(private client: Client) {
+    constructor(private client: Client, private dataStore: DataStoreWrapper) {
         client.on("interactionCreate", async (interaction: Interaction) => {
             if (interaction.isCommand() || interaction.isContextMenu()) {
                 await this.RunCommand(client, interaction);
             }
         });
-        client.on("ready", () =>
-        {
+        client.on("ready", () => {
             this.CreateCommands();
             this.Registercommands();
         });
     }
-    private async Registercommands() {        
-        const commandsToRegister: ChatInputApplicationCommandData[] = [];
-        for(const command of this.commands)
-        {
-            commandsToRegister.push(command.GetCommand())
+    private async Registercommands() {
+        var containers = this.CreateCommandContainers();
+        for (var container of containers.guildCommands) {
+            const guild = await this.client.guilds.fetch(container.guild);
+            await guild?.commands.set(container.commands);
         }
-        const guild  = await this.client.guilds.fetch(DiscordGuilds.DeltasServer);
-        await guild?.commands.set(commandsToRegister);
-
+        if (containers.applicationCommands.length > 0)
+            await this.client.application?.commands.set(containers.applicationCommands);
         console.log("done");
     }
 
+    private CreateCommandContainers(): { guildCommands: guildCommandContainer[], applicationCommands: ChatInputApplicationCommandData[] } {
+        const guildCommandsToRegister: guildCommandContainer[] = [];
+        const applicationcommandsToRegister: ChatInputApplicationCommandData[] = [];
+        for (const command of this.commands) {
+            if (command.GuildLocation === 'All') {
+                applicationcommandsToRegister.push(command.GetCommand());
+            }
+            else {
+                let found = false;
+                for (const guildCommand of guildCommandsToRegister) {
+                    if (guildCommand.guild == command.GuildLocation) {
+                        guildCommand.commands.push(command.GetCommand());
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    guildCommandsToRegister.push({ guild: command.GuildLocation, commands: [command.GetCommand()] });
+            }
+        }
+
+        return { guildCommands: guildCommandsToRegister, applicationCommands: applicationcommandsToRegister };
+    }
+
     private CreateCommands() {
-        this.commands.push(new HelloCommand());
+        this.commands.push(new HelloWorldCommand());
+        this.commands.push(new GamesSlashCommand(this.dataStore));
     }
 
     private async RunCommand(client: Client, interaction: BaseCommandInteraction): Promise<void> {
@@ -46,35 +75,4 @@ export class CommandCreatorService {
 
         await slashCommand.RunCommand(client, interaction);
     };
-}
-
-
-export abstract class Command {
-    protected command: ChatInputApplicationCommandData;
-    protected abstract Description: string;
-    protected type: ApplicationCommandTypes = ApplicationCommandTypes.CHAT_INPUT;
-    
-    public abstract Name: string;
-
-    public GetCommand() : ChatInputApplicationCommandData{
-        this.command = {
-            description: this.Description,
-            name: this.Name
-        }
-        return this.command;
-    }
-
-    public abstract RunCommand(client: Client, interaction: BaseCommandInteraction): Promise<void>;
-}
-
-export class HelloCommand extends Command {
-    protected Description: string = "Will Tell the User Hello";
-    public Name: string = "helloworld";
-
-    public async RunCommand(client: Client<boolean>, interaction: BaseCommandInteraction<CacheType>): Promise<void> {
-        await interaction.followUp({
-            ephemeral: true,
-            content: "Hello World"
-        });
-    }
 }

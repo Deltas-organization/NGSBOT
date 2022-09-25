@@ -38,6 +38,7 @@ const ChannelMessageSender_1 = require("./helpers/messageSenders/ChannelMessageS
 const PmMessageInteraction_1 = require("./message-helpers/PmMessageInteraction");
 const TranslatorService_1 = require("./translators/core/TranslatorService");
 const Globals_1 = require("./Globals");
+const CommandCreatorService_1 = require("./SlashCommands/CommandCreatorService");
 let Bot = class Bot {
     constructor(client, token, apiToken, mongoConnection, botCommand) {
         this.client = client;
@@ -46,7 +47,7 @@ let Bot = class Bot {
         this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
         this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
-        // this.commandCreatorService = new CommandCreatorService(client);
+        this.commandCreatorService = new CommandCreatorService_1.CommandCreatorService(client, this.dependencies.dataStore);
         Globals_1.Globals.ChannelSender = this.messageSender;
     }
     listen() {

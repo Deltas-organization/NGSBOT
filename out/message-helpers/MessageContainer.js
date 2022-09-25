@@ -1,12 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageGroup = exports.MessageContainer = void 0;
+const MessageSender_1 = require("../helpers/messageSenders/MessageSender");
 class MessageContainer {
     constructor() {
         this._groups = [];
     }
     get SingleMessage() {
         return this._groups.map(g => g.AsString()).join('\n\n');
+    }
+    get AsEmbed() {
+        var response = [];
+        for (var message of this.MultiMessages(MessageSender_1.MessageSender.maxLength)) {
+            response.push({ color: 0, description: message });
+        }
+        return response;
     }
     MultiMessages(lengthRequirement) {
         let result = [];

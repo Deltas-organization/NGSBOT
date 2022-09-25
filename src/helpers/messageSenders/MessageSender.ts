@@ -7,7 +7,7 @@ import { MessageWrapper } from "../MessageWrapper";
 import { CommandDependencies } from "../TranslatorDependencies";
 
 export class MessageSender {
-    private maxLength = 2000;
+    public static maxLength = 2000;
 
     constructor(protected client: Client,
         protected messageStore: MessageStore) {
@@ -16,9 +16,9 @@ export class MessageSender {
 
     public async SendBasicMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel): Promise<Message[]> {
         var messagesSent: Message[] = [];
-        while (message.length > this.maxLength) {
-            let newMessage = message.slice(0, this.maxLength);
-            message = message.substr(this.maxLength);
+        while (message.length > MessageSender.maxLength) {
+            let newMessage = message.slice(0, MessageSender.maxLength);
+            message = message.substr(MessageSender.maxLength);
             var result = await this.SendBasicMessageToChannel(newMessage, channel);
             messagesSent.push(...result);
         }
@@ -28,9 +28,9 @@ export class MessageSender {
     }
 
     public async SendMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel, storeMessage = true) {
-        while (message.length > this.maxLength) {
-            let newMessage = message.slice(0, this.maxLength);
-            message = message.substr(this.maxLength);
+        while (message.length > MessageSender.maxLength) {
+            let newMessage = message.slice(0, MessageSender.maxLength);
+            message = message.substr(MessageSender.maxLength);
             await this.SendMessageToChannel(newMessage, channel, storeMessage);
         }
         var sentMessage = await this.JustSendIt(message, channel, false);
@@ -81,7 +81,7 @@ export class MessageSender {
     }
 
     public async SendMessageFromContainerToChannel(container: MessageContainer, channel: TextChannel | DMChannel | NewsChannel, basicMessage = false, storeMessage = true) {
-        var messages = container.MultiMessages(this.maxLength);
+        var messages = container.MultiMessages(MessageSender.maxLength);
         for (var message of messages) {
             var sentMessage = await this.JustSendIt(message, channel, basicMessage);
 
@@ -107,7 +107,7 @@ export class MessageSender {
         let result: string[] = [];
         let currentMessage = '';
         for (var message of messages) {
-            if (currentMessage.length + message.length > this.maxLength) {
+            if (currentMessage.length + message.length > MessageSender.maxLength) {
                 result.push(currentMessage);
                 currentMessage = '';
             }
