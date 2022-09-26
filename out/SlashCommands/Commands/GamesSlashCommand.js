@@ -19,13 +19,14 @@ class GamesSlashCommand extends SlashCommandBase_1.SlashCommandBase {
         this.Description = "Will Respond to the User with their teams games";
         this.Name = "games";
         this.GuildLocation = "All";
+        this.Ephemeral = true;
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
             var worker = new GamesSlashWorker_1.GamesSlashWorker(interaction.user, this.dataStore);
             var messages = yield worker.Run();
             yield interaction.followUp({
-                ephemeral: true,
+                ephemeral: this.Ephemeral,
                 embeds: messages.AsEmbed
             });
         });

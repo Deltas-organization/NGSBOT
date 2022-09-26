@@ -71,7 +71,7 @@ export class CommandCreatorService {
             return;
         }
 
-        await interaction.deferReply();
+        await interaction.deferReply({ephemeral: slashCommand.Ephemeral});
 
         await slashCommand.RunCommand(client, interaction);
     };

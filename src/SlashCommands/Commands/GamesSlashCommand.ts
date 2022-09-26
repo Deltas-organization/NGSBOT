@@ -9,6 +9,7 @@ export class GamesSlashCommand extends SlashCommandBase {
     protected Description: string = "Will Respond to the User with their teams games";
     public Name: string = "games";
     public GuildLocation = "All";
+    public Ephemeral = true;
 
     constructor(private dataStore: DataStoreWrapper){
         super();
@@ -18,7 +19,7 @@ export class GamesSlashCommand extends SlashCommandBase {
         var worker = new GamesSlashWorker(interaction.user, this.dataStore);
         var messages = await worker.Run();
         await interaction.followUp({
-            ephemeral: true,
+            ephemeral: this.Ephemeral,
             embeds: messages.AsEmbed          
         });
     }

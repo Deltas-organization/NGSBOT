@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GamesSlashWorker = void 0;
 const DiscordFuzzySearch_1 = require("../../helpers/DiscordFuzzySearch");
-const MessageHelper_1 = require("../../helpers/MessageHelper");
 const ScheduleHelper_1 = require("../../helpers/ScheduleHelper");
 const MessageContainer_1 = require("../../message-helpers/MessageContainer");
 class GamesSlashWorker {
@@ -36,14 +35,6 @@ class GamesSlashWorker {
             var messages = yield this.GetScheduleMessages(team);
             response.Append(messages);
             return response;
-        });
-    }
-    CreateTeamMessage(ngsTeam) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const message = new MessageHelper_1.MessageHelper("Team");
-            message.AddNew(`Games for: **${ngsTeam.teamName}**`);
-            message.AddEmptyLine();
-            return message;
         });
     }
     GetScheduleMessages(ngsTeam) {

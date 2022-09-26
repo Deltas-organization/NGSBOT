@@ -33,13 +33,6 @@ export class GamesSlashWorker {
         return response;
     }
     
-    private async CreateTeamMessage(ngsTeam: INGSTeam) {
-        const message = new MessageHelper<any>("Team");
-        message.AddNew(`Games for: **${ngsTeam.teamName}**`);
-        message.AddEmptyLine();
-        return message;
-    }
-    
     private async GetScheduleMessages(ngsTeam: INGSTeam): Promise<MessageGroup> {
         var response = new MessageGroup();
         let games = ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames(), 99);

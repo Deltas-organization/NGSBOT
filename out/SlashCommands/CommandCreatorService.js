@@ -73,7 +73,7 @@ class CommandCreatorService {
                 interaction.followUp({ content: "An error has occurred" });
                 return;
             }
-            yield interaction.deferReply();
+            yield interaction.deferReply({ ephemeral: slashCommand.Ephemeral });
             yield slashCommand.RunCommand(client, interaction);
         });
     }

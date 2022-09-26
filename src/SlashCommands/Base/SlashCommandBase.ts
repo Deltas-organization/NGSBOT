@@ -6,7 +6,8 @@ export abstract class SlashCommandBase {
     protected command: ChatInputApplicationCommandData;
     protected abstract Description: string;
     protected type: ApplicationCommandTypes = ApplicationCommandTypes.CHAT_INPUT;
-    
+
+    public Ephemeral = false;    
     public abstract Name: string;
     public abstract GuildLocation: string;
 

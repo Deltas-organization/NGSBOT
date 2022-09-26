@@ -4,6 +4,7 @@ exports.SlashCommandBase = void 0;
 class SlashCommandBase {
     constructor() {
         this.type = 1 /* ApplicationCommandTypes.CHAT_INPUT */;
+        this.Ephemeral = false;
     }
     GetCommand() {
         this.command = {
