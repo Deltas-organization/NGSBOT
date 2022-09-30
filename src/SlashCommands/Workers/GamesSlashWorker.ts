@@ -41,6 +41,6 @@ export class GamesSlashWorker {
         messages.forEach(m => {
             response.AddOnNewLine(m);
         });
-        return response
+        return response;
     }
 }

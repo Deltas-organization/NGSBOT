@@ -6,6 +6,7 @@ import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { SlashCommandBase } from "./Base/SlashCommandBase";
 import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
 import { HelloWorldCommand } from "./Commands/HelloWorldCommand";
+import { RandomSlashCommand } from "./Commands/RandomSlashCommand";
 import { GamesSlashWorker } from "./Workers/GamesSlashWorker";
 
 type guildCommandContainer = { guild: string; commands: ChatInputApplicationCommandData[]; };
@@ -62,6 +63,7 @@ export class CommandCreatorService {
     private CreateCommands() {
         this.commands.push(new HelloWorldCommand());
         this.commands.push(new GamesSlashCommand(this.dataStore));
+        this.commands.push(new RandomSlashCommand());
     }
 
     private async RunCommand(client: Client, interaction: BaseCommandInteraction): Promise<void> {
