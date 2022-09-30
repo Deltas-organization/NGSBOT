@@ -8,15 +8,21 @@ export class RandomSlashWorker {
 
     public Run(respondedOptions: readonly CommandInteractionOption<CacheType>[]) {
         const container = new MessageContainer();
-        for (const data of respondedOptions) {
-            var options = this.FindOption(data.name);
-            const randomResult = this.GetRandomData(options.options, data.value as number);
-            const group = new MessageGroup();
-            group.Add(`Here are your **${options.friendlyName ?? options.name}**`);
-            randomResult.forEach(r => {
-                group.AddOnNewLine(r);
-            })
-            container.Append(group);
+        if (respondedOptions?.length > 0) {
+            for (const data of respondedOptions) {
+                var options = this.FindOption(data.name);
+                const randomResult = this.GetRandomData(options.options, data.value as number);
+                const group = new MessageGroup();
+                group.Add(`Here are your **${options.friendlyName ?? options.name}**`);
+                randomResult.forEach(r => {
+                    group.AddOnNewLine(r);
+                })
+                container.Append(group);
+            }
+        }
+        else
+        {
+            container.AddSimpleGroup("Please choose a sub command to randomize, I can't randomize the entierty of hots :)");
         }
         return container;
     };

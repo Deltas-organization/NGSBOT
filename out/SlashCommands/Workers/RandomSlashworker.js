@@ -7,15 +7,20 @@ class RandomSlashWorker {
     Run(respondedOptions) {
         var _a;
         const container = new MessageContainer_1.MessageContainer();
-        for (const data of respondedOptions) {
-            var options = this.FindOption(data.name);
-            const randomResult = this.GetRandomData(options.options, data.value);
-            const group = new MessageContainer_1.MessageGroup();
-            group.Add(`Here are your **${(_a = options.friendlyName) !== null && _a !== void 0 ? _a : options.name}**`);
-            randomResult.forEach(r => {
-                group.AddOnNewLine(r);
-            });
-            container.Append(group);
+        if ((respondedOptions === null || respondedOptions === void 0 ? void 0 : respondedOptions.length) > 0) {
+            for (const data of respondedOptions) {
+                var options = this.FindOption(data.name);
+                const randomResult = this.GetRandomData(options.options, data.value);
+                const group = new MessageContainer_1.MessageGroup();
+                group.Add(`Here are your **${(_a = options.friendlyName) !== null && _a !== void 0 ? _a : options.name}**`);
+                randomResult.forEach(r => {
+                    group.AddOnNewLine(r);
+                });
+                container.Append(group);
+            }
+        }
+        else {
+            container.AddSimpleGroup("Please choose a sub command to randomize, I can't randomize the entierty of hots :)");
         }
         return container;
     }

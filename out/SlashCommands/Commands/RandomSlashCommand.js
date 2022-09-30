@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RandomSlashCommand = void 0;
+const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 const RandomOptions_1 = require("../../helpers/RandomOptions");
 const OptionsCommandBase_1 = require("../Base/OptionsCommandBase");
 const RandomSlashworker_1 = require("../Workers/RandomSlashworker");
@@ -18,7 +19,7 @@ class RandomSlashCommand extends OptionsCommandBase_1.OptionsCommandBase {
         super(...arguments);
         this.Description = "Return a Random Item from the list";
         this.Name = "random_hots";
-        this.GuildLocation = "All";
+        this.GuildLocation = DiscordGuilds_1.DiscordGuilds.DeltasServer;
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
