@@ -8,7 +8,7 @@ export class RandomSlashCommand extends OptionsCommandBase {
 
     protected Description = "Return a Random Item from the list";
     public Name = "random_hots";
-    public GuildLocation = DiscordGuilds.DeltasServer;
+    public GuildLocation = "All";
 
     public async RunCommand(client: Client<boolean>, interaction: BaseCommandInteraction<CacheType>): Promise<void> {
         const worker = new RandomSlashWorker();
