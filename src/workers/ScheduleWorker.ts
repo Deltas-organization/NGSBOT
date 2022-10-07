@@ -52,7 +52,12 @@ export class ScheduleWorker extends WorkerBase {
 
             return true;
         });
-        let messages = await ScheduleHelper.GetMessages(scheduledGames);
-        await this.messageSender.SendMessages(messages);
+        if (scheduledGames.length > 0) {
+            let messages = await ScheduleHelper.GetMessages(scheduledGames);
+            await this.messageSender.SendMessages(messages);
+        }
+        else {
+            await this.messageSender.SendBasicMessage("didn't find anything on the schedule");
+        }
     }
 }

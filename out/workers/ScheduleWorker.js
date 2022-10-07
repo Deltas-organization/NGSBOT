@@ -61,8 +61,13 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
                     return false;
                 return true;
             });
-            let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(scheduledGames);
-            yield this.messageSender.SendMessages(messages);
+            if (scheduledGames.length > 0) {
+                let messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(scheduledGames);
+                yield this.messageSender.SendMessages(messages);
+            }
+            else {
+                yield this.messageSender.SendBasicMessage("didn't find anything on the schedule");
+            }
         });
     }
 }
