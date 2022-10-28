@@ -36,7 +36,8 @@ export class SearchPlayersWorker extends WorkerBase {
             else
                 message.AddOnNewLine("**No Team Found**");
 
-            for (var rank of player.verifiedRankHistory.sort(SearchPlayersWorker.RankHistorySort)) {
+            var maxSeasonCount = 4;
+            for (var rank of player.verifiedRankHistory.sort(SearchPlayersWorker.RankHistorySort).slice(0, maxSeasonCount)) {
                 if (rank.status == 'verified')
                     message.AddOnNewLine(`${rank.year} Season: ${rank.season}. **${rank.hlRankMetal} ${rank.hlRankDivision}**`);
             }
