@@ -10,8 +10,13 @@ export class ChannelMessageSender extends MessageSender {
     }
 
     public async SendToDiscordChannel(message: string, channel: DiscordChannels | string) {
-        const myChannel = await this.FindChannel(channel);
-        return await this.SendMessageToChannel(message, myChannel)
+        try {
+            const myChannel = await this.FindChannel(channel);
+            return await this.SendMessageToChannel(message, myChannel)
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
 
     public async SendToDiscordChannelAsBasic(message: string, channel: DiscordChannels | string): Promise<Message[]> {

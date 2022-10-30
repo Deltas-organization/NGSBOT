@@ -17,8 +17,13 @@ class ChannelMessageSender extends MessageSender_1.MessageSender {
     }
     SendToDiscordChannel(message, channel) {
         return __awaiter(this, void 0, void 0, function* () {
-            const myChannel = yield this.FindChannel(channel);
-            return yield this.SendMessageToChannel(message, myChannel);
+            try {
+                const myChannel = yield this.FindChannel(channel);
+                return yield this.SendMessageToChannel(message, myChannel);
+            }
+            catch (e) {
+                console.log(e);
+            }
         });
     }
     SendToDiscordChannelAsBasic(message, channel) {
