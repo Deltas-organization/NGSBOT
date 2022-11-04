@@ -40,6 +40,7 @@ const LiveDataStore_1 = require("../LiveDataStore");
 const MessageStore_1 = require("../MessageStore");
 const HistoryDisplay_1 = require("../scheduled/HistoryDisplay");
 const moment = require("moment");
+const CheckPendingMembers_1 = require("../commands/CheckPendingMembers");
 let CronHelper = class CronHelper {
     constructor(client, token, apiToken, mongoConnection) {
         this.client = client;
@@ -52,6 +53,7 @@ let CronHelper = class CronHelper {
         this.checkReportedGames = new CheckReportedGames_1.CheckReportedGames(this.client, this.dataStore);
         this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek_1.CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
         this.checkFlexMatches = new CheckFlexMatches_1.CheckFlexMatches(this.dataStore);
+        this.checkPendingMembers = new CheckPendingMembers_1.CheckPendingMembers(apiToken, this.dataStore, this.mongoHelper);
     }
     sendSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -188,6 +190,19 @@ let CronHelper = class CronHelper {
             try {
                 if (container)
                     yield this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels_1.DiscordChannels.NGSMods);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        });
+    }
+    MessageAboutPendingMembers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.client.login(this.token);
+            const container = yield this.checkPendingMembers.GetMembersPendingMessage();
+            try {
+                if (container)
+                    yield this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels_1.DiscordChannels.NGSMods, true);
             }
             catch (e) {
                 console.log(e);

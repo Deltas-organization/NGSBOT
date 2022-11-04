@@ -16,6 +16,7 @@ import { LiveDataStore } from "../LiveDataStore";
 import { MessageStore } from "../MessageStore";
 import { HistoryDisplay } from "../scheduled/HistoryDisplay";
 import moment = require("moment");
+import { CheckPendingMembers } from "../commands/CheckPendingMembers";
 
 @injectable()
 export class CronHelper {
@@ -27,6 +28,7 @@ export class CronHelper {
     private checkReportedGames: CheckReportedGames;
     private checkUnscheduledGamesForWeek: CheckUnscheduledGamesForWeek;
     private checkFlexMatches: CheckFlexMatches;
+    private checkPendingMembers: CheckPendingMembers;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -43,6 +45,7 @@ export class CronHelper {
         this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);
         this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
         this.checkFlexMatches = new CheckFlexMatches(this.dataStore);
+        this.checkPendingMembers = new CheckPendingMembers(apiToken, this.dataStore, this.mongoHelper);
     }
 
     public async sendSchedule() {
@@ -169,6 +172,18 @@ export class CronHelper {
         try {
             if (container)
                 await this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels.NGSMods);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+
+    public async MessageAboutPendingMembers() {
+        await this.client.login(this.token);
+        const container = await this.checkPendingMembers.GetMembersPendingMessage();
+        try {
+            if (container)
+                await this.messageSender.SendFromContainerToDiscordChannel(container, DiscordChannels.NGSMods, true);
         }
         catch (e) {
             console.log(e);

@@ -38,6 +38,9 @@ class CronRunner {
                 case "flex":
                     yield cronHelper.CheckFlexMatches();
                     break;
+                case "pendingmembers":
+                    yield cronHelper.MessageAboutPendingMembers();
+                    break;
             }
             process.exit();
         });

@@ -43,6 +43,55 @@ export class NGSQueryBuilder {
         });
     }
 
+    public GetSecuredResponse<T>(path: string, apiKey: string): Promise<T> {
+        if (path[0] != '/')
+            path = "/" + path;
+
+        const requestBody = JSON.stringify({
+            apiKey: apiKey,
+        });
+
+        Globals.logAdvanced(`retrieving: ${path}`);
+        return new Promise<T>((resolver, rejector) => {
+            const options = {
+                hostname: 'nexusgamingseries.org',
+                port: 443,
+                path: `/api${path}`,
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Content-Length': Buffer.byteLength(requestBody)
+                },
+            };
+
+            const req = https.request(options, (result) => {
+                result.setEncoding('utf8');
+                var chunks = "";
+                result.on('data', (chunk) => {
+                    chunks += chunk;
+                });
+                result.on('end', () => {
+                    try {
+                        var parsedObject = JSON.parse(chunks);
+                        var response: T = parsedObject.returnObject;
+                        Globals.logAdvanced(`retrieved: ${path}`);
+                        resolver(response);
+                    }
+                    catch (e) {
+                        rejector();
+                    }
+                });
+            });
+
+            req.on('error', (e) => {
+                console.error(`problem with request: ${e.message}`);
+            });
+            req.write(requestBody);
+
+            req.end();
+        });
+    }
+
     public PostResponse<T>(path: string, objectToSerialize: any): Promise<T> {
         const postData = JSON.stringify(objectToSerialize);
         if (path[0] != '/')

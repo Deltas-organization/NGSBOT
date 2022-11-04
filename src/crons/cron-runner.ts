@@ -30,6 +30,9 @@ export class CronRunner {
             case "flex":
                 await cronHelper.CheckFlexMatches();
                 break;
+            case "pendingmembers":
+                await cronHelper.MessageAboutPendingMembers();
+                break
         }
 
         process.exit();

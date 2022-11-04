@@ -24,10 +24,9 @@ export class ChannelMessageSender extends MessageSender {
         return await this.SendBasicMessageToChannel(message, myChannel);
     }
 
-    public async SendFromContainerToDiscordChannel(container: MessageContainer, channel: DiscordChannels | string) {
+    public async SendFromContainerToDiscordChannel(container: MessageContainer, channel: DiscordChannels | string, basic = false) {
         const myChannel = await this.FindChannel(channel);
-        return await this.SendMessageFromContainerToChannel(container, myChannel);
-
+        return await this.SendMessageFromContainerToChannel(container, myChannel, basic);
     }
 
     public async OverwriteBasicMessage(newMessageText: string, messageId: string, messageChannel: DiscordChannels) {

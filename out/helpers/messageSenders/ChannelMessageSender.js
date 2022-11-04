@@ -32,10 +32,10 @@ class ChannelMessageSender extends MessageSender_1.MessageSender {
             return yield this.SendBasicMessageToChannel(message, myChannel);
         });
     }
-    SendFromContainerToDiscordChannel(container, channel) {
+    SendFromContainerToDiscordChannel(container, channel, basic = false) {
         return __awaiter(this, void 0, void 0, function* () {
             const myChannel = yield this.FindChannel(channel);
-            return yield this.SendMessageFromContainerToChannel(container, myChannel);
+            return yield this.SendMessageFromContainerToChannel(container, myChannel, basic);
         });
     }
     OverwriteBasicMessage(newMessageText, messageId, messageChannel) {

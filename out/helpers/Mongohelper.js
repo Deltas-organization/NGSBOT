@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Mongohelper = void 0;
 const mongoDB = require("mongodb");
+const MongoCollections_1 = require("../mongo/models/MongoCollections");
 class Mongohelper {
     constructor(connectionUri) {
         this.client = new mongoDB.MongoClient(connectionUri, { useUnifiedTopology: true });
@@ -156,6 +157,35 @@ class Mongohelper {
             existingRecord.round += 1;
             yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
             return existingRecord;
+        });
+    }
+    RemovePendingMember(pendingMember) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.PendingMembers);
+            var selectOneQuery = { $and: [{ teamName: { $eq: pendingMember.teamName } }, { userName: { $eq: pendingMember.userName } }] };
+            yield collection.deleteOne(selectOneQuery);
+        });
+    }
+    GetAllFromCollection(collectionName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(collectionName);
+            return collection.find().toArray();
+        });
+    }
+    AddToCollection(collectionName, newRecord) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(collectionName);
+            yield collection.insertOne(newRecord);
+        });
+    }
+    AddMultipleToCollection(collectionName, newRecords) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(collectionName);
+            yield collection.insertMany(newRecords);
         });
     }
 }

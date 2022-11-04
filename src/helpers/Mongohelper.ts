@@ -1,8 +1,10 @@
 
 import * as mongoDB from "mongodb";
 import { NGSDivisions } from "../enums/NGSDivisions";
+import { INGSPendingMember } from "../interfaces/INGSPendingMember";
 import { IMongoAssignRolesRequest, IMongoScheduleRequest } from "../mongo";
 import { CaptainList } from "../mongo/models/captain-list";
+import { MongoCollections } from "../mongo/models/MongoCollections";
 import { SeasonInformation } from "../mongo/models/season-information";
 
 export class Mongohelper {
@@ -150,5 +152,30 @@ export class Mongohelper {
         await collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
         return existingRecord;
 
+    }
+
+    public async RemovePendingMember(pendingMember: INGSPendingMember) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<INGSPendingMember>(MongoCollections.PendingMembers);
+        var selectOneQuery = { $and: [{ teamName: { $eq: pendingMember.teamName } }, { userName: { $eq: pendingMember.userName } }] };
+        await collection.deleteOne(selectOneQuery);
+    }
+
+    public async GetAllFromCollection<T>(collectionName: string): Promise<T[]> {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<T>(collectionName);
+        return collection.find().toArray();
+    }
+
+    public async AddToCollection<T>(collectionName: string, newRecord: T) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<T>(collectionName);
+        await collection.insertOne(newRecord);
+    }
+
+    public async AddMultipleToCollection<T>(collectionName: string, newRecords: T[]) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<T>(collectionName);
+        await collection.insertMany(newRecords);
     }
 }
