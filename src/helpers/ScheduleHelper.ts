@@ -128,13 +128,10 @@ export class ScheduleHelper {
                 else
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
 
-                if (m.casterUrl && m.casterUrl.toLowerCase().indexOf("twitch") != -1) {
-                    if (m.casterUrl.indexOf("www") == -1) {
-                        m.casterUrl = "https://www." + m.casterUrl;
-                    }
-                    else if (m.casterUrl.indexOf("http") == -1) {
-                        m.casterUrl = "https://" + m.casterUrl;
-                    }
+                const twitchIndex = m.casterUrl?.toLowerCase().indexOf("twitch");
+                if (twitchIndex && twitchIndex != -1) {
+                    var twitchURL = m.casterUrl.slice(twitchIndex);
+                    m.casterUrl = "https://www." + twitchURL;
 
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
