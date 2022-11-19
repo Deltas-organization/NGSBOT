@@ -16,5 +16,6 @@ export interface INGSSchedule {
         awayTwo: string,
         homeOne: string,
         homeTwo: string
-    }
+    },
+    title: string
 }

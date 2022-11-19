@@ -124,9 +124,18 @@ export class ScheduleHelper {
 
                 let scheduleMessage = new MessageHelper<any>('scheduleMessage');
                 if (m.divisionDisplayName)
+                {
                     scheduleMessage.AddNew(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
+                }
+                else if(m.title)
+                {
+                    scheduleMessage.AddNewLine(`**${m.title}**`);
+                    scheduleMessage.AddNewLine(`**${m.home.teamName}** vs **${m.away.teamName}**`);
+                }
                 else
+                {
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
+                }
 
                 const twitchIndex = m.casterUrl?.toLowerCase().indexOf("twitch");
                 if (twitchIndex && twitchIndex != -1) {

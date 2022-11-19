@@ -122,10 +122,16 @@ class ScheduleHelper {
                         scheduleContainer.AddNewTimeSection(timeSection);
                 }
                 let scheduleMessage = new MessageHelper_1.MessageHelper('scheduleMessage');
-                if (m.divisionDisplayName)
+                if (m.divisionDisplayName) {
                     scheduleMessage.AddNew(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
-                else
+                }
+                else if (m.title) {
+                    scheduleMessage.AddNewLine(`**${m.title}**`);
+                    scheduleMessage.AddNewLine(`**${m.home.teamName}** vs **${m.away.teamName}**`);
+                }
+                else {
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
+                }
                 const twitchIndex = (_a = m.casterUrl) === null || _a === void 0 ? void 0 : _a.toLowerCase().indexOf("twitch");
                 if (twitchIndex && twitchIndex != -1) {
                     var twitchURL = m.casterUrl.slice(twitchIndex);
