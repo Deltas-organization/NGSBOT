@@ -61,7 +61,7 @@ export class CronHelper {
     }
 
     public async sendScheduleForDad() {
-        await this.sendScheduleByDivision(DiscordChannels.DeltaServer, NGSDivisions.AEast);
+        await this.sendScheduleByDivision(DiscordChannels.DeltaServer, NGSDivisions.Nexus);
     }
 
     public async sendScheduleForSis() {

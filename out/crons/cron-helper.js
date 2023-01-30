@@ -70,7 +70,7 @@ let CronHelper = class CronHelper {
     }
     sendScheduleForDad() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.DeltaServer, NGSDivisions_1.NGSDivisions.AEast);
+            yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.DeltaServer, NGSDivisions_1.NGSDivisions.Nexus);
         });
     }
     sendScheduleForSis() {

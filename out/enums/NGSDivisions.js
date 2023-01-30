@@ -6,8 +6,9 @@ var NGSDivisions;
     NGSDivisions["Storm"] = "Storm";
     NGSDivisions["Heroic"] = "Heroic";
     NGSDivisions["Nexus"] = "Nexus";
-    NGSDivisions["AEast"] = "A East";
-    NGSDivisions["AWest"] = "A West";
+    NGSDivisions["A"] = "A";
+    // AEast = "A East",
+    // AWest = "A West",
     NGSDivisions["BEast"] = "B East";
     NGSDivisions["BWest"] = "B West";
     NGSDivisions["CEast"] = "C East";
