@@ -7,7 +7,7 @@ export abstract class OptionsCommandBase extends SlashCommandBase {
         this.command = {
             description: this.Description,
             name: this.Name,
-            options: this.CreateOptions()
+            options: this.CreateOptions(),
         }
         return this.command;
     }

@@ -14,7 +14,7 @@ export abstract class SlashCommandBase {
     public GetCommand() : ChatInputApplicationCommandData{
         this.command = {
             description: this.Description,
-            name: this.Name
+            name: this.Name,
         }
         return this.command;
     }

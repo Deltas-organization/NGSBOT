@@ -5,6 +5,31 @@ import { Globals } from "../Globals";
 import { ClientHelper } from "./ClientHelper";
 
 export class RoleHelper {
+
+    public static readonly ReservedRoleNames: string[] = [
+        'Caster Hopefuls',
+        NGSRoles.FreeAgents,
+        'Moist',
+        'Supporter',
+        'Interviewee',
+        'Bots',
+        'Storm Casters',
+        'Ladies of the Nexus',
+        'HL Staff',
+        'Editor',
+        'Nitro Booster',
+        'It',
+        'Has Cooties',
+        'PoGo Raider',
+        'Cupid Captain',
+        'HCI Player',
+        'Trait Value',
+        'MemberList',
+        'Heroes International',
+        'HI Caster',
+        'HI Captain',
+        '@everyone'];
+
     constructor(private roles: Role[]) {
         Globals.logAdvanced(`helping with Roles: ${roles.map(role => role.name)}`);
     }
@@ -84,5 +109,19 @@ export class RoleHelper {
         roleNameTrimmed = roleNameTrimmed.toLowerCase();
         roleNameTrimmed = roleNameTrimmed.replace(/ /g, '')
         return roleNameTrimmed;
+    }
+
+    public GetReservedRoles(): Role[] {
+        const result: Role[] = [];
+        for (let roleName of RoleHelper.ReservedRoleNames) {
+            let foundRole = this.lookForRole(roleName);
+            if (foundRole) {
+                result.push(foundRole);
+            }
+            else {
+                Globals.logAdvanced(`didnt find role: ${roleName}`);
+            }
+        }
+        return result;
     }
 }

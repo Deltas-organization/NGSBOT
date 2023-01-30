@@ -10,30 +10,6 @@ import { WorkerBase } from "./WorkerBase";
 
 export abstract class RoleWorkerBase extends WorkerBase {
 
-    protected reservedRoleNames: string[] = [
-        'Caster Hopefuls',
-        NGSRoles.FreeAgents,
-        'Moist',
-        'Supporter',
-        'Interviewee',
-        'Bots',
-        'Storm Casters',
-        'Ladies of the Nexus',
-        'HL Staff',
-        'Editor',
-        'Nitro Booster',
-        'It',
-        'Has Cooties',
-        'PoGo Raider',
-        'Cupid Captain',
-        'HCI Player',
-        'Trait Value',
-        'MemberList',
-        'Heroes International',
-        'HI Caster',
-        'HI Captain',
-        '@everyone'];
-
     protected reserveredRoles: Role[] = [];
     protected myBotRole: Role;
     protected captainRole: Role;
@@ -88,28 +64,20 @@ export abstract class RoleWorkerBase extends WorkerBase {
     }
 
     private async GetReservedRoles(): Promise<Role[]> {
-        const result: Role[] = [];
-        for (let roleName of this.reservedRoleNames) {
-            let foundRole = this.roleHelper.lookForRole(roleName);
-            if (foundRole) {
-                result.push(foundRole);
-            }
-            else {
-                Globals.logAdvanced(`didnt find role: ${roleName}`);
-            }
-        }
+        const reservedRoles: Role[] = this.roleHelper.GetReservedRoles();
+        
         var selfAssignableRoles = await this.mongoConnection.GetAssignedRoleRequests(this.guild.id);
         const allRoles = await this.guild.roles.fetch();
         for (let roleId of selfAssignableRoles) {
             let foundRole = await allRoles.find(item => item.id == roleId);
             if (foundRole) {
-                result.push(foundRole);
+                reservedRoles.push(foundRole);
             }
             else {
                 Globals.logAdvanced(`didnt find role: ${foundRole}`);
             }
         }
 
-        return result;
+        return reservedRoles;
     }
 }

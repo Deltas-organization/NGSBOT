@@ -30,5 +30,4 @@ export class RandomSlashCommand extends OptionsCommandBase {
         }
         return options;
     }
-
 }
