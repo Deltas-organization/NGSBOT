@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordFuzzySearch = void 0;
-const Globals_1 = require("../Globals");
 class DiscordFuzzySearch {
     static FindGuildMember(user, guildMembers) {
         var _a;
@@ -32,7 +31,7 @@ class DiscordFuzzySearch {
             if (member) {
                 if (foundById && returnResult) {
                     if (returnResult.member.id != member.id) {
-                        yield Globals_1.Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`);
+                        // await Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`)
                         return null;
                     }
                 }
