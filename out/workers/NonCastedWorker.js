@@ -15,9 +15,9 @@ const WorkerBase_1 = require("./Bases/WorkerBase");
 class NonCastedWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._messageCommand = (messages, _) => this.messageSender.DMMessages(messages);
+            this._messageCommand = (messages) => this.messageSender.DMMessages(messages);
             if (this.detailed) {
-                this._messageCommand = (messages, storeMessage) => this.messageSender.SendMessages(messages, storeMessage);
+                this._messageCommand = (messages) => this.messageSender.SendMessages(messages);
             }
             let futureDays = 99;
             if (commands.length > 0) {

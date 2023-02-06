@@ -17,11 +17,10 @@ class WorkerBase {
         this.detailed = detailed;
         this.messageSender = messageSender;
         this.client = workerDependencies.client;
-        this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
         if (messageSender.originalMessage.guild)
             this.guild = messageSender.originalMessage.guild;
-        this._channelMessageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client, this.messageStore);
+        this._channelMessageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client);
     }
     Begin(commands) {
         return __awaiter(this, void 0, void 0, function* () {

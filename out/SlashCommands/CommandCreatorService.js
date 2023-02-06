@@ -10,13 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandCreatorService = void 0;
+const CaptainsCommand_1 = require("./Commands/CaptainsCommand");
 const GamesSlashCommand_1 = require("./Commands/GamesSlashCommand");
 const HelloWorldCommand_1 = require("./Commands/HelloWorldCommand");
 const RandomSlashCommand_1 = require("./Commands/RandomSlashCommand");
 class CommandCreatorService {
-    constructor(client, dataStore) {
+    constructor(client, dataStore, mongoConnectionUri) {
         this.client = client;
         this.dataStore = dataStore;
+        this.mongoConnectionUri = mongoConnectionUri;
         this.commands = [];
         client.on("interactionCreate", (interaction) => __awaiter(this, void 0, void 0, function* () {
             if (interaction.isCommand() || interaction.isContextMenu()) {
@@ -67,6 +69,7 @@ class CommandCreatorService {
         this.commands.push(new HelloWorldCommand_1.HelloWorldCommand());
         this.commands.push(new GamesSlashCommand_1.GamesSlashCommand(this.dataStore));
         this.commands.push(new RandomSlashCommand_1.RandomSlashCommand());
+        this.commands.push(new CaptainsCommand_1.CaptainsCommand(this.dataStore, this.mongoConnectionUri));
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {

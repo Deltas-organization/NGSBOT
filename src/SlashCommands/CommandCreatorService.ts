@@ -1,9 +1,11 @@
 import { debug } from "console";
 import { Client, ChatInputApplicationCommandData, BaseCommandInteraction, Interaction, CacheType } from "discord.js";
 import { ApplicationCommandTypes } from "discord.js/typings/enums";
+import { UpdateCaptainsListCommand } from "../commands/UpdateCaptainsListCommand";
 import { DiscordGuilds } from "../enums/DiscordGuilds";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { SlashCommandBase } from "./Base/SlashCommandBase";
+import { CaptainsCommand } from "./Commands/CaptainsCommand";
 import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
 import { HelloWorldCommand } from "./Commands/HelloWorldCommand";
 import { RandomSlashCommand } from "./Commands/RandomSlashCommand";
@@ -14,7 +16,7 @@ export class CommandCreatorService {
 
     private commands: SlashCommandBase[] = [];
 
-    constructor(private client: Client, private dataStore: DataStoreWrapper) {
+    constructor(private client: Client, private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
         client.on("interactionCreate", async (interaction: Interaction) => {
             if (interaction.isCommand() || interaction.isContextMenu()) {
                 await this.RunCommand(client, interaction);
@@ -64,6 +66,7 @@ export class CommandCreatorService {
         this.commands.push(new HelloWorldCommand());
         this.commands.push(new GamesSlashCommand(this.dataStore));
         this.commands.push(new RandomSlashCommand());
+        this.commands.push(new CaptainsCommand(this.dataStore, this.mongoConnectionUri));
     }
 
     private async RunCommand(client: Client, interaction: BaseCommandInteraction): Promise<void> {

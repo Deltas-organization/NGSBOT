@@ -31,11 +31,11 @@ export class Bot {
         @inject(TYPES.MongConection) mongoConnection: string,
         @inject(TYPES.BotCommand) botCommand: string
     ) {
-        this.dependencies = new CommandDependencies(client, new MessageStore(), new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken, mongoConnection);
-        this.messageSender = new ChannelMessageSender(client, this.dependencies.messageStore);
+        this.dependencies = new CommandDependencies(client, new DataStoreWrapper(new LiveDataStore(apiToken)), apiToken, mongoConnection);
+        this.messageSender = new ChannelMessageSender(client);
         this.pmMessageInteraction = new PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService(botCommand, this.dependencies);
-        this.commandCreatorService = new CommandCreatorService(client, this.dependencies.dataStore);
+        this.commandCreatorService = new CommandCreatorService(client, this.dependencies.dataStore, mongoConnection);
         Globals.ChannelSender = this.messageSender;
     }
 

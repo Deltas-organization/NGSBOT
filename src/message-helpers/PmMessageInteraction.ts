@@ -10,7 +10,7 @@ export class PmMessageInteraction {
     private mongoHelper: Mongohelper;
 
     constructor(client: Client, dependencies: CommandDependencies) {
-        this.messageSender = new ChannelMessageSender(client, dependencies.messageStore);
+        this.messageSender = new ChannelMessageSender(client);
     }
 
     public async ReceivePM(message: Message) {

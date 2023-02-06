@@ -26,7 +26,6 @@ const discord_js_1 = require("discord.js");
 const inversify_1 = require("inversify");
 const types_1 = require("./inversify/types");
 const LiveDataStore_1 = require("./LiveDataStore");
-const MessageStore_1 = require("./MessageStore");
 const TranslatorDependencies_1 = require("./helpers/TranslatorDependencies");
 const DiscordChannels_1 = require("./enums/DiscordChannels");
 const AssignNewUserCommand_1 = require("./commands/AssignNewUserCommand");
@@ -43,11 +42,11 @@ let Bot = class Bot {
     constructor(client, token, apiToken, mongoConnection, botCommand) {
         this.client = client;
         this.token = token;
-        this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new MessageStore_1.MessageStore(), new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
-        this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, this.dependencies.messageStore);
+        this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
+        this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client);
         this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
-        this.commandCreatorService = new CommandCreatorService_1.CommandCreatorService(client, this.dependencies.dataStore);
+        this.commandCreatorService = new CommandCreatorService_1.CommandCreatorService(client, this.dependencies.dataStore, mongoConnection);
         Globals_1.Globals.ChannelSender = this.messageSender;
     }
     listen() {

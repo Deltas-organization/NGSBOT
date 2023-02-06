@@ -13,8 +13,8 @@ exports.RespondToMessageSender = void 0;
 const Globals_1 = require("../../Globals");
 const MessageSender_1 = require("./MessageSender");
 class RespondToMessageSender extends MessageSender_1.MessageSender {
-    constructor(client, originalMessage, messageStore) {
-        super(client, messageStore);
+    constructor(client, originalMessage) {
+        super(client);
         this.originalMessage = originalMessage;
     }
     get Channel() {
@@ -35,8 +35,6 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
                         description: message
                     }]
             });
-            if (storeMessage)
-                this.messageStore.AddMessage(sentMessage);
             yield sentMessage.react('✅');
             yield sentMessage.react('❌');
             if (!this.originalMessage.guild)
@@ -81,7 +79,6 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
                         fields: fields
                     }]
             });
-            this.messageStore.AddMessage(sentMessage);
             return sentMessage;
         });
     }
@@ -90,21 +87,21 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
             return yield this.SendBasicMessageToChannel(message, this.Channel);
         });
     }
-    SendMessage(message, storeMessage = true) {
+    SendMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.SendMessageToChannel(message, this.Channel, storeMessage);
+            return yield this.SendMessageToChannel(message, this.Channel);
         });
     }
-    SendMessages(messages, storeMessage = true) {
+    SendMessages(messages) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.SendMessagesToChannel(messages, this.Channel, storeMessage);
+            return yield this.SendMessagesToChannel(messages, this.Channel);
         });
     }
     DMMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.GuildMember) {
                 var channel = yield this.GuildMember.createDM();
-                return yield this.SendMessageToChannel(message, channel, false);
+                return yield this.SendMessageToChannel(message, channel);
             }
         });
     }
@@ -112,7 +109,7 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.GuildMember) {
                 var channel = yield this.GuildMember.createDM();
-                return yield this.SendMessagesToChannel(messages, channel, false);
+                return yield this.SendMessagesToChannel(messages, channel);
             }
         });
     }

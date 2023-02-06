@@ -6,7 +6,6 @@ const Cleanup_1 = require("../Cleanup");
 const CoinFlip_1 = require("../CoinFlip");
 const commandLister_1 = require("../commandLister");
 const ConfigSetter_1 = require("../ConfigSetter");
-const DeleteMessage_1 = require("../DeleteMessage");
 const GamesCommand_1 = require("../GamesCommand");
 const Leave_1 = require("../Leave");
 const SelfAssignRolesCreator_1 = require("../mongo/SelfAssignRolesCreator");
@@ -36,7 +35,6 @@ class TranslatorService {
     Initialize() {
         this.scheduleLister = new ScheduleLister_1.ScheduleLister(this.dependencies);
         this.translators.push(this.scheduleLister);
-        this.translators.push(new DeleteMessage_1.DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter_1.ConfigSetter(this.dependencies));
         this.translators.push(new SearchPlayers_1.SearchPlayers(this.dependencies));
         this.translators.push(new TeamChecker_1.TeamNameChecker(this.dependencies));

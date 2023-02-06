@@ -18,13 +18,11 @@ export abstract class TranslatorBase implements ITranslate {
 
     protected readonly dataStore: DataStoreWrapper;
     protected readonly client: Client;
-    protected readonly messageStore: MessageStore;
     protected readonly apiKey: string;
     private readonly mongoConnectionUri: string;
 
     constructor(protected translatorDependencies: CommandDependencies) {
         this.client = translatorDependencies.client;
-        this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;
         this.apiKey = translatorDependencies.apiKey;
         this.mongoConnectionUri = translatorDependencies.mongoConnectionString;
@@ -60,7 +58,7 @@ export abstract class TranslatorBase implements ITranslate {
 
         if (foundBang) {
             let commands = this.RetrieveCommands(messageText);
-            let messageSender = new RespondToMessageSender(this.client, message, this.messageStore);
+            let messageSender = new RespondToMessageSender(this.client, message);
             await this.Interpret(commands, detailed, messageSender);
             Globals.log("Might be done running", this.constructor.name);
 

@@ -17,11 +17,11 @@ const WorkerBase_1 = require("./Bases/WorkerBase");
 class GamesWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._messageCommand = (message, _) => this.messageSender.DMMessage(message);
-            this._multiMessageCommand = (messages, _) => this.messageSender.DMMessages(messages);
+            this._messageCommand = (message) => this.messageSender.DMMessage(message);
+            this._multiMessageCommand = (messages) => this.messageSender.DMMessages(messages);
             if (this.detailed) {
-                this._messageCommand = (message, storeMessage) => this.messageSender.SendMessage(message, storeMessage);
-                this._multiMessageCommand = (messages, storeMessage) => this.messageSender.SendMessages(messages, storeMessage);
+                this._messageCommand = (message) => this.messageSender.SendMessage(message);
+                this._multiMessageCommand = (messages) => this.messageSender.SendMessages(messages);
             }
             let messages;
             if (commands.length <= 0) {

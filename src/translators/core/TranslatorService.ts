@@ -6,7 +6,6 @@ import { CleanupTranslator } from "../Cleanup";
 import { CoinFlip } from "../CoinFlip";
 import { CommandLister } from "../commandLister";
 import { ConfigSetter } from "../ConfigSetter";
-import { DeleteMessage } from "../DeleteMessage";
 import { GamesCommand } from "../GamesCommand";
 import { Leave } from "../Leave";
 import { SelfAssignRolesCreator } from "../mongo/SelfAssignRolesCreator";
@@ -40,7 +39,6 @@ export class TranslatorService {
 
         this.scheduleLister = new ScheduleLister(this.dependencies);
         this.translators.push(this.scheduleLister);
-        this.translators.push(new DeleteMessage(this.dependencies));
         this.translators.push(new ConfigSetter(this.dependencies));
         this.translators.push(new SearchPlayers(this.dependencies));
         this.translators.push(new TeamNameChecker(this.dependencies));

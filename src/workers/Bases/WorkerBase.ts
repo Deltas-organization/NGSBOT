@@ -11,17 +11,15 @@ export abstract class WorkerBase {
 
     protected readonly dataStore: DataStoreWrapper;
     protected readonly client: Client;
-    protected readonly messageStore: MessageStore;
     protected readonly guild: Guild;
     private _channelMessageSender: ChannelMessageSender;
 
     constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         this.client = workerDependencies.client;
-        this.messageStore = workerDependencies.messageStore;
         this.dataStore = workerDependencies.dataStore;
         if (messageSender.originalMessage.guild)
             this.guild = messageSender.originalMessage.guild;
-        this._channelMessageSender = new ChannelMessageSender(this.client, this.messageStore);
+        this._channelMessageSender = new ChannelMessageSender(this.client);
     }
 
     public async Begin(commands: string[]) {

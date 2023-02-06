@@ -4,12 +4,12 @@ import { ScheduleHelper } from "../helpers/ScheduleHelper";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class NonCastedWorker extends WorkerBase {
-    private _messageCommand: (message: string[], storeMessage?: boolean) => Promise<MessageWrapper[] | undefined>;
+    private _messageCommand: (message: string[]) => Promise<MessageWrapper[] | undefined>;
 
     protected async Start(commands: string[]) {
-        this._messageCommand = (messages: string[], _?: boolean) => this.messageSender.DMMessages(messages);
+        this._messageCommand = (messages: string[]) => this.messageSender.DMMessages(messages);
         if (this.detailed) {
-            this._messageCommand = (messages: string[], storeMessage?: boolean) => this.messageSender.SendMessages(messages, storeMessage);
+            this._messageCommand = (messages: string[]) => this.messageSender.SendMessages(messages);
         }
 
         let futureDays = 99;

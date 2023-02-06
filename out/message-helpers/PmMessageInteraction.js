@@ -14,7 +14,7 @@ const DiscordChannels_1 = require("../enums/DiscordChannels");
 const ChannelMessageSender_1 = require("../helpers/messageSenders/ChannelMessageSender");
 class PmMessageInteraction {
     constructor(client, dependencies) {
-        this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client, dependencies.messageStore);
+        this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client);
     }
     ReceivePM(message) {
         return __awaiter(this, void 0, void 0, function* () {

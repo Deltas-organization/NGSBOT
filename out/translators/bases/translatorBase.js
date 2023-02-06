@@ -18,7 +18,6 @@ class TranslatorBase {
     constructor(translatorDependencies) {
         this.translatorDependencies = translatorDependencies;
         this.client = translatorDependencies.client;
-        this.messageStore = translatorDependencies.messageStore;
         this.dataStore = translatorDependencies.dataStore;
         this.apiKey = translatorDependencies.apiKey;
         this.mongoConnectionUri = translatorDependencies.mongoConnectionString;
@@ -53,7 +52,7 @@ class TranslatorBase {
             });
             if (foundBang) {
                 let commands = this.RetrieveCommands(messageText);
-                let messageSender = new RespondToMessageSender_1.RespondToMessageSender(this.client, message, this.messageStore);
+                let messageSender = new RespondToMessageSender_1.RespondToMessageSender(this.client, message);
                 yield this.Interpret(commands, detailed, messageSender);
                 Globals_1.Globals.log("Might be done running", this.constructor.name);
             }

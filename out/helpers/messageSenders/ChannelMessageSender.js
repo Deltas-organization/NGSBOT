@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelMessageSender = void 0;
 const MessageSender_1 = require("./MessageSender");
 class ChannelMessageSender extends MessageSender_1.MessageSender {
-    constructor(client, messageStore) {
-        super(client, messageStore);
+    constructor(client) {
+        super(client);
     }
     SendToDiscordChannel(message, channel) {
         return __awaiter(this, void 0, void 0, function* () {

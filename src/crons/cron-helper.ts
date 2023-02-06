@@ -39,7 +39,7 @@ export class CronHelper {
         this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
         this.mongoHelper = new Mongohelper(mongoConnection);
 
-        this.messageSender = new ChannelMessageSender(this.client, new MessageStore());
+        this.messageSender = new ChannelMessageSender(this.client);
         this.historyDisplay = new HistoryDisplay(this.dataStore);
         this.cleanupFreeAgentsChannel = new CleanupFreeAgentsChannel(this.client);
         this.checkReportedGames = new CheckReportedGames(this.client, this.dataStore);

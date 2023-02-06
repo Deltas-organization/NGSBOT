@@ -31,6 +31,7 @@ class DiscordFuzzySearch {
             if (member) {
                 if (foundById && returnResult) {
                     if (returnResult.member.id != member.id) {
+                        return { member: member, updateDiscordId: true };
                         // await Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`)
                         return null;
                     }

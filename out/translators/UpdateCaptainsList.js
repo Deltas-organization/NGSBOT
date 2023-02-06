@@ -29,7 +29,7 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             var season = +LiveDataStore_1.LiveDataStore.season;
             const updateCaptainsList = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.translatorDependencies);
-            const channelSender = new ChannelMessageSender_1.ChannelMessageSender(this.client, this.messageStore);
+            const channelSender = new ChannelMessageSender_1.ChannelMessageSender(this.client);
             const message = yield messageSender.SendMessage("Updating captains list now");
             for (var value in NGSDivisions_1.NGSDivisions) {
                 const division = NGSDivisions_1.NGSDivisions[value];

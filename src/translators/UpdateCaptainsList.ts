@@ -22,7 +22,7 @@ export class UpdateCaptainsList extends ngsTranslatorBase {
     protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         var season: number = +LiveDataStore.season;
         const updateCaptainsList = new UpdateCaptainsListCommand(this.translatorDependencies);
-        const channelSender = new ChannelMessageSender(this.client, this.messageStore);
+        const channelSender = new ChannelMessageSender(this.client);
         const message = await messageSender.SendMessage("Updating captains list now");
         for (var value in NGSDivisions) {
             const division = NGSDivisions[value];

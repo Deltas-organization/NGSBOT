@@ -14,26 +14,27 @@ const WorkerBase_1 = require("./Bases/WorkerBase");
 class DeleteMessageWorker extends WorkerBase_1.WorkerBase {
     Start(commands) {
         return __awaiter(this, void 0, void 0, function* () {
-            let amountToDelete = 1;
-            if (commands.length > 0) {
-                let parsedNumber = parseInt(commands[0]);
-                if (!isNaN(parsedNumber)) {
-                    amountToDelete = parsedNumber;
-                }
-            }
-            var message = (yield this.messageSender.SendMessage(`would you like me to delete my last ${amountToDelete} message${(amountToDelete > 1 && 's?') || '?'}`, false)).Message;
-            message.react('✅');
-            const filter = (reaction, user) => {
-                return ['✅'].includes(reaction.emoji.name) && user.id === this.messageSender.originalMessage.author.id;
-            };
-            try {
-                yield message.awaitReactions({ filter, max: 1, time: 3e4 });
-                this.messageStore.DeleteMessage(amountToDelete);
-                message.delete();
-                this.messageSender.originalMessage.delete();
-            }
-            catch (_a) {
-            }
+            // let amountToDelete = 1;
+            // if (commands.length > 0) {
+            //     let parsedNumber = parseInt(commands[0])
+            //     if (!isNaN(parsedNumber)) {
+            //         amountToDelete = parsedNumber;
+            //     }
+            // }
+            // var message = (await this.messageSender.SendMessage(`would you like me to delete my last ${amountToDelete} message${(amountToDelete > 1 && 's?') || '?'}`)).Message;
+            // message.react('✅');
+            // const filter = (reaction, user) => {
+            //     return ['✅'].includes(reaction.emoji.name) && user.id === this.messageSender.originalMessage.author.id;
+            // };
+            // try {
+            //     await message.awaitReactions({ filter, max: 1, time: 3e4 });
+            //     this.messageStore.DeleteMessage(amountToDelete);
+            //     message.delete();
+            //     this.messageSender.originalMessage.delete();
+            // }
+            // catch
+            // {
+            // }
         });
     }
 }

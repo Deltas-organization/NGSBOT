@@ -9,8 +9,7 @@ import { CommandDependencies } from "../TranslatorDependencies";
 export class MessageSender {
     public static maxLength = 2000;
 
-    constructor(protected client: Client,
-        protected messageStore: MessageStore) {
+    constructor(protected client: Client) {
 
     }
 
@@ -27,26 +26,23 @@ export class MessageSender {
         return messagesSent;
     }
 
-    public async SendMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel, storeMessage = true) {
+    public async SendMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel) {
         while (message.length > MessageSender.maxLength) {
             let newMessage = message.slice(0, MessageSender.maxLength);
             message = message.substr(MessageSender.maxLength);
-            await this.SendMessageToChannel(newMessage, channel, storeMessage);
+            await this.SendMessageToChannel(newMessage, channel);
         }
         var sentMessage = await this.JustSendIt(message, channel, false);
-
-        if (storeMessage)
-            this.messageStore.AddMessage(sentMessage);
 
         return new MessageWrapper(this, sentMessage);
     }
 
-    public async SendMessagesToChannel(messages: string[], channel: TextChannel | DMChannel | NewsChannel, storeMessage = true) {
+    public async SendMessagesToChannel(messages: string[], channel: TextChannel | DMChannel | NewsChannel) {
         let result: MessageWrapper[] = [];
         let combinedMessages = this.CombineMultiple(messages);
 
         for (var message of combinedMessages) {
-            result.push(await this.SendMessageToChannel(message, channel, storeMessage));
+            result.push(await this.SendMessageToChannel(message, channel));
         }
         return result;
     }
@@ -62,9 +58,7 @@ export class MessageSender {
 
 
     public static async SendMessageToChannel(dependencies: CommandDependencies, message: string, channelID: string) {
-        var sentMessage = await this.SendMessageToChannelThroughClient(dependencies.client, message, channelID);
-        if (sentMessage)
-            dependencies.messageStore.AddMessage(sentMessage);
+        await this.SendMessageToChannelThroughClient(dependencies.client, message, channelID);
     }
 
     public static async SendMessageToChannelThroughClient(client: Client, message: string, channelID: string) {
@@ -80,13 +74,10 @@ export class MessageSender {
         }
     }
 
-    public async SendMessageFromContainerToChannel(container: MessageContainer, channel: TextChannel | DMChannel | NewsChannel, basicMessage = false, storeMessage = true) {
+    public async SendMessageFromContainerToChannel(container: MessageContainer, channel: TextChannel | DMChannel | NewsChannel, basicMessage = false) {
         var messages = container.MultiMessages(MessageSender.maxLength);
         for (var message of messages) {
-            var sentMessage = await this.JustSendIt(message, channel, basicMessage);
-
-            if (storeMessage)
-                this.messageStore.AddMessage(sentMessage);
+            await this.JustSendIt(message, channel, basicMessage);
         }
     }
 

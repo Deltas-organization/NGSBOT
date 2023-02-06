@@ -5,8 +5,8 @@ import { MessageStore } from "../../MessageStore";
 import { MessageSender } from "./MessageSender";
 
 export class ChannelMessageSender extends MessageSender {
-    constructor(client: Client, messageStore: MessageStore) {
-        super(client, messageStore)
+    constructor(client: Client) {
+        super(client)
     }
 
     public async SendToDiscordChannel(message: string, channel: DiscordChannels | string) {

@@ -9,7 +9,8 @@ class SlashCommandBase {
     GetCommand() {
         this.command = {
             description: this.Description,
-            name: this.Name
+            name: this.Name,
+            defaultMemberPermissions: this.Permissions
         };
         return this.command;
     }

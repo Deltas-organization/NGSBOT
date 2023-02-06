@@ -7,15 +7,15 @@ import { INGSTeam } from "../interfaces";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class GamesWorker extends WorkerBase {
-    private _messageCommand: (message: string, storeMessage?: boolean) => Promise<MessageWrapper | undefined>;
-    private _multiMessageCommand: (message: string[], storeMessage?: boolean) => Promise<MessageWrapper[] | undefined>;
+    private _messageCommand: (message: string) => Promise<MessageWrapper | undefined>;
+    private _multiMessageCommand: (message: string[]) => Promise<MessageWrapper[] | undefined>;
 
     protected async Start(commands: string[]) {
-        this._messageCommand = (message: string, _?: boolean) => this.messageSender.DMMessage(message);
-        this._multiMessageCommand = (messages: string[], _?: boolean) => this.messageSender.DMMessages(messages);
+        this._messageCommand = (message: string) => this.messageSender.DMMessage(message);
+        this._multiMessageCommand = (messages: string[]) => this.messageSender.DMMessages(messages);
         if (this.detailed) {
-            this._messageCommand = (message: string, storeMessage?: boolean) => this.messageSender.SendMessage(message, storeMessage);
-            this._multiMessageCommand = (messages: string[], storeMessage?: boolean) => this.messageSender.SendMessages(messages, storeMessage);
+            this._messageCommand = (message: string) => this.messageSender.SendMessage(message);
+            this._multiMessageCommand = (messages: string[]) => this.messageSender.SendMessages(messages);
         }
 
         let messages: string[] | undefined;

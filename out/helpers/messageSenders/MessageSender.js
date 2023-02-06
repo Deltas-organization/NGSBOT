@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageSender = void 0;
 const MessageWrapper_1 = require("../MessageWrapper");
 class MessageSender {
-    constructor(client, messageStore) {
+    constructor(client) {
         this.client = client;
-        this.messageStore = messageStore;
     }
     SendBasicMessageToChannel(message, channel) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -30,25 +29,23 @@ class MessageSender {
             return messagesSent;
         });
     }
-    SendMessageToChannel(message, channel, storeMessage = true) {
+    SendMessageToChannel(message, channel) {
         return __awaiter(this, void 0, void 0, function* () {
             while (message.length > MessageSender.maxLength) {
                 let newMessage = message.slice(0, MessageSender.maxLength);
                 message = message.substr(MessageSender.maxLength);
-                yield this.SendMessageToChannel(newMessage, channel, storeMessage);
+                yield this.SendMessageToChannel(newMessage, channel);
             }
             var sentMessage = yield this.JustSendIt(message, channel, false);
-            if (storeMessage)
-                this.messageStore.AddMessage(sentMessage);
             return new MessageWrapper_1.MessageWrapper(this, sentMessage);
         });
     }
-    SendMessagesToChannel(messages, channel, storeMessage = true) {
+    SendMessagesToChannel(messages, channel) {
         return __awaiter(this, void 0, void 0, function* () {
             let result = [];
             let combinedMessages = this.CombineMultiple(messages);
             for (var message of combinedMessages) {
-                result.push(yield this.SendMessageToChannel(message, channel, storeMessage));
+                result.push(yield this.SendMessageToChannel(message, channel));
             }
             return result;
         });
@@ -65,9 +62,7 @@ class MessageSender {
     }
     static SendMessageToChannel(dependencies, message, channelID) {
         return __awaiter(this, void 0, void 0, function* () {
-            var sentMessage = yield this.SendMessageToChannelThroughClient(dependencies.client, message, channelID);
-            if (sentMessage)
-                dependencies.messageStore.AddMessage(sentMessage);
+            yield this.SendMessageToChannelThroughClient(dependencies.client, message, channelID);
         });
     }
     static SendMessageToChannelThroughClient(client, message, channelID) {
@@ -84,13 +79,11 @@ class MessageSender {
             }
         });
     }
-    SendMessageFromContainerToChannel(container, channel, basicMessage = false, storeMessage = true) {
+    SendMessageFromContainerToChannel(container, channel, basicMessage = false) {
         return __awaiter(this, void 0, void 0, function* () {
             var messages = container.MultiMessages(MessageSender.maxLength);
             for (var message of messages) {
-                var sentMessage = yield this.JustSendIt(message, channel, basicMessage);
-                if (storeMessage)
-                    this.messageStore.AddMessage(sentMessage);
+                yield this.JustSendIt(message, channel, basicMessage);
             }
         });
     }
