@@ -32,7 +32,8 @@ export abstract class RoleWorkerBase extends WorkerBase {
         'Heroes International',
         'HI Caster',
         'HI Captain',
-        '@everyone'];
+        '@everyone',
+        'Ticket Tool'];
 
     protected reserveredRoles: Role[] = [];
     protected myBotRole: Role;

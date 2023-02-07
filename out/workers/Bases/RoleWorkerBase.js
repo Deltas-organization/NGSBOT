@@ -42,7 +42,8 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             'Heroes International',
             'HI Caster',
             'HI Captain',
-            '@everyone'
+            '@everyone',
+            'Ticket Tool'
         ];
         this.reserveredRoles = [];
     }
