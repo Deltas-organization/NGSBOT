@@ -2,6 +2,7 @@ import { Client, Guild, GuildChannel, Message, User } from "discord.js";
 import { DiscordChannels } from "../../enums/DiscordChannels";
 import { NGSDivisions } from "../../enums/NGSDivisions";
 import { Globals } from "../../Globals";
+import { ChannelHelper } from "../../helpers/ChannelHelper";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { DiscordFuzzySearch } from "../../helpers/DiscordFuzzySearch";
 import { MessageHelper } from "../../helpers/MessageHelper";
@@ -13,6 +14,7 @@ import { INGSTeam } from "../../interfaces";
 import { LiveDataStore } from "../../LiveDataStore";
 import { MessageContainer, MessageGroup } from "../../message-helpers/MessageContainer";
 import { AugmentedNGSUser } from "../../models/AugmentedNGSUser";
+import { CaptainList } from "../../mongo/models/captain-list";
 
 export class CaptainsListWorker {
 
@@ -22,13 +24,13 @@ export class CaptainsListWorker {
     private _roleHelper: RoleHelper;
     private _messageSender: ChannelMessageSender;
 
-    public constructor(private client: Client<boolean>, private dataStore: DataStoreWrapper, private mongoConnectionUri: string){
-        this._season = +LiveDataStore.season;        
-        this._mongoHelper = new Mongohelper(this.mongoConnectionUri);        
+    public constructor(private client: Client<boolean>, private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
+        this._season = +LiveDataStore.season;
+        this._mongoHelper = new Mongohelper(this.mongoConnectionUri);
         this._messageSender = new ChannelMessageSender(this.client);
     }
 
-    public async Run() : Promise<void> {
+    public async Run(): Promise<void> {
         this._guild = await this.GetGuild(DiscordChannels.NGSDiscord);
         this._roleHelper = await RoleHelper.CreateFrom(this._guild);
 
@@ -41,22 +43,61 @@ export class CaptainsListWorker {
                 await this.AttemptToUpdateCaptainMessage(division);
             }
         }
-    }    
-    
+    }
+
     private async AttemptToUpdateCaptainMessage(division: NGSDivisions) {
-        const messageId = await this._mongoHelper.GetCaptainListMessageId(this._season, division);
         const message = await this.CreateDivisionList(division, DiscordChannels.NGSDiscord);
+        if (message) {
+            let mongoMessage = await this._mongoHelper.GetCaptainListMessage(this._season, division);
+            if (!mongoMessage) {
+                mongoMessage = <CaptainList>{
+                    season: this._season,
+                    division: division
+                };
+            }
+             var captainChannelDivisionMessages = await this.UpdateCaptainChannel(mongoMessage.messageId, message);
+            var discordChannel = ChannelHelper.GetDiscordChannelForDivision(division);
+            if (discordChannel) {
+                var divisionChannelDivisionMessages = await this.UpdateDivisionChannelMessage(mongoMessage.divisionChannelMessageId, message, discordChannel);
+                var updateDatabase = false;
+                if (captainChannelDivisionMessages?.length == 1 && !mongoMessage.messageId) {
+                    updateDatabase = true;
+                    mongoMessage.messageId = captainChannelDivisionMessages[0].id;
+                }
+                if (divisionChannelDivisionMessages.length == 1 && !mongoMessage.divisionChannelMessageId) {
+                    updateDatabase = true;
+                    mongoMessage.divisionChannelMessageId = divisionChannelDivisionMessages[0].id;
+                }
+                if (updateDatabase) {
+                    await this._mongoHelper.UpdateCaptainListRecord(mongoMessage);
+                }
+            }
+        }
+    }
+
+    private async UpdateCaptainChannel(messageId: string, message: string): Promise<Message<boolean>[]> {
+        var result: Message<boolean>[] = [];
         if (message) {
             if (messageId)
                 await this._messageSender.OverwriteBasicMessage(message, messageId, DiscordChannels.NGSCaptainList);
             else {
-                var messages = await this._messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels.NGSCaptainList);
-                await this.CreateMongoRecord(messages, this._season, division);
+                result = await this._messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels.NGSCaptainList);
             }
-       }
+        }
+        return result;
     }
-    
-    public async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string | undefined> {
+
+    private async UpdateDivisionChannelMessage(messageId: string, message: string, discordChannel: DiscordChannels): Promise<Message<boolean>[]> {
+        var result: Message<boolean>[] = [];
+        if (messageId)
+            await this._messageSender.OverwriteBasicMessage(message, messageId, discordChannel);
+        else {
+            result = await this._messageSender.SendToDiscordChannelAsBasic(message, discordChannel);
+        }
+        return result;
+    }
+
+    private async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string | undefined> {
         try {
 
             const teams = await this.GetTeamsInDivision(division);
@@ -109,20 +150,6 @@ export class CaptainsListWorker {
         catch (e) {
             Globals.log(e);
         }
-    }
-
-    protected GetCaptainsList(division: NGSDivisions) {
-        return this._mongoHelper.GetCaptainListMessageId(this._season, division);
-    }
-
-    private async CreateMongoRecord(messages: Message[], season: number, division: NGSDivisions) {
-        if (messages.length > 1) {
-            Globals.log("There is more then one captain message for a division help...");
-            return;
-        }
-        var mongoHelper = new Mongohelper(this.mongoConnectionUri);
-        return await mongoHelper.CreateCaptainListRecord(messages[0].id, season, division);
-
     }
 
     private async GetTeamsInDivision(division: NGSDivisions) {

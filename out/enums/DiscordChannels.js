@@ -15,5 +15,12 @@ var DiscordChannels;
     DiscordChannels["SisSchedule"] = "793559101975429151";
     DiscordChannels["DeltaPmChannel"] = "936761691734171699";
     DiscordChannels["NGSMods"] = "517100802154954754";
+    DiscordChannels["DivisionHeroic"] = "430595764935327744";
+    DiscordChannels["DivisionNexus"] = "808690169556893727";
+    DiscordChannels["DivisionA"] = "334400254545887234";
+    DiscordChannels["DivisionB"] = "334399716383260695";
+    DiscordChannels["DivisionC"] = "334399328573718530";
+    DiscordChannels["DivisionD"] = "430595404699271178";
+    DiscordChannels["DivisionE"] = "808688397010468864";
 })(DiscordChannels = exports.DiscordChannels || (exports.DiscordChannels = {}));
 //# sourceMappingURL=DiscordChannels.js.map

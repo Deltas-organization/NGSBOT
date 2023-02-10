@@ -60,7 +60,7 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
     GetSavedMessage(season, division) {
         return __awaiter(this, void 0, void 0, function* () {
             var mongoHelper = this.CreateMongoHelper();
-            return mongoHelper.GetCaptainListMessageId(season, division);
+            return (yield mongoHelper.GetCaptainListMessage(season, division)).messageId;
         });
     }
     CreateMongoRecord(messages, season, division) {

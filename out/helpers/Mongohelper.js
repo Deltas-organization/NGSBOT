@@ -110,19 +110,19 @@ class Mongohelper {
                 return null;
         });
     }
-    GetCaptainListMessageId(season, division) {
+    GetCaptainListMessage(season, division) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.ngsDatabase.collection("CaptainList");
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
             var selectOneFilter = { season: { $eq: season }, division: { $eq: division } };
             var existingMessage = yield collection.findOne(selectOneFilter);
-            return existingMessage === null || existingMessage === void 0 ? void 0 : existingMessage.messageId;
+            return existingMessage;
         });
     }
     CreateCaptainListRecord(messageId, season, division) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.ngsDatabase.collection("CaptainList");
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
             var newRecord = {
                 season: season,
                 messageId: messageId,
@@ -132,10 +132,20 @@ class Mongohelper {
             return newRecord;
         });
     }
+    UpdateCaptainListRecord(record) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
+            var selectOneFilter = { season: { $eq: record.season }, division: { $eq: record.division } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            yield collection.updateOne(selectOneFilter, { $set: record }, { upsert: true });
+            return existingRecord;
+        });
+    }
     GetNgsInformation(season) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.ngsDatabase.collection("SeasonInformation");
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.SeasonInformation);
             var selectOneFilter = { season: { $eq: season } };
             var result = yield collection.findOne(selectOneFilter);
             if (!result) {
@@ -151,7 +161,7 @@ class Mongohelper {
     UpdateSeasonRound(season) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.ngsDatabase.collection("SeasonInformation");
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.SeasonInformation);
             var selectOneFilter = { season: { $eq: season } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             existingRecord.round += 1;

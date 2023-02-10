@@ -108,29 +108,38 @@ export class Mongohelper {
             return null;
     }
 
-    public async GetCaptainListMessageId(season: number, division: NGSDivisions) {
+    public async GetCaptainListMessage(season: number, division: NGSDivisions) {
         await this.connectedPromise;
-        var collection = this.ngsDatabase.collection<CaptainList>("CaptainList");
+        var collection = this.ngsDatabase.collection<CaptainList>(MongoCollections.CaptainList);
         var selectOneFilter = { season: { $eq: season }, division: { $eq: division } };
-        var existingMessage = await collection.findOne(selectOneFilter)
-        return existingMessage?.messageId;
+        var existingMessage: CaptainList = await collection.findOne(selectOneFilter)
+        return existingMessage;
     }
 
     public async CreateCaptainListRecord(messageId: string, season: number, division: NGSDivisions) {
         await this.connectedPromise;
-        var collection = this.ngsDatabase.collection<CaptainList>("CaptainList");
-        var newRecord: CaptainList = {
+        var collection = this.ngsDatabase.collection<CaptainList>(MongoCollections.CaptainList);
+        var newRecord: CaptainList = <CaptainList>{
             season: season,
             messageId: messageId,
             division: division
-        }
+        };
         await collection.insertOne(newRecord);
         return newRecord;
     }
 
+    public async UpdateCaptainListRecord(record: CaptainList): Promise<CaptainList>    {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<CaptainList>(MongoCollections.CaptainList);
+        var selectOneFilter = { season: { $eq: record.season }, division: { $eq: record.division } }
+        const existingRecord = await collection.findOne(selectOneFilter);
+        await collection.updateOne(selectOneFilter, { $set: record }, { upsert: true });
+        return existingRecord;
+    }
+
     public async GetNgsInformation(season: number): Promise<SeasonInformation> {
         await this.connectedPromise;
-        var collection = this.ngsDatabase.collection<SeasonInformation>("SeasonInformation");
+        var collection = this.ngsDatabase.collection<SeasonInformation>(MongoCollections.SeasonInformation);
         var selectOneFilter = { season: { $eq: season } };
         var result = await collection.findOne(selectOneFilter)
         if (!result) {
@@ -145,13 +154,12 @@ export class Mongohelper {
 
     public async UpdateSeasonRound(season: number): Promise<SeasonInformation> {
         await this.connectedPromise;
-        var collection = this.ngsDatabase.collection<SeasonInformation>("SeasonInformation");
+        var collection = this.ngsDatabase.collection<SeasonInformation>(MongoCollections.SeasonInformation);
         var selectOneFilter = { season: { $eq: season } };
         const existingRecord = await collection.findOne(selectOneFilter);
         existingRecord.round += 1;
         await collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
         return existingRecord;
-
     }
 
     public async RemovePendingMember(pendingMember: INGSPendingMember) {

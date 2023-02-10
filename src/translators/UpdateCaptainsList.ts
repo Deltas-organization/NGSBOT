@@ -51,7 +51,7 @@ export class UpdateCaptainsList extends ngsTranslatorBase {
 
     private async GetSavedMessage(season: number, division: NGSDivisions) {
         var mongoHelper = this.CreateMongoHelper();
-        return mongoHelper.GetCaptainListMessageId(season, division);
+        return (await mongoHelper.GetCaptainListMessage(season, division)).messageId;
     }
 
     private async CreateMongoRecord(messages: Message[], season: number, division: NGSDivisions) {

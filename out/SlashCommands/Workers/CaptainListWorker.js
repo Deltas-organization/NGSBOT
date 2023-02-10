@@ -13,6 +13,7 @@ exports.CaptainsListWorker = void 0;
 const DiscordChannels_1 = require("../../enums/DiscordChannels");
 const NGSDivisions_1 = require("../../enums/NGSDivisions");
 const Globals_1 = require("../../Globals");
+const ChannelHelper_1 = require("../../helpers/ChannelHelper");
 const DiscordFuzzySearch_1 = require("../../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../../helpers/MessageHelper");
 const ChannelMessageSender_1 = require("../../helpers/messageSenders/ChannelMessageSender");
@@ -45,16 +46,57 @@ class CaptainsListWorker {
     }
     AttemptToUpdateCaptainMessage(division) {
         return __awaiter(this, void 0, void 0, function* () {
-            const messageId = yield this._mongoHelper.GetCaptainListMessageId(this._season, division);
             const message = yield this.CreateDivisionList(division, DiscordChannels_1.DiscordChannels.NGSDiscord);
+            if (message) {
+                let mongoMessage = yield this._mongoHelper.GetCaptainListMessage(this._season, division);
+                if (!mongoMessage) {
+                    mongoMessage = {
+                        season: this._season,
+                        division: division
+                    };
+                }
+                var captainChannelDivisionMessages = yield this.UpdateCaptainChannel(mongoMessage.messageId, message);
+                var discordChannel = ChannelHelper_1.ChannelHelper.GetDiscordChannelForDivision(division);
+                if (discordChannel) {
+                    var divisionChannelDivisionMessages = yield this.UpdateDivisionChannelMessage(mongoMessage.divisionChannelMessageId, message, discordChannel);
+                    var updateDatabase = false;
+                    if ((captainChannelDivisionMessages === null || captainChannelDivisionMessages === void 0 ? void 0 : captainChannelDivisionMessages.length) == 1 && !mongoMessage.messageId) {
+                        updateDatabase = true;
+                        mongoMessage.messageId = captainChannelDivisionMessages[0].id;
+                    }
+                    if (divisionChannelDivisionMessages.length == 1 && !mongoMessage.divisionChannelMessageId) {
+                        updateDatabase = true;
+                        mongoMessage.divisionChannelMessageId = divisionChannelDivisionMessages[0].id;
+                    }
+                    if (updateDatabase) {
+                        yield this._mongoHelper.UpdateCaptainListRecord(mongoMessage);
+                    }
+                }
+            }
+        });
+    }
+    UpdateCaptainChannel(messageId, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var result = [];
             if (message) {
                 if (messageId)
                     yield this._messageSender.OverwriteBasicMessage(message, messageId, DiscordChannels_1.DiscordChannels.NGSCaptainList);
                 else {
-                    var messages = yield this._messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels_1.DiscordChannels.NGSCaptainList);
-                    yield this.CreateMongoRecord(messages, this._season, division);
+                    result = yield this._messageSender.SendToDiscordChannelAsBasic(message, DiscordChannels_1.DiscordChannels.NGSCaptainList);
                 }
             }
+            return result;
+        });
+    }
+    UpdateDivisionChannelMessage(messageId, message, discordChannel) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var result = [];
+            if (messageId)
+                yield this._messageSender.OverwriteBasicMessage(message, messageId, discordChannel);
+            else {
+                result = yield this._messageSender.SendToDiscordChannelAsBasic(message, discordChannel);
+            }
+            return result;
         });
     }
     CreateDivisionList(division, channelToUserForGuildRetrieval) {
@@ -108,19 +150,6 @@ class CaptainsListWorker {
             catch (e) {
                 Globals_1.Globals.log(e);
             }
-        });
-    }
-    GetCaptainsList(division) {
-        return this._mongoHelper.GetCaptainListMessageId(this._season, division);
-    }
-    CreateMongoRecord(messages, season, division) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (messages.length > 1) {
-                Globals_1.Globals.log("There is more then one captain message for a division help...");
-                return;
-            }
-            var mongoHelper = new Mongohelper_1.Mongohelper(this.mongoConnectionUri);
-            return yield mongoHelper.CreateCaptainListRecord(messages[0].id, season, division);
         });
     }
     GetTeamsInDivision(division) {
