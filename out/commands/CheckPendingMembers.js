@@ -99,7 +99,7 @@ class CheckPendingMembers {
             for (var pending of pendingInBoth) {
                 var found = false;
                 for (var team of teams.Teams) {
-                    if (pending.teamName == team.teamName) {
+                    if (pending.teamName.toLowerCase() == team.teamName.toLowerCase()) {
                         found = true;
                         result.push({ pendingMember: pending, division: team.divisionDisplayName });
                     }
