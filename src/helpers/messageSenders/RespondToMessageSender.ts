@@ -1,9 +1,7 @@
-import { Message, Client, GuildMember, User, FileOptions, BufferResolvable, MessageAttachment, DMChannel, NewsChannel, TextChannel } from "discord.js";
+import { Message, Client, GuildMember, User, BufferResolvable, DMChannel, NewsChannel, TextChannel, Attachment, AttachmentBuilder } from "discord.js";
 import { Stream } from "stream";
 import { Globals } from "../../Globals";
 import { MessageContainer } from "../../message-helpers/MessageContainer";
-import { MessageStore } from "../../MessageStore";
-import { MessageWrapper } from "../MessageWrapper";
 import { MessageSender } from "./MessageSender";
 
 export class RespondToMessageSender extends MessageSender {
@@ -27,7 +25,6 @@ export class RespondToMessageSender extends MessageSender {
     public async SendReactionMessage(message: string, authentication: (member: GuildMember | undefined) => boolean, yesReaction: () => Promise<any> | any, noReaction: () => Promise<any> | any = () => { }, storeMessage = true): Promise<{ message: Message, response: boolean | null } | undefined> {
         var sentMessage = await this.Channel.send({
             embeds: [{
-                color: 'DEFAULT',
                 description: message
             }]
         });
@@ -62,14 +59,13 @@ export class RespondToMessageSender extends MessageSender {
         return { message: sentMessage, response: response };
     }
 
-    public async SendFiles(files: (FileOptions | BufferResolvable | Stream | MessageAttachment)[]) {
+    public async SendFiles(files: (BufferResolvable | Stream | AttachmentBuilder)[]) {
         return this.Channel.send({ files: files });
     }
 
     public async SendFields(description: string, fields: { name: string, value: string }[]) {
         var sentMessage = await this.Channel.send({
             embeds: [{
-                color: "DEFAULT",
                 description: description,
                 fields: fields
             }]

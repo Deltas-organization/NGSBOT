@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { ChannelType, Client, Message, MessageType } from "discord.js";
 import { inject, injectable } from "inversify";
 import { TYPES } from "./inversify/types";
 import { LiveDataStore } from "./LiveDataStore";
@@ -15,6 +15,7 @@ import { PmMessageInteraction } from "./message-helpers/PmMessageInteraction";
 import { TranslatorService } from "./translators/core/TranslatorService";
 import { Globals } from "./Globals";
 import { CommandCreatorService } from "./SlashCommands/CommandCreatorService";
+import { TypeFlags } from "typescript";
 
 @injectable()
 export class Bot {
@@ -87,7 +88,7 @@ export class Bot {
     private async OnMessageReceived(message: Message) {
         this.translatorService.runTranslators(message);
 
-        if (message.channel.type == "DM" && message.author.bot == false) {
+        if (message.channel.type == ChannelType.DM && message.author.bot == false) {
             await this.pmMessageInteraction.ReceivePM(message);
         }
     }

@@ -1,8 +1,5 @@
-import { Message, TextChannel, Client, Channel, GuildMember, User, NewsChannel, DMChannel, MessageAttachment, BufferResolvable, FileOptions } from "discord.js";
-import { Stream } from "stream";
-import { DiscordChannels } from "../../enums/DiscordChannels";
+import { Message, TextChannel, Client, NewsChannel, DMChannel } from "discord.js";
 import { MessageContainer } from "../../message-helpers/MessageContainer";
-import { MessageStore } from "../../MessageStore";
 import { MessageWrapper } from "../MessageWrapper";
 import { CommandDependencies } from "../TranslatorDependencies";
 

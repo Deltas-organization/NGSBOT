@@ -9,18 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminTranslatorBase = void 0;
-const translatorBase_1 = require("./translatorBase");
-const discord_js_1 = require("discord.js");
-class AdminTranslatorBase extends translatorBase_1.TranslatorBase {
-    Verify(message) {
-        var _a;
+exports.ReplayCommandWorker = void 0;
+const ChannelMessageSender_1 = require("../../helpers/messageSenders/ChannelMessageSender");
+const Mongohelper_1 = require("../../helpers/Mongohelper");
+const LiveDataStore_1 = require("../../LiveDataStore");
+class ReplayCommandWorker {
+    constructor(client, dataStore, mongoConnectionUri) {
+        this.client = client;
+        this.dataStore = dataStore;
+        this.mongoConnectionUri = mongoConnectionUri;
+        this._season = +LiveDataStore_1.LiveDataStore.season;
+        this._mongoHelper = new Mongohelper_1.Mongohelper(this.mongoConnectionUri);
+        this._messageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client);
+    }
+    Run() {
         return __awaiter(this, void 0, void 0, function* () {
-            if ((_a = message.member) === null || _a === void 0 ? void 0 : _a.permissions.has(discord_js_1.PermissionFlagsBits.Administrator))
-                return true;
-            return false;
         });
     }
 }
-exports.AdminTranslatorBase = AdminTranslatorBase;
-//# sourceMappingURL=adminTranslatorBase.js.map
+exports.ReplayCommandWorker = ReplayCommandWorker;
+//# sourceMappingURL=ReplayCommandWorker.js.map

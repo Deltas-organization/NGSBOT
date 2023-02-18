@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionData, Client, BaseCommandInteraction, CacheType } from "discord.js";
+import { ApplicationCommandOptionData, Client, CommandInteraction, CacheType, ApplicationCommandOptionType } from "discord.js";
 import { DiscordGuilds } from "../../enums/DiscordGuilds";
 import { Random } from "../../helpers/RandomOptions";
 import { OptionsCommandBase } from "../Base/OptionsCommandBase";
@@ -10,7 +10,7 @@ export class RandomSlashCommand extends OptionsCommandBase {
     public Name = "random_hots";
     public GuildLocation = "All";
 
-    public async RunCommand(client: Client<boolean>, interaction: BaseCommandInteraction<CacheType>): Promise<void> {
+    public async RunCommand(client: Client<boolean>, interaction: CommandInteraction<CacheType>): Promise<void> {
         const worker = new RandomSlashWorker();
         const message = worker.Run(interaction.options.data);
         await interaction.followUp(
@@ -25,7 +25,7 @@ export class RandomSlashCommand extends OptionsCommandBase {
             options.push({
                 name: option.name,
                 description: option.description,
-                type: "INTEGER"
+                type: ApplicationCommandOptionType.Integer
             })
         }
         return options;

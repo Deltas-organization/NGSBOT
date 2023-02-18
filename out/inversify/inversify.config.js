@@ -9,7 +9,15 @@ const cron_helper_1 = require("../crons/cron-helper");
 let container = new inversify_1.Container();
 container.bind(types_1.TYPES.Bot).to(bot_1.Bot).inSingletonScope();
 container.bind(types_1.TYPES.CronHelper).to(cron_helper_1.CronHelper).inSingletonScope();
-container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.DIRECT_MESSAGES, discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MEMBERS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES, discord_js_1.Intents.FLAGS.GUILD_MESSAGE_REACTIONS, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES] }));
+container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({ intents: [
+        discord_js_1.GatewayIntentBits.DirectMessages,
+        discord_js_1.GatewayIntentBits.Guilds,
+        discord_js_1.GatewayIntentBits.GuildMembers,
+        discord_js_1.GatewayIntentBits.GuildMessages,
+        discord_js_1.GatewayIntentBits.GuildMessageReactions,
+        discord_js_1.GatewayIntentBits.MessageContent,
+        discord_js_1.GatewayIntentBits.GuildVoiceStates
+    ] }));
 if (process.env.TOKEN)
     container.bind(types_1.TYPES.Token).toConstantValue(process.env.TOKEN);
 if (process.env.NGSToken)

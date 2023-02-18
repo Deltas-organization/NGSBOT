@@ -1,11 +1,10 @@
-import { BaseCommandInteraction, ChatInputApplicationCommandData, Client, PermissionResolvable } from "discord.js";
-import { ApplicationCommandTypes } from "discord.js/typings/enums";
+import { CommandInteraction, ChatInputApplicationCommandData, Client, PermissionResolvable, ApplicationCommandType } from "discord.js";
 import { DiscordGuilds } from "../../enums/DiscordGuilds";
 
 export abstract class SlashCommandBase {
     protected command: ChatInputApplicationCommandData;
     protected abstract Description: string;
-    protected type: ApplicationCommandTypes = ApplicationCommandTypes.CHAT_INPUT;
+    protected type: ApplicationCommandType = ApplicationCommandType.ChatInput;
 
     public Ephemeral = false;    
     public abstract Name: string;
@@ -21,5 +20,5 @@ export abstract class SlashCommandBase {
         return this.command;
     }
 
-    public abstract RunCommand(client: Client, interaction: BaseCommandInteraction): Promise<void>;
+    public abstract RunCommand(client: Client, interaction: CommandInteraction): Promise<void>;
 }

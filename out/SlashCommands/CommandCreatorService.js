@@ -21,7 +21,7 @@ class CommandCreatorService {
         this.mongoConnectionUri = mongoConnectionUri;
         this.commands = [];
         client.on("interactionCreate", (interaction) => __awaiter(this, void 0, void 0, function* () {
-            if (interaction.isCommand() || interaction.isContextMenu()) {
+            if (interaction.isCommand() || interaction.isContextMenuCommand()) {
                 yield this.RunCommand(client, interaction);
             }
         }));

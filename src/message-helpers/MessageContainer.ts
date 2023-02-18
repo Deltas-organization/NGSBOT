@@ -1,4 +1,4 @@
-import { MessageEmbed, MessageEmbedOptions, MessageEmbedProvider } from "discord.js";
+import { APIEmbed } from "discord.js";
 import { MessageSender } from "../helpers/messageSenders/MessageSender";
 
 export class MessageContainer {
@@ -8,8 +8,8 @@ export class MessageContainer {
         return this._groups.map(g => g.AsString()).join('\n\n');
     }
 
-    public get AsEmbed(): MessageEmbedOptions[] {
-        var response: MessageEmbedOptions[] = [];
+    public get AsEmbed(): APIEmbed[] {
+        var response: APIEmbed[] = [];
         for (var message of this.MultiMessages(MessageSender.maxLength)) 
         {
             response.push({color: 0, description: message});

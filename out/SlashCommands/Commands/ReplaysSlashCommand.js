@@ -10,20 +10,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReplaysSlashCommand = void 0;
+const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 const SlashCommandBase_1 = require("../Base/SlashCommandBase");
+const ReplayCommandWorker_1 = require("../Workers/ReplayCommandWorker");
 class ReplaysSlashCommand extends SlashCommandBase_1.SlashCommandBase {
-    constructor(dataStore) {
+    constructor(dataStore, mongoConnectionUri) {
         super();
         this.dataStore = dataStore;
-        this.Description = "Will Respond to the User with their teams games";
-        this.Name = "games";
-        this.GuildLocation = "All";
+        this.mongoConnectionUri = mongoConnectionUri;
+        this.Description = "Will Download Replay for a team.";
+        this.Name = "Replays";
+        this.GuildLocation = DiscordGuilds_1.DiscordGuilds.DeltasServer;
         this.Ephemeral = true;
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            // var worker = new GamesSlashWorker(interaction.user, this.dataStore);
-            // var messages = await worker.Run();
+            var worker = new ReplayCommandWorker_1.ReplayCommandWorker(client, this.dataStore, this.mongoConnectionUri);
+            // await interaction.followUp({
+            //     content: "Please provide additional information.",
+            //     components: [
+            //         {
+            //             type: ComponentType.Button,
+            //         },
+            //         {
+            //             type: ComponentType.BUTTON,
+            //         }
+            //     ]
+            // })
+            var messages = yield worker.Run();
             // await interaction.followUp({
             //     ephemeral: this.Ephemeral,
             //     embeds: messages.AsEmbed          

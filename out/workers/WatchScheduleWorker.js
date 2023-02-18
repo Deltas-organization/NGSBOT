@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WatchScheduleWorker = void 0;
 const NGSDivisions_1 = require("../enums/NGSDivisions");
 const WorkerBase_1 = require("./Bases/WorkerBase");
+const discord_js_1 = require("discord.js");
 class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
     constructor(mongoHelper, workerDependencies, detailed, messageSender) {
         super(workerDependencies, detailed, messageSender);
@@ -54,10 +55,10 @@ class WatchScheduleWorker extends WorkerBase_1.WorkerBase {
         return unsupportedCommands;
     }
     hasCapabilityToSendMessage() {
-        var _a;
-        if ((_a = this.messageSender.originalMessage.guild) === null || _a === void 0 ? void 0 : _a.me) {
-            var me = this.messageSender.originalMessage.guild.me;
-            return me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS']);
+        var _a, _b, _c;
+        if ((_b = (_a = this.messageSender.originalMessage.guild) === null || _a === void 0 ? void 0 : _a.members) === null || _b === void 0 ? void 0 : _b.me) {
+            var me = (_c = this.messageSender.originalMessage.guild.members) === null || _c === void 0 ? void 0 : _c.me;
+            return me.permissionsIn(this.messageSender.Channel.id).has([discord_js_1.PermissionFlagsBits.SendMessages, discord_js_1.PermissionFlagsBits.EmbedLinks]);
         }
         return false;
     }

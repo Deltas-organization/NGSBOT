@@ -3,15 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandLister = void 0;
 const translatorBase_1 = require("./bases/translatorBase");
 class CommandLister extends translatorBase_1.TranslatorBase {
-    constructor(translatorDependencies, translators) {
-        super(translatorDependencies);
-        this.translators = translators;
-    }
     get commandBangs() {
         return ["commands"];
     }
     get description() {
         return "Lists the available commands";
+    }
+    constructor(translatorDependencies, translators) {
+        super(translatorDependencies);
+        this.translators = translators;
     }
     Interpret(commands, detailed, messageSender) {
         let fields = [];

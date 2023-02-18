@@ -108,12 +108,12 @@ class HistoryDisplay {
 }
 exports.HistoryDisplay = HistoryDisplay;
 class HistoryContainer {
+    get HasHistories() {
+        return this.Information.size > 0;
+    }
     constructor(Team) {
         this.Team = Team;
         this.Information = new Map();
-    }
-    get HasHistories() {
-        return this.Information.size > 0;
     }
     AddHistory(historyInformation) {
         const key = historyInformation.History.timestamp;

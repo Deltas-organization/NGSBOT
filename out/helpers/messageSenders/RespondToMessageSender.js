@@ -13,10 +13,6 @@ exports.RespondToMessageSender = void 0;
 const Globals_1 = require("../../Globals");
 const MessageSender_1 = require("./MessageSender");
 class RespondToMessageSender extends MessageSender_1.MessageSender {
-    constructor(client, originalMessage) {
-        super(client);
-        this.originalMessage = originalMessage;
-    }
     get Channel() {
         return this.originalMessage.channel;
     }
@@ -27,11 +23,14 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
         var _a;
         return (_a = this.GuildMember) === null || _a === void 0 ? void 0 : _a.user;
     }
+    constructor(client, originalMessage) {
+        super(client);
+        this.originalMessage = originalMessage;
+    }
     SendReactionMessage(message, authentication, yesReaction, noReaction = () => { }, storeMessage = true) {
         return __awaiter(this, void 0, void 0, function* () {
             var sentMessage = yield this.Channel.send({
                 embeds: [{
-                        color: 'DEFAULT',
                         description: message
                     }]
             });
@@ -74,7 +73,6 @@ class RespondToMessageSender extends MessageSender_1.MessageSender {
         return __awaiter(this, void 0, void 0, function* () {
             var sentMessage = yield this.Channel.send({
                 embeds: [{
-                        color: "DEFAULT",
                         description: description,
                         fields: fields
                     }]

@@ -82,7 +82,6 @@ export class CheckPendingMembers {
         await Promise.all(removePromises);
     }
 
-
     private async AddDivisionToPendings(pendingInBoth: INGSPendingMember[]): Promise<PendingDivisionInformation[]> {
         var result: PendingDivisionInformation[] = [];
         var teams = await this.dataStore.GetTeams();

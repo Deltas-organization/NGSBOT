@@ -4,6 +4,7 @@ import { RespondToMessageSender } from "../helpers/messageSenders/RespondToMessa
 import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { IMongoScheduleRequest } from "../mongo/models/schedule-request";
 import { WorkerBase } from "./Bases/WorkerBase";
+import { GuildMemberManager, PermissionFlagsBits } from "discord.js";
 
 export class WatchScheduleWorker extends WorkerBase {
 
@@ -47,9 +48,9 @@ export class WatchScheduleWorker extends WorkerBase {
     }
 
     private hasCapabilityToSendMessage(): boolean {
-        if (this.messageSender.originalMessage.guild?.me) {
-            var me = this.messageSender.originalMessage.guild.me;
-            return me.permissionsIn(this.messageSender.Channel.id).has(['SEND_MESSAGES', 'EMBED_LINKS'])
+        if (this.messageSender.originalMessage.guild?.members?.me) {
+            var me = this.messageSender.originalMessage.guild.members?.me;
+            return me.permissionsIn(this.messageSender.Channel.id).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])
         }
         return false;
     }

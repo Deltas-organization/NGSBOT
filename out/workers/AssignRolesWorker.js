@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignRolesWorker = void 0;
+const discord_js_1 = require("discord.js");
 const NGSRoles_1 = require("../enums/NGSRoles");
 const Globals_1 = require("../Globals");
 const DiscordFuzzySearch_1 = require("../helpers/DiscordFuzzySearch");
@@ -65,10 +66,9 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
                     updatedTeams: messagesLog.filter(this.FindUpdatedTeams).map(m => m.CreateJsonMessage()),
                     nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
                 }));
-                yield this.messageSender.SendFiles([{
-                        attachment: './files/assignedRoles.json',
-                        name: 'AssignRolesReport.json'
-                    }]).catch(console.error);
+                var attachment = new discord_js_1.AttachmentBuilder('./files/assignedRoles.json');
+                attachment.name = 'AssignRolesReport.json';
+                yield this.messageSender.SendFiles([attachment]).catch(console.error);
             }
             catch (e) {
                 Globals_1.Globals.log(e);

@@ -1,21 +1,34 @@
-import { BaseCommandInteraction, CacheType, Client } from "discord.js";
+import { CacheType, Client, CommandInteraction, ComponentType } from "discord.js";
+import { DiscordGuilds } from "../../enums/DiscordGuilds";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { SlashCommandBase } from "../Base/SlashCommandBase";
 import { GamesSlashWorker } from "../Workers/GamesSlashWorker";
+import { ReplayCommandWorker } from "../Workers/ReplayCommandWorker";
 
 export class ReplaysSlashCommand extends SlashCommandBase {
-    protected Description: string = "Will Respond to the User with their teams games";
-    public Name: string = "games";
-    public GuildLocation = "All";
+    protected Description: string = "Will Download Replay for a team.";
+    public Name: string = "Replays";
+    public GuildLocation = DiscordGuilds.DeltasServer;
     public Ephemeral = true;
 
-    constructor(private dataStore: DataStoreWrapper){
+    constructor(private dataStore: DataStoreWrapper, private mongoConnectionUri: string){
         super();
     }
 
-    public async RunCommand(client: Client<boolean>, interaction: BaseCommandInteraction<CacheType>): Promise<void> {
-        // var worker = new GamesSlashWorker(interaction.user, this.dataStore);
-        // var messages = await worker.Run();
+    public async RunCommand(client: Client<boolean>, interaction: CommandInteraction<CacheType>): Promise<void> {
+        var worker = new ReplayCommandWorker(client, this.dataStore, this.mongoConnectionUri);
+        // await interaction.followUp({
+        //     content: "Please provide additional information.",
+        //     components: [
+        //         {
+        //             type: ComponentType.Button,
+        //         },
+        //         {
+        //             type: ComponentType.BUTTON,
+        //         }
+        //     ]
+        // })
+        var messages = await worker.Run();
         // await interaction.followUp({
         //     ephemeral: this.Ephemeral,
         //     embeds: messages.AsEmbed          

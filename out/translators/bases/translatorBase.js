@@ -15,6 +15,9 @@ const Globals_1 = require("../../Globals");
 const RespondToMessageSender_1 = require("../../helpers/messageSenders/RespondToMessageSender");
 const Mongohelper_1 = require("../../helpers/Mongohelper");
 class TranslatorBase {
+    get delimiter() {
+        return null;
+    }
     constructor(translatorDependencies) {
         this.translatorDependencies = translatorDependencies;
         this.client = translatorDependencies.client;
@@ -22,9 +25,6 @@ class TranslatorBase {
         this.apiKey = translatorDependencies.apiKey;
         this.mongoConnectionUri = translatorDependencies.mongoConnectionString;
         this.Init();
-    }
-    get delimiter() {
-        return null;
     }
     Init() {
     }

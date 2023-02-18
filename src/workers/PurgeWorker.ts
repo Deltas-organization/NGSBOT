@@ -1,4 +1,4 @@
-import { GuildMember, Role } from "discord.js";
+import { AttachmentBuilder, GuildMember, Role } from "discord.js";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
 import { MessageHelper } from "../helpers/MessageHelper";
@@ -79,10 +79,10 @@ export class PurgeWorker extends RoleWorkerBase {
             detailedInformation: removedRoles.map(message => message.CreateJsonMessage()),
             ignoredUsers: ignoredUsers.map(message => message.CreateJsonMessage())
         }));
-        await this.messageSender.SendFiles([{
-            attachment: './files/purgedRoles.json',
-            name: 'purgedRoles.json'
-        }]).catch(console.error);
+        var attachment = new AttachmentBuilder('./files/purgedRoles.json');
+        attachment.name = 'purgedRoles.json';
+        await this.messageSender.SendFiles([attachment]).catch(console.error);
+        
         var message = 'Finished Purging Roles! \n';
         message += `Removed ${removedRoles.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`;
         if (this._testing)

@@ -140,7 +140,7 @@ class ChangeCaptainNickNameWorker extends WorkerBase_1.WorkerBase {
         valueToSearch = valueToSearch
             .replace("(", "\\(")
             .replace(")", "\\)");
-        if (nameWithNoSpaces.search(new RegExp(valueToSearch, "i")) != -1)
+        if ((nameWithNoSpaces === null || nameWithNoSpaces === void 0 ? void 0 : nameWithNoSpaces.search(new RegExp(valueToSearch, "i"))) != -1)
             return true;
         return false;
     }

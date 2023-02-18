@@ -11,12 +11,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ngsTranslatorBase = void 0;
 const translatorBase_1 = require("./translatorBase");
+const discord_js_1 = require("discord.js");
 const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 class ngsTranslatorBase extends translatorBase_1.TranslatorBase {
     Verify(message) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            if ((((_a = message.member) === null || _a === void 0 ? void 0 : _a.permissions.has('ADMINISTRATOR')) && ((_b = message.guild) === null || _b === void 0 ? void 0 : _b.id) == DiscordGuilds_1.DiscordGuilds.NGS))
+            if ((((_a = message.member) === null || _a === void 0 ? void 0 : _a.permissions.has(discord_js_1.PermissionFlagsBits.Administrator)) && ((_b = message.guild) === null || _b === void 0 ? void 0 : _b.id) == DiscordGuilds_1.DiscordGuilds.NGS))
                 return true;
             return false;
         });

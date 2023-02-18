@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PurgeWorker = void 0;
+const discord_js_1 = require("discord.js");
 const NGSRoles_1 = require("../enums/NGSRoles");
 const Globals_1 = require("../Globals");
 const MessageHelper_1 = require("../helpers/MessageHelper");
@@ -82,10 +83,9 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
                 detailedInformation: removedRoles.map(message => message.CreateJsonMessage()),
                 ignoredUsers: ignoredUsers.map(message => message.CreateJsonMessage())
             }));
-            yield this.messageSender.SendFiles([{
-                    attachment: './files/purgedRoles.json',
-                    name: 'purgedRoles.json'
-                }]).catch(console.error);
+            var attachment = new discord_js_1.AttachmentBuilder('./files/purgedRoles.json');
+            attachment.name = 'purgedRoles.json';
+            yield this.messageSender.SendFiles([attachment]).catch(console.error);
             var message = 'Finished Purging Roles! \n';
             message += `Removed ${removedRoles.map(m => m.Options.rolesRemovedCount).reduce((m1, m2) => m1 + m2, 0)} Roles`;
             if (this._testing)

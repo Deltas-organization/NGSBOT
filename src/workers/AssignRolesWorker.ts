@@ -1,4 +1,4 @@
-import { GuildMember, Role } from "discord.js";
+import { AttachmentBuilder, GuildMember, Role } from "discord.js";
 import { NGSRoles } from "../enums/NGSRoles";
 import { Globals } from "../Globals";
 import { DiscordFuzzySearch } from "../helpers/DiscordFuzzySearch";
@@ -62,10 +62,10 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 updatedTeams: messagesLog.filter(this.FindUpdatedTeams).map(m => m.CreateJsonMessage()),
                 nonUpdatedTeams: messagesLog.filter(m => !this.FindUpdatedTeams(m)).map(m => m.CreateJsonMessage())
             }));
-            await this.messageSender.SendFiles([{
-                attachment: './files/assignedRoles.json',
-                name: 'AssignRolesReport.json'
-            }]).catch(console.error);
+
+            var attachment = new AttachmentBuilder('./files/assignedRoles.json');
+            attachment.name = 'AssignRolesReport.json';
+            await this.messageSender.SendFiles([attachment]).catch(console.error);
         }
         catch (e) {
             Globals.log(e);

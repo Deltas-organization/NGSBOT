@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SlashCommandBase = void 0;
+const discord_js_1 = require("discord.js");
 class SlashCommandBase {
     constructor() {
-        this.type = 1 /* ApplicationCommandTypes.CHAT_INPUT */;
+        this.type = discord_js_1.ApplicationCommandType.ChatInput;
         this.Ephemeral = false;
     }
     GetCommand() {

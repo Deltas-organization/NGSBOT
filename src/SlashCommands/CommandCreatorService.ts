@@ -1,15 +1,10 @@
-import { debug } from "console";
-import { Client, ChatInputApplicationCommandData, BaseCommandInteraction, Interaction, CacheType } from "discord.js";
-import { ApplicationCommandTypes } from "discord.js/typings/enums";
-import { UpdateCaptainsListCommand } from "../commands/UpdateCaptainsListCommand";
-import { DiscordGuilds } from "../enums/DiscordGuilds";
+import { Client, ChatInputApplicationCommandData, CommandInteraction, Interaction } from "discord.js";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { SlashCommandBase } from "./Base/SlashCommandBase";
 import { CaptainsCommand } from "./Commands/CaptainsCommand";
 import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
 import { HelloWorldCommand } from "./Commands/HelloWorldCommand";
 import { RandomSlashCommand } from "./Commands/RandomSlashCommand";
-import { GamesSlashWorker } from "./Workers/GamesSlashWorker";
 
 type guildCommandContainer = { guild: string; commands: ChatInputApplicationCommandData[]; };
 export class CommandCreatorService {
@@ -18,7 +13,7 @@ export class CommandCreatorService {
 
     constructor(private client: Client, private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
         client.on("interactionCreate", async (interaction: Interaction) => {
-            if (interaction.isCommand() || interaction.isContextMenu()) {
+            if (interaction.isCommand() || interaction.isContextMenuCommand()) {
                 await this.RunCommand(client, interaction);
             }
         });
@@ -69,7 +64,7 @@ export class CommandCreatorService {
         this.commands.push(new CaptainsCommand(this.dataStore, this.mongoConnectionUri));
     }
 
-    private async RunCommand(client: Client, interaction: BaseCommandInteraction): Promise<void> {
+    private async RunCommand(client: Client, interaction: CommandInteraction): Promise<void> {
         const slashCommand = this.commands.find(c => c.Name === interaction.commandName);
         if (!slashCommand) {
             interaction.followUp({ content: "An error has occurred" });

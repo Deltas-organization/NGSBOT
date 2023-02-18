@@ -35,7 +35,8 @@ export abstract class TranslatorBase implements ITranslate {
     }
 
     public async Translate(messageText: string, message: Message) {
-        if (message.member?.user.id != DiscordMembers.Delta) {
+        if (message.member?.user.id != DiscordMembers.Delta) 
+        {
             //not enough permissions
             if (await this.Verify(message) == false)
                 return;

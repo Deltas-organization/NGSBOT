@@ -92,7 +92,7 @@ let Bot = class Bot {
     OnMessageReceived(message) {
         return __awaiter(this, void 0, void 0, function* () {
             this.translatorService.runTranslators(message);
-            if (message.channel.type == "DM" && message.author.bot == false) {
+            if (message.channel.type == discord_js_1.ChannelType.DM && message.author.bot == false) {
                 yield this.pmMessageInteraction.ReceivePM(message);
             }
         });

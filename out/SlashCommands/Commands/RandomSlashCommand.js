@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RandomSlashCommand = void 0;
+const discord_js_1 = require("discord.js");
 const RandomOptions_1 = require("../../helpers/RandomOptions");
 const OptionsCommandBase_1 = require("../Base/OptionsCommandBase");
 const RandomSlashworker_1 = require("../Workers/RandomSlashworker");
@@ -35,7 +36,7 @@ class RandomSlashCommand extends OptionsCommandBase_1.OptionsCommandBase {
             options.push({
                 name: option.name,
                 description: option.description,
-                type: "INTEGER"
+                type: discord_js_1.ApplicationCommandOptionType.Integer
             });
         }
         return options;

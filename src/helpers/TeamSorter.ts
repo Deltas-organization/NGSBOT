@@ -1,3 +1,4 @@
+import { ContainerModule } from "inversify";
 import { NGSDivisionConcat } from "../enums/NGSDivisionConcat";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { INGSTeam } from "../interfaces";
@@ -31,10 +32,19 @@ export class TeamSorter {
         NGSDivisions.EWest];
 
         for (var current of order) {
-            if (divisionDisplay1?.indexOf(current) > -1) {
+            var division1Index = divisionDisplay1?.indexOf(current);
+            if(!division1Index)
+                return -1;
+
+            if (division1Index > -1) {
                 return -1;
             }
-            else if (divisionDisplay2?.indexOf(current) > -1) {
+            
+            var division2Index = divisionDisplay2?.indexOf(current);
+            if(!division2Index)
+                return 1;
+
+            if (division2Index > -1) {
                 return 1;
             }
         }
@@ -58,10 +68,19 @@ export class TeamSorter {
         NGSDivisionConcat.EWest];
 
         for (var current of order) {
-            if (divisionDisplay1?.indexOf(current) > -1) {
+            var division1Index = divisionDisplay1?.indexOf(current);
+            if(!division1Index)
+                return -1;
+
+            if (division1Index > -1) {
                 return -1;
             }
-            else if (divisionDisplay2?.indexOf(current) > -1) {
+            
+            var division2Index = divisionDisplay2?.indexOf(current);
+            if(!division2Index)
+                return 1;
+
+            if (division2Index > -1) {
                 return 1;
             }
         }

@@ -1,4 +1,4 @@
-import { Client, BaseCommandInteraction, CacheType } from "discord.js";
+import { Client, CommandInteraction, CacheType } from "discord.js";
 import { DiscordGuilds } from "../../enums/DiscordGuilds";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { GamesWorker } from "../../workers/GamesWorker";
@@ -15,7 +15,7 @@ export class GamesSlashCommand extends SlashCommandBase {
         super();
     }
 
-    public async RunCommand(client: Client<boolean>, interaction: BaseCommandInteraction<CacheType>): Promise<void> {
+    public async RunCommand(client: Client<boolean>, interaction: CommandInteraction<CacheType>): Promise<void> {
         var worker = new GamesSlashWorker(interaction.user, this.dataStore);
         var messages = await worker.Run();
         await interaction.followUp({
