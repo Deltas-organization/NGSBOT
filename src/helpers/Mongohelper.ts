@@ -1,9 +1,11 @@
 
 import * as mongoDB from "mongodb";
+import { DiscordGuilds } from "../enums/DiscordGuilds";
 import { NGSDivisions } from "../enums/NGSDivisions";
 import { INGSPendingMember } from "../interfaces/INGSPendingMember";
 import { IMongoAssignRolesRequest, IMongoScheduleRequest } from "../mongo";
 import { CaptainList } from "../mongo/models/captain-list";
+import { IIgnoreRolesDocument } from "../mongo/models/ignore-roles-document";
 import { MongoCollections } from "../mongo/models/MongoCollections";
 import { SeasonInformation } from "../mongo/models/season-information";
 
@@ -99,13 +101,35 @@ export class Mongohelper {
 
     public async GetAssignedRoleRequests(guildId: string) {
         await this.connectedPromise;
-        var collection = this.ngsDatabase.collection<IMongoAssignRolesRequest>("AssignRoleRequest");
+        var collection = this.ngsDatabase.collection<IMongoAssignRolesRequest>(MongoCollections.AssignRoleRequest);
         var selectOneFilter = { guildId: { $eq: guildId } };
         const existingRecord = await collection.findOne(selectOneFilter);
         if (existingRecord)
             return existingRecord.assignablesRoles;
         else
             return null;
+    }
+
+    
+    public async AddRoleToIgnore(guildId: string, roleId: string) {
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<IIgnoreRolesDocument>(MongoCollections.RolesToIgnore);
+        var newRecord: IIgnoreRolesDocument = {
+            guildId: guildId,
+            roleId: roleId
+        };
+        await collection.insertOne(newRecord);
+    }
+
+    public async GetRolesToIgnore(guildToSearch: string) {
+        var result: string[] = [];
+        await this.connectedPromise;
+        var collection = this.ngsDatabase.collection<IIgnoreRolesDocument>(MongoCollections.RolesToIgnore);
+        var selectFilter = { guildId: { $eq: guildToSearch } };
+        const existingRecords: IIgnoreRolesDocument[] = await collection.find(selectFilter);
+        if (existingRecords)
+            result = existingRecords.map(item => item.roleId);
+        return result;
     }
 
     public async GetCaptainListMessage(season: number, division: NGSDivisions) {
@@ -128,7 +152,7 @@ export class Mongohelper {
         return newRecord;
     }
 
-    public async UpdateCaptainListRecord(record: CaptainList): Promise<CaptainList>    {
+    public async UpdateCaptainListRecord(record: CaptainList): Promise<CaptainList> {
         await this.connectedPromise;
         var collection = this.ngsDatabase.collection<CaptainList>(MongoCollections.CaptainList);
         var selectOneFilter = { season: { $eq: record.season }, division: { $eq: record.division } }

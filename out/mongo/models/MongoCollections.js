@@ -8,5 +8,6 @@ var MongoCollections;
     MongoCollections["PendingMembers"] = "PendingMembers";
     MongoCollections["ScheduleRequest"] = "ScheduleRequest";
     MongoCollections["SeasonInformation"] = "SeasonInformation";
+    MongoCollections["RolesToIgnore"] = "RolesToIgnore";
 })(MongoCollections = exports.MongoCollections || (exports.MongoCollections = {}));
 //# sourceMappingURL=MongoCollections.js.map

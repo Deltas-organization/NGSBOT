@@ -101,13 +101,36 @@ class Mongohelper {
     GetAssignedRoleRequests(guildId) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.ngsDatabase.collection("AssignRoleRequest");
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.AssignRoleRequest);
             var selectOneFilter = { guildId: { $eq: guildId } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             if (existingRecord)
                 return existingRecord.assignablesRoles;
             else
                 return null;
+        });
+    }
+    AddRoleToIgnore(guildId, roleId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
+            var newRecord = {
+                guildId: guildId,
+                roleId: roleId
+            };
+            yield collection.insertOne(newRecord);
+        });
+    }
+    GetRolesToIgnore(guildToSearch) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var result = [];
+            yield this.connectedPromise;
+            var collection = this.ngsDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
+            var selectFilter = { guildId: { $eq: guildToSearch } };
+            const existingRecords = yield collection.find(selectFilter);
+            if (existingRecords)
+                result = existingRecords.map(item => item.roleId);
+            return result;
         });
     }
     GetCaptainListMessage(season, division) {
