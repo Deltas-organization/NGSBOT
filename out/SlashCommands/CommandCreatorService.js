@@ -10,10 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandCreatorService = void 0;
+const discord_js_1 = require("discord.js");
+const ButtonSlashCommandBase_1 = require("./Base/ButtonSlashCommandBase");
 const CaptainsCommand_1 = require("./Commands/CaptainsCommand");
 const GamesSlashCommand_1 = require("./Commands/GamesSlashCommand");
-const HelloWorldCommand_1 = require("./Commands/HelloWorldCommand");
 const RandomSlashCommand_1 = require("./Commands/RandomSlashCommand");
+const RoleHelperCommand_1 = require("./Commands/RoleHelperCommand");
+const SearchDBDCommand_1 = require("./Commands/SearchDBDCommand");
 class CommandCreatorService {
     constructor(client, dataStore, mongoConnectionUri) {
         this.client = client;
@@ -21,7 +24,7 @@ class CommandCreatorService {
         this.mongoConnectionUri = mongoConnectionUri;
         this.commands = [];
         client.on("interactionCreate", (interaction) => __awaiter(this, void 0, void 0, function* () {
-            if (interaction.isCommand() || interaction.isContextMenuCommand()) {
+            if (interaction.isCommand() || interaction.isContextMenuCommand() || interaction.isButton()) {
                 yield this.RunCommand(client, interaction);
             }
         }));
@@ -31,7 +34,7 @@ class CommandCreatorService {
         });
     }
     Registercommands() {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             var containers = this.CreateCommandContainers();
             for (var container of containers.guildCommands) {
@@ -40,6 +43,14 @@ class CommandCreatorService {
             }
             if (containers.applicationCommands.length > 0)
                 yield ((_a = this.client.application) === null || _a === void 0 ? void 0 : _a.commands.set(containers.applicationCommands));
+            (_b = this.client.application) === null || _b === void 0 ? void 0 : _b.commands.cache.forEach(command => {
+                console.log(`commandName: ${command.name}, applicationId: ${command.id}`);
+            });
+            this.client.guilds.cache.forEach(guild => {
+                guild.commands.cache.forEach(command => {
+                    console.log(`Guild information: commandName: ${command.name}, applicationId: ${command.id}`);
+                });
+            });
             console.log("done");
         });
     }
@@ -66,20 +77,35 @@ class CommandCreatorService {
         return { guildCommands: guildCommandsToRegister, applicationCommands: applicationcommandsToRegister };
     }
     CreateCommands() {
-        this.commands.push(new HelloWorldCommand_1.HelloWorldCommand());
         this.commands.push(new GamesSlashCommand_1.GamesSlashCommand(this.dataStore));
         this.commands.push(new RandomSlashCommand_1.RandomSlashCommand());
         this.commands.push(new CaptainsCommand_1.CaptainsCommand(this.dataStore, this.mongoConnectionUri));
+        this.commands.push(new RoleHelperCommand_1.RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
+        this.commands.push(new SearchDBDCommand_1.SearchDBDCommand(this.mongoConnectionUri));
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            const slashCommand = this.commands.find(c => c.Name === interaction.commandName);
-            if (!slashCommand) {
-                interaction.followUp({ content: "An error has occurred" });
-                return;
+            if (interaction instanceof discord_js_1.CommandInteraction) {
+                const slashCommand = this.commands.find(c => c.Name === interaction.commandName);
+                if (!slashCommand) {
+                    interaction.followUp({ content: "An error has occurred" });
+                    return;
+                }
+                yield interaction.deferReply({ ephemeral: slashCommand.Ephemeral });
+                yield slashCommand.RunCommand(client, interaction);
             }
-            yield interaction.deferReply({ ephemeral: slashCommand.Ephemeral });
-            yield slashCommand.RunCommand(client, interaction);
+            if (interaction instanceof discord_js_1.ButtonInteraction) {
+                const buttonCommand = this.commands.find(c => {
+                    if (c instanceof ButtonSlashCommandBase_1.ButtonSlashCommandBase) {
+                        return true;
+                    }
+                    return false;
+                });
+                if (buttonCommand) {
+                    yield interaction.deferReply({ ephemeral: buttonCommand.Ephemeral });
+                    yield buttonCommand.RunButton(client, interaction);
+                }
+            }
         });
     }
     ;

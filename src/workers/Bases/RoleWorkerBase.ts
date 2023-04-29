@@ -7,6 +7,7 @@ import { Mongohelper } from "../../helpers/Mongohelper";
 import { RoleHelper } from "../../helpers/RoleHelper";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { WorkerBase } from "./WorkerBase";
+import { NGSMongoHelper } from "../../helpers/NGSMongoHelper";
 
 export abstract class RoleWorkerBase extends WorkerBase {
 
@@ -42,7 +43,7 @@ export abstract class RoleWorkerBase extends WorkerBase {
 
     protected roleHelper: RoleHelper;
 
-    public constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private mongoConnection: Mongohelper) {
+    public constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private mongoConnection: NGSMongoHelper) {
 
         super(workerDependencies, detailed, messageSender);
     }
@@ -108,6 +109,19 @@ export abstract class RoleWorkerBase extends WorkerBase {
             }
             else {
                 Globals.logAdvanced(`didnt find role: ${foundRole}`);
+            }
+        }
+
+        var rolestoIgnore = await this.mongoConnection.GetRolesToIgnore(this.guild.id);
+        if (rolestoIgnore) {
+            for (let roleId of rolestoIgnore) {
+                let foundRole = await allRoles.find(item => item.id == roleId);
+                if (foundRole) {
+                    result.push(foundRole);
+                }
+                else {
+                    Globals.logAdvanced(`didnt find role: ${foundRole}`);
+                }
             }
         }
 

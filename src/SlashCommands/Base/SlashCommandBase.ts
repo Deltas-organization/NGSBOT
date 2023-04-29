@@ -6,12 +6,12 @@ export abstract class SlashCommandBase {
     protected abstract Description: string;
     protected type: ApplicationCommandType = ApplicationCommandType.ChatInput;
 
-    public Ephemeral = false;    
+    public Ephemeral = false;
     public abstract Name: string;
     public abstract GuildLocation: string;
     public Permissions: PermissionResolvable;
 
-    public GetCommand() : ChatInputApplicationCommandData{
+    public GetCommand(): ChatInputApplicationCommandData {
         this.command = {
             description: this.Description,
             name: this.Name,

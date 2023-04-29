@@ -5,12 +5,13 @@ import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { IMongoScheduleRequest } from "../mongo/models/schedule-request";
 import { WorkerBase } from "./Bases/WorkerBase";
 import { GuildMemberManager, PermissionFlagsBits } from "discord.js";
+import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
 
 export class WatchScheduleWorker extends WorkerBase {
 
     private divisionsToWatch: string[] = [];
 
-    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
+    constructor(private mongoHelper: NGSMongoHelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         super(workerDependencies, detailed, messageSender)
     }
 

@@ -17,6 +17,7 @@ import { MessageStore } from "../MessageStore";
 import { HistoryDisplay } from "../scheduled/HistoryDisplay";
 import moment = require("moment");
 import { CheckPendingMembers } from "../commands/CheckPendingMembers";
+import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
 
 @injectable()
 export class CronHelper {
@@ -24,7 +25,7 @@ export class CronHelper {
     private messageSender: ChannelMessageSender;
     private historyDisplay: HistoryDisplay;
     private cleanupFreeAgentsChannel: CleanupFreeAgentsChannel;
-    private mongoHelper: Mongohelper;
+    private mongoHelper: NGSMongoHelper;
     private checkReportedGames: CheckReportedGames;
     private checkUnscheduledGamesForWeek: CheckUnscheduledGamesForWeek;
     private checkFlexMatches: CheckFlexMatches;
@@ -37,7 +38,7 @@ export class CronHelper {
         @inject(TYPES.MongConection) mongoConnection: string
     ) {
         this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
-        this.mongoHelper = new Mongohelper(mongoConnection);
+        this.mongoHelper = new NGSMongoHelper(mongoConnection);
 
         this.messageSender = new ChannelMessageSender(this.client);
         this.historyDisplay = new HistoryDisplay(this.dataStore);

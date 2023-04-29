@@ -10,6 +10,7 @@ import { INGSTeam, INGSUser } from "../interfaces";
 import { AssignRolesOptions } from "../message-helpers/AssignRolesOptions";
 import { RoleWorkerBase } from "./Bases/RoleWorkerBase";
 import { Mongohelper } from "../helpers/Mongohelper";
+import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
 
 const fs = require('fs');
 
@@ -18,7 +19,7 @@ export class AssignRolesWorker extends RoleWorkerBase {
     private _testing = false;
     private _mutedRole: Role;
 
-    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string, mongoHelper: Mongohelper) {
+    constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string, mongoHelper: NGSMongoHelper) {
         super(workerDependencies, detailed, messageSender, mongoHelper);
 
     }
@@ -149,7 +150,6 @@ export class AssignRolesWorker extends RoleWorkerBase {
                 mentionable: true,
                 hoist: true,
                 reason: 'needed a new team role added'
-
             });
 
             messageTracker.Options.CreatedTeamRole = true;

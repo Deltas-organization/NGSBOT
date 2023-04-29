@@ -15,18 +15,19 @@ import { LiveDataStore } from "../../LiveDataStore";
 import { MessageContainer, MessageGroup } from "../../message-helpers/MessageContainer";
 import { AugmentedNGSUser } from "../../models/AugmentedNGSUser";
 import { CaptainList } from "../../mongo/models/captain-list";
+import { NGSMongoHelper } from "../../helpers/NGSMongoHelper";
 
 export class CaptainsListWorker {
 
     private _season: number;
-    private _mongoHelper: Mongohelper;
+    private _mongoHelper: NGSMongoHelper;
     private _guild: Guild;
     private _roleHelper: RoleHelper;
     private _messageSender: ChannelMessageSender;
 
     public constructor(private client: Client<boolean>, private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
         this._season = +LiveDataStore.season;
-        this._mongoHelper = new Mongohelper(this.mongoConnectionUri);
+        this._mongoHelper = new NGSMongoHelper(this.mongoConnectionUri);
         this._messageSender = new ChannelMessageSender(this.client);
     }
 

@@ -4,10 +4,11 @@ import { Mongohelper } from "../../helpers/Mongohelper";
 import { RespondToMessageSender } from "../../helpers/messageSenders/RespondToMessageSender";
 import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { RoleWorkerBase } from "../Bases/RoleWorkerBase";
+import { NGSMongoHelper } from "../../helpers/NGSMongoHelper";
 
 export class SelfAssignRolesWatcherWorker extends RoleWorkerBase {
 
-    constructor(private mongoHelper: Mongohelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
+    constructor(private mongoHelper: NGSMongoHelper, workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender) {
         super(workerDependencies, detailed, messageSender, mongoHelper)
     }
 

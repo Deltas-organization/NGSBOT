@@ -8,6 +8,7 @@ import { CommandDependencies } from "../../helpers/TranslatorDependencies";
 import { INGSUser } from "../../interfaces";
 import { ITranslate } from "../../interfaces/ITranslator";
 import { MessageStore } from "../../MessageStore";
+import { NGSMongoHelper } from "../../helpers/NGSMongoHelper";
 
 export abstract class TranslatorBase implements ITranslate {
     public abstract get commandBangs(): string[];
@@ -106,6 +107,6 @@ export abstract class TranslatorBase implements ITranslate {
     }
 
     protected CreateMongoHelper() {
-        return new Mongohelper(this.mongoConnectionUri);
+        return new NGSMongoHelper(this.mongoConnectionUri);
     }
 }

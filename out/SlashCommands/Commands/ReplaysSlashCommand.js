@@ -11,9 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReplaysSlashCommand = void 0;
 const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
-const SlashCommandBase_1 = require("../Base/SlashCommandBase");
+const ButtonSlashCommandBase_1 = require("../Base/ButtonSlashCommandBase");
 const ReplayCommandWorker_1 = require("../Workers/ReplayCommandWorker");
-class ReplaysSlashCommand extends SlashCommandBase_1.SlashCommandBase {
+class ReplaysSlashCommand extends ButtonSlashCommandBase_1.ButtonSlashCommandBase {
     constructor(dataStore, mongoConnectionUri) {
         super();
         this.dataStore = dataStore;
@@ -22,6 +22,8 @@ class ReplaysSlashCommand extends SlashCommandBase_1.SlashCommandBase {
         this.Name = "Replays";
         this.GuildLocation = DiscordGuilds_1.DiscordGuilds.DeltasServer;
         this.Ephemeral = true;
+        this.AllButtonID = "AllReplays";
+        this.NewReplayButtonId = "NewReplays";
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -43,6 +45,12 @@ class ReplaysSlashCommand extends SlashCommandBase_1.SlashCommandBase {
             //     embeds: messages.AsEmbed          
             // });
         });
+    }
+    RunButton(client, interaction) {
+        throw new Error("Method not implemented.");
+    }
+    CreateButtons() {
+        throw "not implemented";
     }
 }
 exports.ReplaysSlashCommand = ReplaysSlashCommand;

@@ -1,5 +1,6 @@
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { Mongohelper } from "../helpers/Mongohelper";
+import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
 import { NGSQueryBuilder } from "../helpers/NGSQueryBuilder";
 import { TeamSorter } from "../helpers/TeamSorter";
 import { INGSTeam } from "../interfaces";
@@ -9,7 +10,7 @@ import { IMongoPendingMemberCollection, MongoCollections } from "../mongo/models
 
 export class CheckPendingMembers {
 
-    constructor(private apiKey: string, private dataStore: DataStoreWrapper, private mongoHelper: Mongohelper) {
+    constructor(private apiKey: string, private dataStore: DataStoreWrapper, private mongoHelper: NGSMongoHelper) {
 
     }
 

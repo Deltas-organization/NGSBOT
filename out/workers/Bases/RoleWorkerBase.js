@@ -115,6 +115,18 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
                     Globals_1.Globals.logAdvanced(`didnt find role: ${foundRole}`);
                 }
             }
+            var rolestoIgnore = yield this.mongoConnection.GetRolesToIgnore(this.guild.id);
+            if (rolestoIgnore) {
+                for (let roleId of rolestoIgnore) {
+                    let foundRole = yield allRoles.find(item => item.id == roleId);
+                    if (foundRole) {
+                        result.push(foundRole);
+                    }
+                    else {
+                        Globals_1.Globals.logAdvanced(`didnt find role: ${foundRole}`);
+                    }
+                }
+            }
             return result;
         });
     }

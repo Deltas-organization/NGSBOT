@@ -13,7 +13,7 @@ exports.TranslatorBase = void 0;
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
 const Globals_1 = require("../../Globals");
 const RespondToMessageSender_1 = require("../../helpers/messageSenders/RespondToMessageSender");
-const Mongohelper_1 = require("../../helpers/Mongohelper");
+const NGSMongoHelper_1 = require("../../helpers/NGSMongoHelper");
 class TranslatorBase {
     get delimiter() {
         return null;
@@ -96,7 +96,7 @@ class TranslatorBase {
         });
     }
     CreateMongoHelper() {
-        return new Mongohelper_1.Mongohelper(this.mongoConnectionUri);
+        return new NGSMongoHelper_1.NGSMongoHelper(this.mongoConnectionUri);
     }
 }
 exports.TranslatorBase = TranslatorBase;

@@ -12,11 +12,12 @@ import { ScheduleHelper, ScheduleInformation } from "../helpers/ScheduleHelper";
 import { INGSSchedule, INGSUser } from "../interfaces";
 import { LiveDataStore } from "../LiveDataStore";
 import { AugmentedNGSUser } from "../models/AugmentedNGSUser";
+import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
 
 export class CheckUnscheduledGamesForWeek {
     private _divisionsWithAllGamesScheduled: string[] = [];
 
-    constructor(private mongoHelper: Mongohelper, private dataStore: DataStoreWrapper) {
+    constructor(private mongoHelper: NGSMongoHelper, private dataStore: DataStoreWrapper) {
 
     }
 

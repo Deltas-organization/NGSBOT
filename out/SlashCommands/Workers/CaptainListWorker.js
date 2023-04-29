@@ -17,16 +17,16 @@ const ChannelHelper_1 = require("../../helpers/ChannelHelper");
 const DiscordFuzzySearch_1 = require("../../helpers/DiscordFuzzySearch");
 const MessageHelper_1 = require("../../helpers/MessageHelper");
 const ChannelMessageSender_1 = require("../../helpers/messageSenders/ChannelMessageSender");
-const Mongohelper_1 = require("../../helpers/Mongohelper");
 const RoleHelper_1 = require("../../helpers/RoleHelper");
 const LiveDataStore_1 = require("../../LiveDataStore");
+const NGSMongoHelper_1 = require("../../helpers/NGSMongoHelper");
 class CaptainsListWorker {
     constructor(client, dataStore, mongoConnectionUri) {
         this.client = client;
         this.dataStore = dataStore;
         this.mongoConnectionUri = mongoConnectionUri;
         this._season = +LiveDataStore_1.LiveDataStore.season;
-        this._mongoHelper = new Mongohelper_1.Mongohelper(this.mongoConnectionUri);
+        this._mongoHelper = new NGSMongoHelper_1.NGSMongoHelper(this.mongoConnectionUri);
         this._messageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client);
     }
     Run() {
