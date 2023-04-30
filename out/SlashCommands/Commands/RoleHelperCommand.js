@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoleHelperCommand = void 0;
 const discord_js_1 = require("discord.js");
-const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 const ButtonSlashCommandBase_1 = require("../Base/ButtonSlashCommandBase");
 const NGSMongoHelper_1 = require("../../helpers/NGSMongoHelper");
 class RoleHelperCommand extends ButtonSlashCommandBase_1.ButtonSlashCommandBase {
@@ -23,7 +22,7 @@ class RoleHelperCommand extends ButtonSlashCommandBase_1.ButtonSlashCommandBase 
         this._noButtonId = "RoleHelperCommand_NoButton";
         this.Description = "Will Add Roles.";
         this.Name = "addrole";
-        this.GuildLocation = DiscordGuilds_1.DiscordGuilds.DeltasServer;
+        this.GuildLocation = "All";
         this.Ephemeral = false;
     }
     GetCommand() {

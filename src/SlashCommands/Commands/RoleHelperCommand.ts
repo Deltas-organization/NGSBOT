@@ -18,7 +18,7 @@ export class RoleHelperCommand extends ButtonSlashCommandBase {
 
     protected Description: string = "Will Add Roles.";
     public Name: string = "addrole";
-    public GuildLocation = DiscordGuilds.DeltasServer;
+    public GuildLocation = "All";
     public Ephemeral = false;
 
     constructor(private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
