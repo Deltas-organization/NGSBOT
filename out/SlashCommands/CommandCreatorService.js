@@ -11,12 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandCreatorService = void 0;
 const discord_js_1 = require("discord.js");
-const ButtonSlashCommandBase_1 = require("./Base/ButtonSlashCommandBase");
 const CaptainsCommand_1 = require("./Commands/CaptainsCommand");
 const GamesSlashCommand_1 = require("./Commands/GamesSlashCommand");
 const RandomSlashCommand_1 = require("./Commands/RandomSlashCommand");
 const RoleHelperCommand_1 = require("./Commands/RoleHelperCommand");
-const SearchDBDCommand_1 = require("./Commands/SearchDBDCommand");
 class CommandCreatorService {
     constructor(client, dataStore, mongoConnectionUri) {
         this.client = client;
@@ -81,7 +79,7 @@ class CommandCreatorService {
         this.commands.push(new RandomSlashCommand_1.RandomSlashCommand());
         this.commands.push(new CaptainsCommand_1.CaptainsCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RoleHelperCommand_1.RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
-        this.commands.push(new SearchDBDCommand_1.SearchDBDCommand(this.mongoConnectionUri));
+        // this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -95,8 +93,9 @@ class CommandCreatorService {
                 yield slashCommand.RunCommand(client, interaction);
             }
             if (interaction instanceof discord_js_1.ButtonInteraction) {
+                const splitId = interaction.customId.split(":");
                 const buttonCommand = this.commands.find(c => {
-                    if (c instanceof ButtonSlashCommandBase_1.ButtonSlashCommandBase) {
+                    if (c.Name == splitId[0]) {
                         return true;
                     }
                     return false;

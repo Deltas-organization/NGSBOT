@@ -58,22 +58,18 @@ export class RoleHelperCommand extends ButtonSlashCommandBase {
         var row = new ActionRowBuilder<ButtonBuilder>()
         row.addComponents(await this.CreateButtons(role.id));
 
-        //Store Role
-
-        var message = await interaction.editReply({ content: 'Make this role unpurgeable', components: [row] });
-
-        console.log(message);
+        await interaction.editReply({ content: 'Make this role unpurgeable', components: [row] });
     }
 
     protected CreateButtons(roleId: string): ButtonBuilder[] | Promise<ButtonBuilder[]> {
         var buttons: ButtonBuilder[] = [];
         var yesButton = new ButtonBuilder()
-            .setCustomId(this._yesButtonId + ":" + roleId)
+            .setCustomId(`${this.Name}:${this._yesButtonId}:${roleId}`)
             .setLabel('Yes')
             .setStyle(ButtonStyle.Primary);
 
         var noButton = new ButtonBuilder()
-            .setCustomId(this._noButtonId)
+            .setCustomId(`${this.Name}:${this._noButtonId}`)
             .setLabel('No')
             .setStyle(ButtonStyle.Primary);
 
@@ -84,16 +80,20 @@ export class RoleHelperCommand extends ButtonSlashCommandBase {
     }
 
     public async RunButton(client: Client<boolean>, interaction: ButtonInteraction<CacheType>): Promise<void> {
-        if (interaction.customId.startsWith(this._yesButtonId)) {
-            await interaction.editReply({
-                content: `You pressed the maybees button.`
-            });
+        
+        const buttonElements = interaction.customId.split(':');
+        const clickedButton = buttonElements[1];
+
+        if (clickedButton == this._yesButtonId) {
             if (!interaction.guild)
                 return;
 
-            var roleId = interaction.customId.split(':')[1];
-            var mongoHelper = new NGSMongoHelper(this.mongoConnectionUri);
-            await mongoHelper.AddRoleToIgnore(interaction.guild.id, roleId)
+            const roleId = buttonElements[2];
+            const mongoHelper = new NGSMongoHelper(this.mongoConnectionUri);
+            await mongoHelper.AddRoleToIgnore(interaction.guild.id, roleId);
+            await interaction.editReply({
+                content: `The role will not be purged.`
+            });
         }
     }
 

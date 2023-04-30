@@ -54,19 +54,17 @@ class RoleHelperCommand extends ButtonSlashCommandBase_1.ButtonSlashCommandBase 
             var role = yield this.CreateRole(newRoleName, interaction.guild);
             var row = new discord_js_1.ActionRowBuilder();
             row.addComponents(yield this.CreateButtons(role.id));
-            //Store Role
-            var message = yield interaction.editReply({ content: 'Make this role unpurgeable', components: [row] });
-            console.log(message);
+            yield interaction.editReply({ content: 'Make this role unpurgeable', components: [row] });
         });
     }
     CreateButtons(roleId) {
         var buttons = [];
         var yesButton = new discord_js_1.ButtonBuilder()
-            .setCustomId(this._yesButtonId + ":" + roleId)
+            .setCustomId(`${this.Name}:${this._yesButtonId}:${roleId}`)
             .setLabel('Yes')
             .setStyle(discord_js_1.ButtonStyle.Primary);
         var noButton = new discord_js_1.ButtonBuilder()
-            .setCustomId(this._noButtonId)
+            .setCustomId(`${this.Name}:${this._noButtonId}`)
             .setLabel('No')
             .setStyle(discord_js_1.ButtonStyle.Primary);
         buttons.push(yesButton);
@@ -75,15 +73,17 @@ class RoleHelperCommand extends ButtonSlashCommandBase_1.ButtonSlashCommandBase 
     }
     RunButton(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (interaction.customId.startsWith(this._yesButtonId)) {
-                yield interaction.editReply({
-                    content: `You pressed the maybees button.`
-                });
+            const buttonElements = interaction.customId.split(':');
+            const clickedButton = buttonElements[1];
+            if (clickedButton == this._yesButtonId) {
                 if (!interaction.guild)
                     return;
-                var roleId = interaction.customId.split(':')[1];
-                var mongoHelper = new NGSMongoHelper_1.NGSMongoHelper(this.mongoConnectionUri);
+                const roleId = buttonElements[2];
+                const mongoHelper = new NGSMongoHelper_1.NGSMongoHelper(this.mongoConnectionUri);
                 yield mongoHelper.AddRoleToIgnore(interaction.guild.id, roleId);
+                yield interaction.editReply({
+                    content: `The role will not be purged.`
+                });
             }
         });
     }

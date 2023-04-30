@@ -73,7 +73,7 @@ export class CommandCreatorService {
         this.commands.push(new RandomSlashCommand());
         this.commands.push(new CaptainsCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
-        this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
+        // this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
     }
 
     private async RunCommand(client: Client, interaction: CommandInteraction | ButtonInteraction): Promise<void> {
@@ -90,8 +90,9 @@ export class CommandCreatorService {
         }
 
         if (interaction instanceof ButtonInteraction) {
-            const buttonCommand = <ButtonSlashCommandBase | undefined>this.commands.find(c => {
-                if (c instanceof ButtonSlashCommandBase) {
+            const splitId = interaction.customId.split(":");            
+            const buttonCommand = <ButtonSlashCommandBase | undefined>this.commands.find(c => {                
+                if (c.Name == splitId[0]) {
                     return true;
                 }
                 return false;

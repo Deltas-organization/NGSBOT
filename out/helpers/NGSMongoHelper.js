@@ -119,9 +119,9 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
             yield this.connectedPromise;
             var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
             var selectFilter = { guildId: { $eq: guildToSearch } };
-            const existingRecords = yield collection.find(selectFilter);
-            if (existingRecords)
-                result = existingRecords.map(item => item.roleId);
+            yield collection.find(selectFilter).forEach(item => {
+                result.push(item.roleId);
+            });
             return result;
         });
     }

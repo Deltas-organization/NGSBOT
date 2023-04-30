@@ -12,7 +12,7 @@ export class NGSMongoHelper extends Mongohelper {
     constructor(connectionUri: string) {
         super(connectionUri, "NGS");
     }
-    
+
     public async AddOrUpdateScheduleRequest(request: IMongoScheduleRequest): Promise<IMongoScheduleRequest | null> {
         await this.connectedPromise;
         var collection = this.connectedDatabase.collection<IMongoScheduleRequest>("ScheduleRequest");
@@ -109,9 +109,9 @@ export class NGSMongoHelper extends Mongohelper {
         await this.connectedPromise;
         var collection = this.connectedDatabase.collection<IIgnoreRolesDocument>(MongoCollections.RolesToIgnore);
         var selectFilter = { guildId: { $eq: guildToSearch } };
-        const existingRecords: IIgnoreRolesDocument[] = await collection.find(selectFilter);
-        if (existingRecords)
-            result = existingRecords.map(item => item.roleId);
+        await collection.find(selectFilter).forEach(item => {            
+                result.push(item.roleId);
+        });
         return result;
     }
 
