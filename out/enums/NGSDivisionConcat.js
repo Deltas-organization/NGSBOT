@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NGSDivisionConcat = void 0;
 var NGSDivisionConcat;
 (function (NGSDivisionConcat) {
-    NGSDivisionConcat["Storm"] = "storm";
+    // Storm = "storm",
     NGSDivisionConcat["Heroic"] = "heroic";
     NGSDivisionConcat["Nexus"] = "nexus";
     NGSDivisionConcat["A"] = "a";
@@ -15,7 +15,8 @@ var NGSDivisionConcat;
     NGSDivisionConcat["CWest"] = "c-west";
     NGSDivisionConcat["DEast"] = "d-east";
     NGSDivisionConcat["DWest"] = "d-west";
-    NGSDivisionConcat["EEast"] = "e-east";
-    NGSDivisionConcat["EWest"] = "e-west";
+    // EEast = "e-east",
+    // EWest = "e-west"
+    NGSDivisionConcat["E"] = "e";
 })(NGSDivisionConcat = exports.NGSDivisionConcat || (exports.NGSDivisionConcat = {}));
 //# sourceMappingURL=NGSDivisionConcat.js.map

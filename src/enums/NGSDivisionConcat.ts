@@ -1,5 +1,5 @@
 export enum NGSDivisionConcat {
-    Storm = "storm",
+    // Storm = "storm",
     Heroic = "heroic",
     Nexus = "nexus",
     A = "a",
@@ -11,6 +11,7 @@ export enum NGSDivisionConcat {
     CWest = "c-west",
     DEast = "d-east",
     DWest = "d-west",
-    EEast = "e-east",
-    EWest = "e-west"
+    // EEast = "e-east",
+    // EWest = "e-west"
+    E = "e"
 }

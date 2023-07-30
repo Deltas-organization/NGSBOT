@@ -21,8 +21,7 @@ class ChannelHelper {
             case NGSDivisions_1.NGSDivisions.DEast:
             case NGSDivisions_1.NGSDivisions.DWest:
                 return DiscordChannels_1.DiscordChannels.DivisionD;
-            case NGSDivisions_1.NGSDivisions.EEast:
-            case NGSDivisions_1.NGSDivisions.EWest:
+            case NGSDivisions_1.NGSDivisions.E:
                 return DiscordChannels_1.DiscordChannels.DivisionE;
             default:
                 return null;

@@ -32,6 +32,7 @@ export class CommandCreatorService {
             await guild?.commands.set(container.commands);
         }
         if (containers.applicationCommands.length > 0)
+        {
             await this.client.application?.commands.set(containers.applicationCommands);
             this.client.application?.commands.cache.forEach(command => {
                 console.log(`commandName: ${command.name}, applicationId: ${command.id}`)
@@ -41,7 +42,7 @@ export class CommandCreatorService {
                     console.log(`Guild information: commandName: ${command.name}, applicationId: ${command.id}`)
                 });
             });
-        console.log("done");
+        }
     }
 
     private CreateCommandContainers(): { guildCommands: guildCommandContainer[], applicationCommands: ChatInputApplicationCommandData[] } {

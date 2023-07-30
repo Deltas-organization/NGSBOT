@@ -40,8 +40,6 @@ export class CronRunner {
 
     private async SendSchedule() {
         await cronHelper.sendSchedule();
-        await cronHelper.sendScheduleForMom();
-        await cronHelper.sendScheduleForSis();
         await cronHelper.sendRequestedSchedules();
     }
 }

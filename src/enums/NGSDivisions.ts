@@ -1,5 +1,5 @@
 export enum NGSDivisions {
-    Storm = "Storm",
+    //Storm = "Storm",
     Heroic =  "Heroic",
     Nexus = "Nexus",
     A = "A",
@@ -11,6 +11,7 @@ export enum NGSDivisions {
     CWest = "C West",
     DEast = "D East",
     DWest = "D West",
-    EEast = "E East",
-    EWest = "E West"
+    // EEast = "E East",
+    // EWest = "E West",
+    E = "E"
 }

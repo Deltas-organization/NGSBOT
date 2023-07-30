@@ -18,9 +18,6 @@ function sendSchedule() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield cronHelper.sendSchedule();
-            yield cronHelper.sendScheduleForDad();
-            yield cronHelper.sendScheduleForMom();
-            yield cronHelper.sendScheduleForSis();
             yield cronHelper.sendRequestedSchedules();
         }
         catch (e) {

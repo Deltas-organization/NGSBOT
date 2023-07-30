@@ -29,7 +29,6 @@ const CheckReportedGames_1 = require("../commands/CheckReportedGames");
 const CheckUnscheduledGamesForWeek_1 = require("../commands/CheckUnscheduledGamesForWeek");
 const CleanupFreeAgentsChannel_1 = require("../commands/CleanupFreeAgentsChannel");
 const DiscordChannels_1 = require("../enums/DiscordChannels");
-const NGSDivisions_1 = require("../enums/NGSDivisions");
 const Globals_1 = require("../Globals");
 const DataStoreWrapper_1 = require("../helpers/DataStoreWrapper");
 const ChannelMessageSender_1 = require("../helpers/messageSenders/ChannelMessageSender");
@@ -65,21 +64,6 @@ let CronHelper = class CronHelper {
                     yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
                 }
             }
-        });
-    }
-    sendScheduleForDad() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.DeltaServer, NGSDivisions_1.NGSDivisions.Nexus);
-        });
-    }
-    sendScheduleForSis() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.SisSchedule, NGSDivisions_1.NGSDivisions.EEast);
-        });
-    }
-    sendScheduleForMom() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.sendScheduleByDivision(DiscordChannels_1.DiscordChannels.MomSchedule, NGSDivisions_1.NGSDivisions.BEast);
         });
     }
     sendScheduleByDivision(channel, ...divisions) {

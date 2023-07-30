@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NGSDivisions = void 0;
 var NGSDivisions;
 (function (NGSDivisions) {
-    NGSDivisions["Storm"] = "Storm";
+    //Storm = "Storm",
     NGSDivisions["Heroic"] = "Heroic";
     NGSDivisions["Nexus"] = "Nexus";
     NGSDivisions["A"] = "A";
@@ -15,7 +15,8 @@ var NGSDivisions;
     NGSDivisions["CWest"] = "C West";
     NGSDivisions["DEast"] = "D East";
     NGSDivisions["DWest"] = "D West";
-    NGSDivisions["EEast"] = "E East";
-    NGSDivisions["EWest"] = "E West";
+    // EEast = "E East",
+    // EWest = "E West",
+    NGSDivisions["E"] = "E";
 })(NGSDivisions = exports.NGSDivisions || (exports.NGSDivisions = {}));
 //# sourceMappingURL=NGSDivisions.js.map

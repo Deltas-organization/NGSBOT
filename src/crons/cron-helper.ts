@@ -61,18 +61,6 @@ export class CronHelper {
         }
     }
 
-    public async sendScheduleForDad() {
-        await this.sendScheduleByDivision(DiscordChannels.DeltaServer, NGSDivisions.Nexus);
-    }
-
-    public async sendScheduleForSis() {
-        await this.sendScheduleByDivision(DiscordChannels.SisSchedule, NGSDivisions.EEast);
-    }
-
-    public async sendScheduleForMom() {
-        await this.sendScheduleByDivision(DiscordChannels.MomSchedule, NGSDivisions.BEast);
-    }
-
     public async sendScheduleByDivision(channel: DiscordChannels | string, ...divisions: NGSDivisions[]) {
         await this.client.login(this.token);
         const messages = await ScheduleHelper.GetTodaysGamesByDivisions(this.dataStore, ...divisions);

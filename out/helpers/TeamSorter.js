@@ -14,7 +14,7 @@ class TeamSorter {
             return 1;
     }
     static SortByDivision(divisionDisplay1, divisionDisplay2) {
-        const order = [NGSDivisions_1.NGSDivisions.Storm,
+        const order = [
             NGSDivisions_1.NGSDivisions.Heroic,
             NGSDivisions_1.NGSDivisions.Nexus,
             NGSDivisions_1.NGSDivisions.A,
@@ -26,8 +26,10 @@ class TeamSorter {
             NGSDivisions_1.NGSDivisions.CWest,
             NGSDivisions_1.NGSDivisions.DEast,
             NGSDivisions_1.NGSDivisions.DWest,
-            NGSDivisions_1.NGSDivisions.EEast,
-            NGSDivisions_1.NGSDivisions.EWest];
+            NGSDivisionConcat_1.NGSDivisionConcat.E
+        ];
+        //NGSDivisions.EEast,
+        //NGSDivisions.EWest];
         for (var current of order) {
             var division1Index = divisionDisplay1 === null || divisionDisplay1 === void 0 ? void 0 : divisionDisplay1.indexOf(current);
             if (!division1Index)
@@ -45,7 +47,7 @@ class TeamSorter {
         return 0;
     }
     static SortByDivisionConcat(divisionDisplay1, divisionDisplay2) {
-        const order = [NGSDivisionConcat_1.NGSDivisionConcat.Storm,
+        const order = [
             NGSDivisionConcat_1.NGSDivisionConcat.Heroic,
             NGSDivisionConcat_1.NGSDivisionConcat.Nexus,
             NGSDivisionConcat_1.NGSDivisionConcat.A,
@@ -57,8 +59,10 @@ class TeamSorter {
             NGSDivisionConcat_1.NGSDivisionConcat.CWest,
             NGSDivisionConcat_1.NGSDivisionConcat.DEast,
             NGSDivisionConcat_1.NGSDivisionConcat.DWest,
-            NGSDivisionConcat_1.NGSDivisionConcat.EEast,
-            NGSDivisionConcat_1.NGSDivisionConcat.EWest];
+            // NGSDivisionConcat.EEast,
+            // NGSDivisionConcat.EWest
+            NGSDivisionConcat_1.NGSDivisionConcat.E
+        ];
         for (var current of order) {
             var division1Index = divisionDisplay1 === null || divisionDisplay1 === void 0 ? void 0 : divisionDisplay1.indexOf(current);
             if (!division1Index)

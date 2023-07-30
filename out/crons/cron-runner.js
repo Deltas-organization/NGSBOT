@@ -48,8 +48,6 @@ class CronRunner {
     SendSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
             yield cronHelper.sendSchedule();
-            yield cronHelper.sendScheduleForMom();
-            yield cronHelper.sendScheduleForSis();
             yield cronHelper.sendRequestedSchedules();
         });
     }

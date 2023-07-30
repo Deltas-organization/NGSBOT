@@ -39,17 +39,17 @@ class CommandCreatorService {
                 const guild = yield this.client.guilds.fetch(container.guild);
                 yield (guild === null || guild === void 0 ? void 0 : guild.commands.set(container.commands));
             }
-            if (containers.applicationCommands.length > 0)
+            if (containers.applicationCommands.length > 0) {
                 yield ((_a = this.client.application) === null || _a === void 0 ? void 0 : _a.commands.set(containers.applicationCommands));
-            (_b = this.client.application) === null || _b === void 0 ? void 0 : _b.commands.cache.forEach(command => {
-                console.log(`commandName: ${command.name}, applicationId: ${command.id}`);
-            });
-            this.client.guilds.cache.forEach(guild => {
-                guild.commands.cache.forEach(command => {
-                    console.log(`Guild information: commandName: ${command.name}, applicationId: ${command.id}`);
+                (_b = this.client.application) === null || _b === void 0 ? void 0 : _b.commands.cache.forEach(command => {
+                    console.log(`commandName: ${command.name}, applicationId: ${command.id}`);
                 });
-            });
-            console.log("done");
+                this.client.guilds.cache.forEach(guild => {
+                    guild.commands.cache.forEach(command => {
+                        console.log(`Guild information: commandName: ${command.name}, applicationId: ${command.id}`);
+                    });
+                });
+            }
         });
     }
     CreateCommandContainers() {

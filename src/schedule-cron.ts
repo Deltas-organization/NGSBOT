@@ -7,9 +7,6 @@ let cronHelper = container.get<CronHelper>(TYPES.CronHelper);
 async function sendSchedule() {
     try {
         await cronHelper.sendSchedule();
-        await cronHelper.sendScheduleForDad();
-        await cronHelper.sendScheduleForMom();
-        await cronHelper.sendScheduleForSis();
         await cronHelper.sendRequestedSchedules();
     }
     catch (e) {
