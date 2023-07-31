@@ -32,11 +32,12 @@ class DiscordFuzzySearch {
                 if (foundById && returnResult) {
                     if (returnResult.member.id != member.id) {
                         return { member: member, updateDiscordId: true };
-                        // await Globals.InformDelta(`DiscordID and DiscordTag return two different people. Id Member: ${returnResult.member.displayName}, Tag Member: ${member.displayName}`)
-                        return null;
                     }
                 }
                 return { member: member, updateDiscordId: !foundById };
+            }
+            else if (foundById) {
+                return returnResult;
             }
             else {
                 return null;
@@ -44,26 +45,9 @@ class DiscordFuzzySearch {
         });
     }
     static FindByDiscordTag(ngsDiscordTag, guildMembers) {
-        const information = DiscordFuzzySearch.SplitNameAndDiscriminator(ngsDiscordTag);
-        if (!information || !information.discriminator || !information.name)
-            return;
-        const discriminator = information.discriminator;
-        const name = information.name;
-        const filteredByDiscriminator = guildMembers.filter(member => member.user.discriminator == discriminator);
-        const possibleMembers = [];
-        for (let member of filteredByDiscriminator) {
-            const discordName = DiscordFuzzySearch.GetDiscordId(member.user);
-            if (discordName == ngsDiscordTag) {
-                return member;
-            }
-            else if (member.user.username.toLowerCase().indexOf(name) > -1) {
-                //Globals.log(`FuzzySearch!! Website has: ${name}, Found: ${member.user.username}`)
-                possibleMembers.push(member);
-            }
-        }
-        if (possibleMembers.length == 1) {
-            return possibleMembers[0];
-        }
+        const foundGuildMember = guildMembers.filter(member => member.user.username == ngsDiscordTag);
+        if (foundGuildMember.length == 1)
+            return foundGuildMember[0];
     }
     static SplitNameAndDiscriminator(ngsDiscordTag) {
         const splitNgsDiscord = ngsDiscordTag.split("#");
