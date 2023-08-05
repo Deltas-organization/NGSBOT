@@ -57,6 +57,7 @@ class RoleHelper {
                 break;
             case "e west":
             case "e east":
+            case "e":
                 divRoleName = NGSRoles_1.NGSRoles.DivE;
                 break;
             case "nexus":
