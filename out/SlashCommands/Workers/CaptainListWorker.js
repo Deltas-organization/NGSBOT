@@ -110,7 +110,7 @@ class CaptainsListWorker {
                     return `Unable to find division: ${division}`;
                 const guildMembers = (yield this._guild.members.fetch()).map((mem, _, __) => mem);
                 const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
-                const divMods = guildMembers.filter(member => modsToLookFor.indexOf(DiscordFuzzySearch_1.DiscordFuzzySearch.GetDiscordId(member.user)) != -1);
+                const divMods = guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
                 const messageHelper = new MessageHelper_1.MessageHelper('captainList');
                 messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
                 for (let team of teams) {

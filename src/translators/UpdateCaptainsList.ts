@@ -20,6 +20,8 @@ export class UpdateCaptainsList extends ngsTranslatorBase {
     }
 
     protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
+        await messageSender.SendMessage("Bad Aura, use the /captains command");
+        return;
         var season: number = +LiveDataStore.season;
         const updateCaptainsList = new UpdateCaptainsListCommand(this.translatorDependencies);
         const channelSender = new ChannelMessageSender(this.client);

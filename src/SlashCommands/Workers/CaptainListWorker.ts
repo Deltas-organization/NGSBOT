@@ -56,7 +56,7 @@ export class CaptainsListWorker {
                     division: division
                 };
             }
-             var captainChannelDivisionMessages = await this.UpdateCaptainChannel(mongoMessage.messageId, message);
+            var captainChannelDivisionMessages = await this.UpdateCaptainChannel(mongoMessage.messageId, message);
             var discordChannel = ChannelHelper.GetDiscordChannelForDivision(division);
             if (discordChannel) {
                 var divisionChannelDivisionMessages = await this.UpdateDivisionChannelMessage(mongoMessage.divisionChannelMessageId, message, discordChannel);
@@ -108,8 +108,9 @@ export class CaptainsListWorker {
                 return `Unable to find division: ${division}`;
 
             const guildMembers = (await this._guild.members.fetch()).map((mem, _, __) => mem);
+
             const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
-            const divMods = guildMembers.filter(member => modsToLookFor.indexOf(DiscordFuzzySearch.GetDiscordId(member.user)) != -1);
+            const divMods = guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
             const messageHelper = new MessageHelper<unknown>('captainList');
             messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
             for (let team of teams) {

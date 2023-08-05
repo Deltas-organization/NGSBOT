@@ -30,7 +30,7 @@ export class UpdateCaptainsListCommand {
 
             const guildMembers = (await guild.members.fetch()).map((mem, _, __) => mem);
             const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
-            const divMods = guildMembers.filter(member => modsToLookFor.indexOf(DiscordFuzzySearch.GetDiscordId(member.user)) != -1);
+            const divMods = guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
             const messageHelper = new MessageHelper<unknown>('captainList');
             messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
             for (let team of teams) {

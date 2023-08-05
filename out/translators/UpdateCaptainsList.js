@@ -27,6 +27,8 @@ class UpdateCaptainsList extends ngsTranslatorBase_1.ngsTranslatorBase {
     }
     Interpret(commands, detailed, messageSender) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield messageSender.SendMessage("Bad Aura, use the /captains command");
+            return;
             var season = +LiveDataStore_1.LiveDataStore.season;
             const updateCaptainsList = new UpdateCaptainsListCommand_1.UpdateCaptainsListCommand(this.translatorDependencies);
             const channelSender = new ChannelMessageSender_1.ChannelMessageSender(this.client);
