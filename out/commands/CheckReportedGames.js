@@ -185,7 +185,7 @@ class CheckReportedGames {
             if (!divisionInformation)
                 return [];
             const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
-            const divMods = this.guildMembers.filter(member => modsToLookFor.indexOf(DiscordFuzzySearch_1.DiscordFuzzySearch.GetDiscordId(member.user)) != -1);
+            const divMods = this.guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
             return divMods;
         });
     }
