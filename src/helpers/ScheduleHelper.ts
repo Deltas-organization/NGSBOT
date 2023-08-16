@@ -123,27 +123,32 @@ export class ScheduleHelper {
                 }
 
                 let scheduleMessage = new MessageHelper<any>('scheduleMessage');
-                if (m.divisionDisplayName)
-                {
+                if (m.divisionDisplayName) {
                     scheduleMessage.AddNew(`${m.divisionDisplayName} - **${m.home.teamName}** vs **${m.away.teamName}**`);
                 }
-                else if(m.title)
-                {
+                else if (m.title) {
                     scheduleMessage.AddNewLine(`**${m.title}**`);
                     scheduleMessage.AddNewLine(`**${m.home.teamName}** vs **${m.away.teamName}**`);
                 }
-                else
-                {
+                else {
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
                 }
 
                 const twitchIndex = m.casterUrl?.toLowerCase().indexOf("twitch");
+                const youtubeIndex = m.casterUrl?.toLowerCase().indexOf("youtube");
                 if (twitchIndex && twitchIndex != -1) {
-                    var twitchURL = m.casterUrl.slice(twitchIndex);
+                    const twitchURL = m.casterUrl.slice(twitchIndex);
                     m.casterUrl = "https://www." + twitchURL;
 
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
+                else if (youtubeIndex && youtubeIndex != -1) {
+                    const youtubeUrl = m.casterUrl.slice(youtubeIndex);
+                    m.casterUrl = "https://www." + youtubeUrl;
+
+                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
+                }
+
                 if (scheduleContainer)
                     scheduleContainer.AddSchedule(scheduleMessage);
             }

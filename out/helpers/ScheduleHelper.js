@@ -94,7 +94,7 @@ class ScheduleHelper {
     }
     static GetMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {
-            var _a;
+            var _a, _b;
             let messagesToSend = [];
             let scheduleContainer = null;
             let currentTime = '';
@@ -133,9 +133,15 @@ class ScheduleHelper {
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
                 }
                 const twitchIndex = (_a = m.casterUrl) === null || _a === void 0 ? void 0 : _a.toLowerCase().indexOf("twitch");
+                const youtubeIndex = (_b = m.casterUrl) === null || _b === void 0 ? void 0 : _b.toLowerCase().indexOf("youtube");
                 if (twitchIndex && twitchIndex != -1) {
-                    var twitchURL = m.casterUrl.slice(twitchIndex);
+                    const twitchURL = m.casterUrl.slice(twitchIndex);
                     m.casterUrl = "https://www." + twitchURL;
+                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
+                }
+                else if (youtubeIndex && youtubeIndex != -1) {
+                    const youtubeUrl = m.casterUrl.slice(youtubeIndex);
+                    m.casterUrl = "https://www." + youtubeUrl;
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
                 if (scheduleContainer)
