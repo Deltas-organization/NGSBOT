@@ -38,6 +38,7 @@ const PmMessageInteraction_1 = require("./message-helpers/PmMessageInteraction")
 const TranslatorService_1 = require("./translators/core/TranslatorService");
 const Globals_1 = require("./Globals");
 const CommandCreatorService_1 = require("./SlashCommands/CommandCreatorService");
+const messageChecker_1 = require("./messageChecker");
 let Bot = class Bot {
     constructor(client, token, apiToken, mongoConnection, botCommand) {
         this.client = client;
@@ -47,6 +48,7 @@ let Bot = class Bot {
         this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
         this.commandCreatorService = new CommandCreatorService_1.CommandCreatorService(client, this.dependencies.dataStore, mongoConnection);
+        this.messageChecker = new messageChecker_1.MessageChecker();
         Globals_1.Globals.ChannelSender = this.messageSender;
     }
     listen() {
@@ -95,6 +97,7 @@ let Bot = class Bot {
             if (message.channel.type == discord_js_1.ChannelType.DM && message.author.bot == false) {
                 yield this.pmMessageInteraction.ReceivePM(message);
             }
+            this.messageChecker.Check(message);
         });
     }
 };

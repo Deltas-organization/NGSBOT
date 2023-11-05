@@ -55,8 +55,7 @@ export class CronHelper {
         if (games.length > 0) {
             const messages = await ScheduleHelper.GetMessages(games);
             for (var index = 0; index < messages.length; index++) {
-                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.NGSHype);
-                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.DeltaServer);
+                await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.NGSHype, true);
             }
         }
     }

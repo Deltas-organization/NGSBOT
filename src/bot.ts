@@ -16,6 +16,7 @@ import { TranslatorService } from "./translators/core/TranslatorService";
 import { Globals } from "./Globals";
 import { CommandCreatorService } from "./SlashCommands/CommandCreatorService";
 import { TypeFlags } from "typescript";
+import { MessageChecker } from "./messageChecker";
 
 @injectable()
 export class Bot {
@@ -23,6 +24,7 @@ export class Bot {
     private messageSender: ChannelMessageSender;
     private pmMessageInteraction: PmMessageInteraction;
     private translatorService: TranslatorService;
+    private messageChecker: MessageChecker;
     private commandCreatorService: CommandCreatorService;
 
     constructor(
@@ -37,6 +39,7 @@ export class Bot {
         this.pmMessageInteraction = new PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService(botCommand, this.dependencies);
         this.commandCreatorService = new CommandCreatorService(client, this.dependencies.dataStore, mongoConnection);
+        this.messageChecker = new MessageChecker();
         Globals.ChannelSender = this.messageSender;
     }
 
@@ -91,5 +94,7 @@ export class Bot {
         if (message.channel.type == ChannelType.DM && message.author.bot == false) {
             await this.pmMessageInteraction.ReceivePM(message);
         }
+        
+        this.messageChecker.Check(message);
     }
 }

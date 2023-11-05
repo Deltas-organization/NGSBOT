@@ -9,10 +9,13 @@ export class ChannelMessageSender extends MessageSender {
         super(client)
     }
 
-    public async SendToDiscordChannel(message: string, channel: DiscordChannels | string) {
+    public async SendToDiscordChannel(message: string, channel: DiscordChannels | string, crosspost = false) {
         try {
             const myChannel = await this.FindChannel(channel);
-            return await this.SendMessageToChannel(message, myChannel)
+            var wrapper = await this.SendMessageToChannel(message, myChannel)
+            if (crosspost && wrapper.Message.crosspostable) {
+                await wrapper.Message.crosspost();
+            }
         }
         catch (e) {
             console.log(e);

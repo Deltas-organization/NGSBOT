@@ -15,11 +15,14 @@ class ChannelMessageSender extends MessageSender_1.MessageSender {
     constructor(client) {
         super(client);
     }
-    SendToDiscordChannel(message, channel) {
+    SendToDiscordChannel(message, channel, crosspost = false) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const myChannel = yield this.FindChannel(channel);
-                return yield this.SendMessageToChannel(message, myChannel);
+                var wrapper = yield this.SendMessageToChannel(message, myChannel);
+                if (crosspost && wrapper.Message.crosspostable) {
+                    yield wrapper.Message.crosspost();
+                }
             }
             catch (e) {
                 console.log(e);

@@ -1,0 +1,1 @@
+{"version":3,"file":"messageChecker.js","sourceRoot":"","sources":["../src/messageChecker.ts"],"names":[],"mappings":";;;AACA,6DAA0D;AAE1D,MAAa,cAAc;IAEhB,KAAK,CAAC,OAAgB;QACzB,IAAI,OAAO,CAAC,OAAO,CAAC,EAAE,IAAI,iCAAe,CAAC,cAAc,EAAE;SAEzD;IACL,CAAC;CACJ;AAPD,wCAOC"}

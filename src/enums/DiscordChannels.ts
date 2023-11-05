@@ -18,4 +18,5 @@ export enum DiscordChannels {
     DivisionC = "334399328573718530",
     DivisionD = "430595404699271178",
     DivisionE = "808688397010468864",
+    NGSFlipChannel = "433008843610652682",
 }

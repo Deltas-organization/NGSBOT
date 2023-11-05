@@ -60,8 +60,7 @@ let CronHelper = class CronHelper {
             if (games.length > 0) {
                 const messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
                 for (var index = 0; index < messages.length; index++) {
-                    yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype);
-                    yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.DeltaServer);
+                    yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype, true);
                 }
             }
         });

@@ -18,7 +18,7 @@ function sendSchedule() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield cronHelper.sendSchedule();
-            yield cronHelper.sendRequestedSchedules();
+            //await cronHelper.sendRequestedSchedules();
         }
         catch (e) {
             Globals_1.Globals.log(e);

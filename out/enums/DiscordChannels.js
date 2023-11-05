@@ -22,5 +22,6 @@ var DiscordChannels;
     DiscordChannels["DivisionC"] = "334399328573718530";
     DiscordChannels["DivisionD"] = "430595404699271178";
     DiscordChannels["DivisionE"] = "808688397010468864";
+    DiscordChannels["NGSFlipChannel"] = "433008843610652682";
 })(DiscordChannels = exports.DiscordChannels || (exports.DiscordChannels = {}));
 //# sourceMappingURL=DiscordChannels.js.map
