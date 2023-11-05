@@ -22,20 +22,6 @@ export class UpdateCaptainsList extends ngsTranslatorBase {
     protected async Interpret(commands: string[], detailed: boolean, messageSender: RespondToMessageSender) {
         await messageSender.SendMessage("Bad Aura, use the /captains command");
         return;
-        var season: number = +LiveDataStore.season;
-        const updateCaptainsList = new UpdateCaptainsListCommand(this.translatorDependencies);
-        const channelSender = new ChannelMessageSender(this.client);
-        const message = await messageSender.SendMessage("Updating captains list now");
-        for (var value in NGSDivisions) {
-            const division = NGSDivisions[value];
-            try {
-                await this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, season, division);
-            }
-            catch {
-                await this.AttemptToUpdateCaptainMessage(updateCaptainsList, channelSender, season, division);
-            }
-        }
-        message.Edit("Captains list has been updated");
     }
 
     private async AttemptToUpdateCaptainMessage(captainsListCommand: UpdateCaptainsListCommand, channelSender: ChannelMessageSender, season: number, division: NGSDivisions) {

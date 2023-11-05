@@ -39,7 +39,8 @@ class AssignRolesWorker extends RoleWorkerBase_1.RoleWorkerBase {
     }
     BeginAssigning() {
         return __awaiter(this, void 0, void 0, function* () {
-            const progressMessage = yield this.messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
+            const progressMessages = yield this.messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
+            const progressMessage = progressMessages[0];
             const teams = yield this.dataStore.GetTeams();
             yield progressMessage.Edit("Loading Discord Members.");
             const messagesLog = [];

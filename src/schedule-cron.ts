@@ -7,7 +7,7 @@ let cronHelper = container.get<CronHelper>(TYPES.CronHelper);
 async function sendSchedule() {
     try {
         await cronHelper.sendSchedule();
-        //await cronHelper.sendRequestedSchedules();
+        await cronHelper.sendRequestedSchedules();
     }
     catch (e) {
         Globals.log(e);

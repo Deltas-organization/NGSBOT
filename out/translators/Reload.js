@@ -22,7 +22,8 @@ class Reload extends deltaTranslatorBase_1.DeltaTranslatorBase {
         return __awaiter(this, void 0, void 0, function* () {
             this.dataStore.Clear();
             yield this.dataStore.GetDivisions();
-            let message = yield messageSender.SendMessage("Reloaded 1/4");
+            const messages = yield messageSender.SendMessage("Reloaded 1/4");
+            const message = messages[0];
             yield this.dataStore.GetScheduledGames();
             yield message.Edit("Reloaded 2/4");
             yield this.dataStore.GetTeams();

@@ -19,9 +19,11 @@ class ChannelMessageSender extends MessageSender_1.MessageSender {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const myChannel = yield this.FindChannel(channel);
-                var wrapper = yield this.SendMessageToChannel(message, myChannel);
-                if (crosspost && wrapper.Message.crosspostable) {
-                    yield wrapper.Message.crosspost();
+                var wrappers = yield this.SendMessageToChannel(message, myChannel);
+                for (let wrapper of wrappers) {
+                    if (crosspost && wrapper.Message.crosspostable) {
+                        yield wrapper.Message.crosspost();
+                    }
                 }
             }
             catch (e) {

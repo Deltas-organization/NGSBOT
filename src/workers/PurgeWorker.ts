@@ -28,7 +28,8 @@ export class PurgeWorker extends RoleWorkerBase {
     }
 
     private async BeginPurge() {
-        const progressMessage = await this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
+        const progressMessages = await this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
+        const progressMessage = progressMessages[0];
 
         const teams = await this.dataStore.GetTeams();
         await progressMessage.Edit(`Purging STARTED... STAND BY...`);

@@ -7,7 +7,7 @@ import { INGSTeam } from "../interfaces";
 import { WorkerBase } from "./Bases/WorkerBase";
 
 export class GamesWorker extends WorkerBase {
-    private _messageCommand: (message: string) => Promise<MessageWrapper | undefined>;
+    private _messageCommand: (message: string) => Promise<MessageWrapper[] | undefined>;
     private _multiMessageCommand: (message: string[]) => Promise<MessageWrapper[] | undefined>;
 
     protected async Start(commands: string[]) {

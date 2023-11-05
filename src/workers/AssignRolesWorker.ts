@@ -35,7 +35,9 @@ export class AssignRolesWorker extends RoleWorkerBase {
     }
 
     private async BeginAssigning() {
-        const progressMessage = await this.messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
+        const progressMessages = await this.messageSender.SendMessage("Beginning Assignments \n  Loading teams now.");
+        const progressMessage = progressMessages[0];
+        
         const teams = await this.dataStore.GetTeams();
         await progressMessage.Edit("Loading Discord Members.");
         const messagesLog: MessageHelper<AssignRolesOptions>[] = [];

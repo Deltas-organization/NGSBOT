@@ -24,14 +24,18 @@ export class MessageSender {
     }
 
     public async SendMessageToChannel(message: string, channel: TextChannel | DMChannel | NewsChannel) {
+        const result: MessageWrapper[] = [];
         while (message.length > MessageSender.maxLength) {
-            let newMessage = message.slice(0, MessageSender.maxLength);
+            const newMessage = message.slice(0, MessageSender.maxLength);
             message = message.substr(MessageSender.maxLength);
-            await this.SendMessageToChannel(newMessage, channel);
+            const sentMessage = await this.SendMessageToChannel(newMessage, channel);            
+            result.push(...sentMessage);
         }
         var sentMessage = await this.JustSendIt(message, channel, false);
 
-        return new MessageWrapper(this, sentMessage);
+        const messageWrapper = new MessageWrapper(this, sentMessage);
+        result.push(messageWrapper);
+        return result;
     }
 
     public async SendMessagesToChannel(messages: string[], channel: TextChannel | DMChannel | NewsChannel) {
@@ -39,7 +43,7 @@ export class MessageSender {
         let combinedMessages = this.CombineMultiple(messages);
 
         for (var message of combinedMessages) {
-            result.push(await this.SendMessageToChannel(message, channel));
+            result.push(...(await this.SendMessageToChannel(message, channel)));
         }
         return result;
     }

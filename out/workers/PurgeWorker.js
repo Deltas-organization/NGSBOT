@@ -36,7 +36,8 @@ class PurgeWorker extends RoleWorkerBase_1.RoleWorkerBase {
     }
     BeginPurge() {
         return __awaiter(this, void 0, void 0, function* () {
-            const progressMessage = yield this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
+            const progressMessages = yield this.messageSender.SendMessage("Beginning Purge \n  Loading teams now.");
+            const progressMessage = progressMessages[0];
             const teams = yield this.dataStore.GetTeams();
             yield progressMessage.Edit(`Purging STARTED... STAND BY...`);
             const messages = [];

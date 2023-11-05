@@ -31,13 +31,17 @@ class MessageSender {
     }
     SendMessageToChannel(message, channel) {
         return __awaiter(this, void 0, void 0, function* () {
+            const result = [];
             while (message.length > MessageSender.maxLength) {
-                let newMessage = message.slice(0, MessageSender.maxLength);
+                const newMessage = message.slice(0, MessageSender.maxLength);
                 message = message.substr(MessageSender.maxLength);
-                yield this.SendMessageToChannel(newMessage, channel);
+                const sentMessage = yield this.SendMessageToChannel(newMessage, channel);
+                result.push(...sentMessage);
             }
             var sentMessage = yield this.JustSendIt(message, channel, false);
-            return new MessageWrapper_1.MessageWrapper(this, sentMessage);
+            const messageWrapper = new MessageWrapper_1.MessageWrapper(this, sentMessage);
+            result.push(messageWrapper);
+            return result;
         });
     }
     SendMessagesToChannel(messages, channel) {
@@ -45,7 +49,7 @@ class MessageSender {
             let result = [];
             let combinedMessages = this.CombineMultiple(messages);
             for (var message of combinedMessages) {
-                result.push(yield this.SendMessageToChannel(message, channel));
+                result.push(...(yield this.SendMessageToChannel(message, channel)));
             }
             return result;
         });
