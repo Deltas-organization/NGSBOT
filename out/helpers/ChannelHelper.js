@@ -12,8 +12,7 @@ class ChannelHelper {
                 return DiscordChannels_1.DiscordChannels.DivisionNexus;
             case NGSDivisions_1.NGSDivisions.A:
                 return DiscordChannels_1.DiscordChannels.DivisionA;
-            case NGSDivisions_1.NGSDivisions.BEast:
-            case NGSDivisions_1.NGSDivisions.BWest:
+            case NGSDivisions_1.NGSDivisions.B:
                 return DiscordChannels_1.DiscordChannels.DivisionB;
             case NGSDivisions_1.NGSDivisions.CEast:
             case NGSDivisions_1.NGSDivisions.CWest:
