@@ -21,7 +21,6 @@ export class AssignRolesWorker extends RoleWorkerBase {
 
     constructor(workerDependencies: CommandDependencies, protected detailed: boolean, protected messageSender: RespondToMessageSender, private apiKey: string, mongoHelper: NGSMongoHelper) {
         super(workerDependencies, detailed, messageSender, mongoHelper);
-
     }
 
     protected async Start(commands: string[]) {

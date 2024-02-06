@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, GatewayCloseCodes, GuildScheduledEventCreateOptions, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
 import { inject, injectable } from "inversify";
 import { CheckFlexMatches } from "../commands/CheckFlexMatches";
 import { CheckReportedGames } from "../commands/CheckReportedGames";
@@ -18,6 +18,7 @@ import { HistoryDisplay } from "../scheduled/HistoryDisplay";
 import moment = require("moment");
 import { CheckPendingMembers } from "../commands/CheckPendingMembers";
 import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
+import { DiscordGuilds } from "../enums/DiscordGuilds";
 
 @injectable()
 export class CronHelper {
@@ -56,6 +57,25 @@ export class CronHelper {
             const messages = await ScheduleHelper.GetMessages(games);
             for (var index = 0; index < messages.length; index++) {
                 await this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels.NGSHype, true);
+            }
+
+            const deltasGuild = await this.client.guilds.fetch(DiscordGuilds.DeltasServer);
+            const gameDurationInHours = 2;
+            for (var game of games) {
+                if (game.casterName) {
+                    const eventName = `${game.home.teamName} Vs. ${game.away.teamName}`;
+                    const startTime = new Date(game.scheduledTime.startTime);  
+                    const endTime = new Date();
+                    endTime.setTime(startTime.getTime()  + (gameDurationInHours*60*60*1000));
+                    const eventInformation: GuildScheduledEventCreateOptions = {
+                        name: eventName,
+                        scheduledStartTime: startTime,
+                        scheduledEndTime: endTime,
+                        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+                        entityType: GuildScheduledEventEntityType.External
+                    }
+                    await deltasGuild.scheduledEvents.create(eventInformation)
+                }
             }
         }
     }

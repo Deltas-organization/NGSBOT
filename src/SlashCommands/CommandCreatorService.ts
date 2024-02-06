@@ -4,23 +4,24 @@ import { ButtonSlashCommandBase } from "./Base/ButtonSlashCommandBase";
 import { SlashCommandBase } from "./Base/SlashCommandBase";
 import { CaptainsCommand } from "./Commands/CaptainsCommand";
 import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
-import { HelloWorldCommand } from "./Commands/HelloWorldCommand";
 import { RandomSlashCommand } from "./Commands/RandomSlashCommand";
-import { RoleHelperCommand } from "./Commands/RoleHelperCommand";
-import { SearchDBDCommand } from "./Commands/SearchDBDCommand";
+import { CommandDependencies } from "../helpers/TranslatorDependencies";
+import { SlashAssignRolesWorker } from "./Workers/Slash_AssignRolesWorker";
+import { AssignRolesCommand } from "./Commands/AssignRolesCommand";
 
 type guildCommandContainer = { guild: string; commands: ChatInputApplicationCommandData[]; };
 export class CommandCreatorService {
 
     private commands: SlashCommandBase[] = [];
 
-    constructor(private client: Client, private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
-        client.on("interactionCreate", async (interaction: Interaction) => {
+    constructor(private _dependencies: CommandDependencies){
+
+        _dependencies.client.on("interactionCreate", async (interaction: Interaction) => {
             if (interaction.isCommand() || interaction.isContextMenuCommand() || interaction.isButton()) {
-                await this.RunCommand(client, interaction);
+                await this.RunCommand(_dependencies.client, interaction);
             }
         });
-        client.on("ready", () => {
+        _dependencies.client.on("ready", () => {
             this.CreateCommands();
             this.Registercommands();
         });
@@ -28,16 +29,16 @@ export class CommandCreatorService {
     private async Registercommands() {
         var containers = this.CreateCommandContainers();
         for (var container of containers.guildCommands) {
-            const guild = await this.client.guilds.fetch(container.guild);
+            const guild = await this._dependencies.client.guilds.fetch(container.guild);
             await guild?.commands.set(container.commands);
         }
         if (containers.applicationCommands.length > 0)
         {
-            await this.client.application?.commands.set(containers.applicationCommands);
-            this.client.application?.commands.cache.forEach(command => {
+            await this._dependencies.client.application?.commands.set(containers.applicationCommands);
+            this._dependencies.client.application?.commands.cache.forEach(command => {
                 console.log(`commandName: ${command.name}, applicationId: ${command.id}`)
             });
-            this.client.guilds.cache.forEach(guild => {
+            this._dependencies.client.guilds.cache.forEach(guild => {
                 guild.commands.cache.forEach(command => {
                     console.log(`Guild information: commandName: ${command.name}, applicationId: ${command.id}`)
                 });
@@ -70,11 +71,10 @@ export class CommandCreatorService {
     }
 
     private CreateCommands() {
-        this.commands.push(new GamesSlashCommand(this.dataStore));
+        this.commands.push(new GamesSlashCommand(this._dependencies.dataStore));
         this.commands.push(new RandomSlashCommand());
-        this.commands.push(new CaptainsCommand(this.dataStore, this.mongoConnectionUri));
-        this.commands.push(new RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
-        // this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
+        this.commands.push(new CaptainsCommand(this._dependencies.dataStore, this._dependencies.mongoConnectionString));        
+        this.commands.push(new AssignRolesCommand(this._dependencies));
     }
 
     private async RunCommand(client: Client, interaction: CommandInteraction | ButtonInteraction): Promise<void> {

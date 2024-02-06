@@ -39,6 +39,7 @@ const HistoryDisplay_1 = require("../scheduled/HistoryDisplay");
 const moment = require("moment");
 const CheckPendingMembers_1 = require("../commands/CheckPendingMembers");
 const NGSMongoHelper_1 = require("../helpers/NGSMongoHelper");
+const DiscordGuilds_1 = require("../enums/DiscordGuilds");
 let CronHelper = class CronHelper {
     constructor(client, token, apiToken, mongoConnection) {
         this.client = client;
@@ -61,6 +62,24 @@ let CronHelper = class CronHelper {
                 const messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
                 for (var index = 0; index < messages.length; index++) {
                     yield this.messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype, true);
+                }
+                const deltasGuild = yield this.client.guilds.fetch(DiscordGuilds_1.DiscordGuilds.DeltasServer);
+                const gameDurationInHours = 2;
+                for (var game of games) {
+                    if (game.casterName) {
+                        const eventName = `${game.home.teamName} Vs. ${game.away.teamName}`;
+                        const startTime = new Date(game.scheduledTime.startTime);
+                        const endTime = new Date();
+                        endTime.setTime(startTime.getTime() + (gameDurationInHours * 60 * 60 * 1000));
+                        const eventInformation = {
+                            name: eventName,
+                            scheduledStartTime: startTime,
+                            scheduledEndTime: endTime,
+                            privacyLevel: discord_js_1.GuildScheduledEventPrivacyLevel.GuildOnly,
+                            entityType: discord_js_1.GuildScheduledEventEntityType.External
+                        };
+                        yield deltasGuild.scheduledEvents.create(eventInformation);
+                    }
                 }
             }
         });

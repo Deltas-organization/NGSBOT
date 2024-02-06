@@ -47,7 +47,7 @@ let Bot = class Bot {
         this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client);
         this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
         this.translatorService = new TranslatorService_1.TranslatorService(botCommand, this.dependencies);
-        this.commandCreatorService = new CommandCreatorService_1.CommandCreatorService(client, this.dependencies.dataStore, mongoConnection);
+        this.commandCreatorService = new CommandCreatorService_1.CommandCreatorService(this.dependencies);
         this.messageChecker = new messageChecker_1.MessageChecker();
         Globals_1.Globals.ChannelSender = this.messageSender;
     }

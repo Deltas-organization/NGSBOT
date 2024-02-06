@@ -55,7 +55,7 @@ class ScheduleWorker extends WorkerBase_1.WorkerBase {
                 else
                     division += `-${coast}`;
             }
-            let scheduledGames = yield yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames());
+            let scheduledGames = yield ScheduleHelper_1.ScheduleHelper.GetGamesSorted(yield this.dataStore.GetScheduledGames());
             scheduledGames = scheduledGames.filter(s => {
                 if (!s.divisionConcat.startsWith(division))
                     return false;

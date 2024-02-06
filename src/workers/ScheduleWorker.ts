@@ -45,7 +45,7 @@ export class ScheduleWorker extends WorkerBase {
                 division += `-${coast}`;
         }
 
-        let scheduledGames = await await ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames());
+        let scheduledGames = await ScheduleHelper.GetGamesSorted(await this.dataStore.GetScheduledGames());
         scheduledGames = scheduledGames.filter(s => {
             if (!s.divisionConcat.startsWith(division))
                 return false;
