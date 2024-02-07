@@ -13,4 +13,6 @@ For new seaons you need to go into the ```NGSDivisons.ts``` And Add/Remove divis
 
 For each change to the division list you will need to go to ```TeamSorter.ts``` and ```ChannelHelper.ts``` and adjust those with the new divisions
 
-Lastly you will need to go into the Mongo Database ```NGS.SeasonInformation``` Collection and insert a new record for the season number and the round number, Every sunday this will increment and is mostly used to notify the Mods about unscheduled games for the next week.
+Go into the Mongo Database ```NGS.SeasonInformation``` Collection and insert a new record for the season number and the round number, Every sunday this will increment and is mostly used to notify the Mods about unscheduled games for the next week.
+
+Go into ```LiveDataStore.ts``` and update the season to be the correct value.
