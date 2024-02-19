@@ -136,13 +136,13 @@ export class ScheduleHelper {
 
                 const twitchIndex = m.casterUrl?.toLowerCase().indexOf("twitch");
                 const youtubeIndex = m.casterUrl?.toLowerCase().indexOf("youtube");
-                if (twitchIndex && twitchIndex != -1) {
+                if (twitchIndex >= 0) {
                     const twitchURL = m.casterUrl.slice(twitchIndex);
                     m.casterUrl = "https://www." + twitchURL;
 
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
-                else if (youtubeIndex && youtubeIndex != -1) {
+                else if (youtubeIndex >= 0) {
                     const youtubeUrl = m.casterUrl.slice(youtubeIndex);
                     m.casterUrl = "https://www." + youtubeUrl;
 
