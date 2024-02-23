@@ -134,18 +134,8 @@ export class ScheduleHelper {
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
                 }
 
-                const twitchIndex = m.casterUrl?.toLowerCase().indexOf("twitch");
-                const youtubeIndex = m.casterUrl?.toLowerCase().indexOf("youtube");
-                if (twitchIndex >= 0) {
-                    const twitchURL = m.casterUrl.slice(twitchIndex);
-                    m.casterUrl = "https://www." + twitchURL;
-
-                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
-                }
-                else if (youtubeIndex >= 0) {
-                    const youtubeUrl = m.casterUrl.slice(youtubeIndex);
-                    m.casterUrl = "https://www." + youtubeUrl;
-
+                if(this.SanitizeCasterURL(m))
+                {
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
 
@@ -160,6 +150,22 @@ export class ScheduleHelper {
             }
             resolver(messagesToSend);
         });
+    }
+
+    public static SanitizeCasterURL(match: INGSSchedule) {
+        const twitchIndex = match.casterUrl?.toLowerCase().indexOf("twitch");
+        const youtubeIndex = match.casterUrl?.toLowerCase().indexOf("youtube");
+        if (twitchIndex >= 0) {
+            const twitchURL = match.casterUrl.slice(twitchIndex);
+            match.casterUrl = "https://www." + twitchURL;
+            return true;
+        }
+        else if (youtubeIndex >= 0) {
+            const youtubeUrl = match.casterUrl.slice(youtubeIndex);
+            match.casterUrl = "https://www." + youtubeUrl;
+            return true;
+        }
+        return false;
     }
 }
 

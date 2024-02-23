@@ -6,8 +6,10 @@ const types_1 = require("./types");
 const bot_1 = require("../bot");
 const discord_js_1 = require("discord.js");
 const cron_helper_1 = require("../crons/cron-helper");
+const create_caster_event_1 = require("../crons/create-caster-event");
 let container = new inversify_1.Container();
 container.bind(types_1.TYPES.Bot).to(bot_1.Bot).inSingletonScope();
+container.bind(types_1.TYPES.CreateCasterEvents).to(create_caster_event_1.CreateCasterEvents).inSingletonScope();
 container.bind(types_1.TYPES.CronHelper).to(cron_helper_1.CronHelper).inSingletonScope();
 container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({ intents: [
         discord_js_1.GatewayIntentBits.DirectMessages,
@@ -16,6 +18,7 @@ container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({ i
         discord_js_1.GatewayIntentBits.GuildMessages,
         discord_js_1.GatewayIntentBits.GuildMessageReactions,
         discord_js_1.GatewayIntentBits.MessageContent,
+        discord_js_1.GatewayIntentBits.GuildScheduledEvents,
         discord_js_1.GatewayIntentBits.GuildVoiceStates
     ] }));
 if (process.env.TOKEN)

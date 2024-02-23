@@ -94,7 +94,6 @@ class ScheduleHelper {
     }
     static GetMessages(scheduledMatches) {
         return new Promise((resolver, rejector) => {
-            var _a, _b;
             let messagesToSend = [];
             let scheduleContainer = null;
             let currentTime = '';
@@ -132,16 +131,7 @@ class ScheduleHelper {
                 else {
                     scheduleMessage.AddNew(`**${m.home.teamName}** vs **${m.away.teamName}**`);
                 }
-                const twitchIndex = (_a = m.casterUrl) === null || _a === void 0 ? void 0 : _a.toLowerCase().indexOf("twitch");
-                const youtubeIndex = (_b = m.casterUrl) === null || _b === void 0 ? void 0 : _b.toLowerCase().indexOf("youtube");
-                if (twitchIndex >= 0) {
-                    const twitchURL = m.casterUrl.slice(twitchIndex);
-                    m.casterUrl = "https://www." + twitchURL;
-                    scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
-                }
-                else if (youtubeIndex >= 0) {
-                    const youtubeUrl = m.casterUrl.slice(youtubeIndex);
-                    m.casterUrl = "https://www." + youtubeUrl;
+                if (this.SanitizeCasterURL(m)) {
                     scheduleMessage.AddNewLine(`[${m.casterName}](${m.casterUrl})`);
                 }
                 if (scheduleContainer)
@@ -154,6 +144,22 @@ class ScheduleHelper {
             }
             resolver(messagesToSend);
         });
+    }
+    static SanitizeCasterURL(match) {
+        var _a, _b;
+        const twitchIndex = (_a = match.casterUrl) === null || _a === void 0 ? void 0 : _a.toLowerCase().indexOf("twitch");
+        const youtubeIndex = (_b = match.casterUrl) === null || _b === void 0 ? void 0 : _b.toLowerCase().indexOf("youtube");
+        if (twitchIndex >= 0) {
+            const twitchURL = match.casterUrl.slice(twitchIndex);
+            match.casterUrl = "https://www." + twitchURL;
+            return true;
+        }
+        else if (youtubeIndex >= 0) {
+            const youtubeUrl = match.casterUrl.slice(youtubeIndex);
+            match.casterUrl = "https://www." + youtubeUrl;
+            return true;
+        }
+        return false;
     }
 }
 exports.ScheduleHelper = ScheduleHelper;

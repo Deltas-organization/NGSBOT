@@ -4,10 +4,12 @@ import { TYPES } from "./types";
 import { Bot } from "../bot";
 import { Client, GatewayIntentBits } from "discord.js";
 import { CronHelper } from "../crons/cron-helper";
+import { CreateCasterEvents } from "../crons/create-caster-event";
 
 let container = new Container();
 
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
+container.bind<CreateCasterEvents>(TYPES.CreateCasterEvents).to(CreateCasterEvents).inSingletonScope();
 container.bind<CronHelper>(TYPES.CronHelper).to(CronHelper).inSingletonScope();
 container.bind<Client>(TYPES.Client).toConstantValue(new Client({ intents: [
     GatewayIntentBits.DirectMessages, 
@@ -16,6 +18,7 @@ container.bind<Client>(TYPES.Client).toConstantValue(new Client({ intents: [
     GatewayIntentBits.GuildMessages, 
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildScheduledEvents,
     GatewayIntentBits.GuildVoiceStates] }));
 if (process.env.TOKEN)
     container.bind<string>(TYPES.Token).toConstantValue(process.env.TOKEN);
