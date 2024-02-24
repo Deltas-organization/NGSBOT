@@ -13,19 +13,15 @@ import moment = require("moment");
 
 @injectable()
 export class CreateCasterEvents {
-    private dependencies: CommandDependencies;
     private dataStore: DataStoreWrapper;
-    private mongoHelper: NGSMongoHelper;
+    private _eventDuration: 60; //in minutes
 
     constructor(
         @inject(TYPES.Client) private _client: Client,
         @inject(TYPES.Token) private _token: string,
-        @inject(TYPES.ApiToken) apiToken: string,
-        @inject(TYPES.MongConection) mongoConnection: string
+        @inject(TYPES.ApiToken) apiToken: string
     ) {
         this.dataStore = new DataStoreWrapper(new LiveDataStore(apiToken));
-        this.dependencies = new CommandDependencies(_client, this.dataStore, apiToken, mongoConnection);
-        this.mongoHelper = new NGSMongoHelper(mongoConnection);
     }
 
     public async CheckForNewCastedGames() {
@@ -57,7 +53,7 @@ export class CreateCasterEvents {
         return {
             name: eventName,
             scheduledStartTime: startTime.toDate(),
-            scheduledEndTime: startTime.add(90, "minutes").toDate(),
+            scheduledEndTime: startTime.add(this._eventDuration, "minutes").toDate(),
             privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
             entityType: GuildScheduledEventEntityType.External,
             entityMetadata: {

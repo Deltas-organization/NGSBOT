@@ -26,19 +26,15 @@ const inversify_1 = require("inversify");
 const DataStoreWrapper_1 = require("../helpers/DataStoreWrapper");
 const discord_js_1 = require("discord.js");
 const types_1 = require("../inversify/types");
-const TranslatorDependencies_1 = require("../helpers/TranslatorDependencies");
 const LiveDataStore_1 = require("../LiveDataStore");
-const NGSMongoHelper_1 = require("../helpers/NGSMongoHelper");
 const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
 const DiscordGuilds_1 = require("../enums/DiscordGuilds");
 const moment = require("moment");
 let CreateCasterEvents = class CreateCasterEvents {
-    constructor(_client, _token, apiToken, mongoConnection) {
+    constructor(_client, _token, apiToken) {
         this._client = _client;
         this._token = _token;
         this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
-        this.dependencies = new TranslatorDependencies_1.CommandDependencies(_client, this.dataStore, apiToken, mongoConnection);
-        this.mongoHelper = new NGSMongoHelper_1.NGSMongoHelper(mongoConnection);
     }
     CheckForNewCastedGames() {
         var _a;
@@ -71,7 +67,7 @@ let CreateCasterEvents = class CreateCasterEvents {
         return {
             name: eventName,
             scheduledStartTime: startTime.toDate(),
-            scheduledEndTime: startTime.add(90, "minutes").toDate(),
+            scheduledEndTime: startTime.add(this._eventDuration, "minutes").toDate(),
             privacyLevel: discord_js_1.GuildScheduledEventPrivacyLevel.GuildOnly,
             entityType: discord_js_1.GuildScheduledEventEntityType.External,
             entityMetadata: {
@@ -85,8 +81,7 @@ CreateCasterEvents = __decorate([
     __param(0, (0, inversify_1.inject)(types_1.TYPES.Client)),
     __param(1, (0, inversify_1.inject)(types_1.TYPES.Token)),
     __param(2, (0, inversify_1.inject)(types_1.TYPES.ApiToken)),
-    __param(3, (0, inversify_1.inject)(types_1.TYPES.MongConection)),
-    __metadata("design:paramtypes", [discord_js_1.Client, String, String, String])
+    __metadata("design:paramtypes", [discord_js_1.Client, String, String])
 ], CreateCasterEvents);
 exports.CreateCasterEvents = CreateCasterEvents;
 //# sourceMappingURL=create-caster-event.js.map
