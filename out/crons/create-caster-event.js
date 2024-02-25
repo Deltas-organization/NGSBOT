@@ -40,6 +40,7 @@ let CreateCasterEvents = class CreateCasterEvents {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const matches = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
+            this._client.destroy();
             yield this._client.login(this._token);
             const guild = yield this._client.guilds.fetch(DiscordGuilds_1.DiscordGuilds.NGS);
             const events = (yield guild.scheduledEvents.fetch()).map((event, _, __) => event);

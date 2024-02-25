@@ -26,6 +26,7 @@ export class CreateCasterEvents {
 
     public async CheckForNewCastedGames() {
         const matches: INGSSchedule[] = await ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
+        this._client.destroy();
         await this._client.login(this._token);
         const guild = await this._client.guilds.fetch(DiscordGuilds.NGS);
         const events = (await guild.scheduledEvents.fetch()).map((event, _, __) => event);
