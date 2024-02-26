@@ -14,7 +14,7 @@ import moment = require("moment");
 @injectable()
 export class CreateCasterEvents {
     private dataStore: DataStoreWrapper;
-    private _eventDuration: 60; //in minutes
+    private _eventDuration = 60; //in minutes
 
     constructor(
         @inject(TYPES.Client) private _client: Client,
@@ -26,9 +26,7 @@ export class CreateCasterEvents {
 
     public async CheckForNewCastedGames() {
         const matches: INGSSchedule[] = await ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-        this._client.destroy();
-        await this._client.login(this._token);
-        const guild = await this._client.guilds.fetch(DiscordGuilds.NGS);
+        const guild = await this._client.guilds.fetch(DiscordGuilds.DeltasServer);
         const events = (await guild.scheduledEvents.fetch()).map((event, _, __) => event);
         for (var match of matches) {
             const hasCaster = ScheduleHelper.SanitizeCasterURL(match);
@@ -49,12 +47,14 @@ export class CreateCasterEvents {
         }
     }
 
-    private CreateNewEvent(startTime: moment.Moment, match: INGSSchedule): GuildScheduledEventCreateOptions {
+    private CreateNewEvent(startTimeMoment: moment.Moment, match: INGSSchedule): GuildScheduledEventCreateOptions {
         const eventName = `${match.divisionDisplayName}: ${match.home.teamName} VS ${match.away.teamName}`;
+        const startTime = startTimeMoment.toDate();
+        const endTime = startTimeMoment.add(this._eventDuration, "minutes").toDate();
         return {
             name: eventName,
-            scheduledStartTime: startTime.toDate(),
-            scheduledEndTime: startTime.add(this._eventDuration, "minutes").toDate(),
+            scheduledStartTime: startTime,
+            scheduledEndTime: endTime,
             privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
             entityType: GuildScheduledEventEntityType.External,
             entityMetadata: {

@@ -34,15 +34,14 @@ let CreateCasterEvents = class CreateCasterEvents {
     constructor(_client, _token, apiToken) {
         this._client = _client;
         this._token = _token;
+        this._eventDuration = 60; //in minutes
         this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
     }
     CheckForNewCastedGames() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const matches = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-            this._client.destroy();
-            yield this._client.login(this._token);
-            const guild = yield this._client.guilds.fetch(DiscordGuilds_1.DiscordGuilds.NGS);
+            const guild = yield this._client.guilds.fetch(DiscordGuilds_1.DiscordGuilds.DeltasServer);
             const events = (yield guild.scheduledEvents.fetch()).map((event, _, __) => event);
             for (var match of matches) {
                 const hasCaster = ScheduleHelper_1.ScheduleHelper.SanitizeCasterURL(match);
@@ -63,12 +62,14 @@ let CreateCasterEvents = class CreateCasterEvents {
             }
         });
     }
-    CreateNewEvent(startTime, match) {
+    CreateNewEvent(startTimeMoment, match) {
         const eventName = `${match.divisionDisplayName}: ${match.home.teamName} VS ${match.away.teamName}`;
+        const startTime = startTimeMoment.toDate();
+        const endTime = startTimeMoment.add(this._eventDuration, "minutes").toDate();
         return {
             name: eventName,
-            scheduledStartTime: startTime.toDate(),
-            scheduledEndTime: startTime.add(this._eventDuration, "minutes").toDate(),
+            scheduledStartTime: startTime,
+            scheduledEndTime: endTime,
             privacyLevel: discord_js_1.GuildScheduledEventPrivacyLevel.GuildOnly,
             entityType: discord_js_1.GuildScheduledEventEntityType.External,
             entityMetadata: {
