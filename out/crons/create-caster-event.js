@@ -42,7 +42,7 @@ let CreateCasterEvents = class CreateCasterEvents {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const matches = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-            const guild = yield this._client.guilds.fetch(_eventGuild);
+            const guild = yield this._client.guilds.fetch(this._eventGuild);
             const events = (yield guild.scheduledEvents.fetch()).map((event, _, __) => event);
             for (var match of matches) {
                 const hasCaster = ScheduleHelper_1.ScheduleHelper.SanitizeCasterURL(match);

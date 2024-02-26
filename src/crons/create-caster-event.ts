@@ -27,7 +27,7 @@ export class CreateCasterEvents {
 
     public async CheckForNewCastedGames() {
         const matches: INGSSchedule[] = await ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-        const guild = await this._client.guilds.fetch(_eventGuild);
+        const guild = await this._client.guilds.fetch(this._eventGuild);
         const events = (await guild.scheduledEvents.fetch()).map((event, _, __) => event);
         for (var match of matches) {
             const hasCaster = ScheduleHelper.SanitizeCasterURL(match);
