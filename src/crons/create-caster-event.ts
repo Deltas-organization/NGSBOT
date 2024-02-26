@@ -15,6 +15,7 @@ import moment = require("moment");
 export class CreateCasterEvents {
     private dataStore: DataStoreWrapper;
     private _eventDuration = 60; //in minutes
+    private _eventGuild = DiscordGuilds.NGS;
 
     constructor(
         @inject(TYPES.Client) private _client: Client,
@@ -26,7 +27,7 @@ export class CreateCasterEvents {
 
     public async CheckForNewCastedGames() {
         const matches: INGSSchedule[] = await ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
-        const guild = await this._client.guilds.fetch(DiscordGuilds.DeltasServer);
+        const guild = await this._client.guilds.fetch(_eventGuild);
         const events = (await guild.scheduledEvents.fetch()).map((event, _, __) => event);
         for (var match of matches) {
             const hasCaster = ScheduleHelper.SanitizeCasterURL(match);
