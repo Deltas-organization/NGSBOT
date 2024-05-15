@@ -31,7 +31,11 @@ class UpdateCaptainsListCommand {
                 if (!divisionInformation)
                     return `Unable to find division: ${division}`;
                 const guildMembers = (yield guild.members.fetch()).map((mem, _, __) => mem);
-                const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
+                let discordMods = divisionInformation.moderator.split('&');
+                if (discordMods.length == 1) {
+                    discordMods = divisionInformation.moderator.split(/ and /i);
+                }
+                const modsToLookFor = discordMods.map(item => item.replace(' ', '').toLowerCase());
                 const divMods = guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
                 const messageHelper = new MessageHelper_1.MessageHelper('captainList');
                 messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
