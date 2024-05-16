@@ -14,7 +14,7 @@ import moment = require("moment");
 @injectable()
 export class CreateCasterEvents {
     private dataStore: DataStoreWrapper;
-    private _eventDuration = 60; //in minutes
+    private _eventDuration = 120; //in minutes
     private _eventGuild = DiscordGuilds.NGS;
 
     constructor(
