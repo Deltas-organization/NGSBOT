@@ -22,9 +22,9 @@ export class TeamSorter {
         NGSDivisions.A,
         // NGSDivisions.AEast,
         // NGSDivisions.AWest,
-        NGSDivisions.B,
-        NGSDivisions.CEast,
-        NGSDivisions.CWest,
+        NGSDivisions.BEast,
+        NGSDivisions.BWest,
+        NGSDivisions.C,
         NGSDivisions.DEast,
         NGSDivisions.DWest,
         NGSDivisionConcat.E];
