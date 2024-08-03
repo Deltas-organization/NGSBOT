@@ -9,11 +9,12 @@ var NGSDivisions;
     NGSDivisions["A"] = "A";
     // AEast = "A East",
     // AWest = "A West",
-    NGSDivisions["B"] = "B";
-    //BEast = "B East",
-    //BWest = "B West",
-    NGSDivisions["CEast"] = "C East";
-    NGSDivisions["CWest"] = "C West";
+    //B = "B",
+    NGSDivisions["BEast"] = "B East";
+    NGSDivisions["BWest"] = "B West";
+    NGSDivisions["C"] = "C";
+    //CEast = "C East",
+    //CWest = "C West",
     NGSDivisions["DEast"] = "D East";
     NGSDivisions["DWest"] = "D West";
     // EEast = "E East",

@@ -34,7 +34,7 @@ let CreateCasterEvents = class CreateCasterEvents {
     constructor(_client, _token, apiToken) {
         this._client = _client;
         this._token = _token;
-        this._eventDuration = 60; //in minutes
+        this._eventDuration = 120; //in minutes
         this._eventGuild = DiscordGuilds_1.DiscordGuilds.NGS;
         this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
     }
