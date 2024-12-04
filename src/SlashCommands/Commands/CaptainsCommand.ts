@@ -7,7 +7,7 @@ import { CaptainsListWorker } from "../Workers/CaptainListWorker";
 export class CaptainsCommand extends SlashCommandBase {
     protected Description: string = "Will Update Captain List";
     public Name: string = "captains";
-    public GuildLocation = "All";
+    public GuildLocation = DiscordGuilds.NGS;
     public Permissions: PermissionResolvable = PermissionFlagsBits.ManageRoles;
 
     constructor(private dataStore: DataStoreWrapper, private mongoConnectionUri: string){

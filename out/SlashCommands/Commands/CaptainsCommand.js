@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CaptainsCommand = void 0;
 const discord_js_1 = require("discord.js");
+const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
 const SlashCommandBase_1 = require("../Base/SlashCommandBase");
 const CaptainListWorker_1 = require("../Workers/CaptainListWorker");
 class CaptainsCommand extends SlashCommandBase_1.SlashCommandBase {
@@ -20,7 +21,7 @@ class CaptainsCommand extends SlashCommandBase_1.SlashCommandBase {
         this.mongoConnectionUri = mongoConnectionUri;
         this.Description = "Will Update Captain List";
         this.Name = "captains";
-        this.GuildLocation = "All";
+        this.GuildLocation = DiscordGuilds_1.DiscordGuilds.NGS;
         this.Permissions = discord_js_1.PermissionFlagsBits.ManageRoles;
     }
     RunCommand(client, interaction) {
