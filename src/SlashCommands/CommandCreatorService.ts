@@ -4,10 +4,9 @@ import { ButtonSlashCommandBase } from "./Base/ButtonSlashCommandBase";
 import { SlashCommandBase } from "./Base/SlashCommandBase";
 import { CaptainsCommand } from "./Commands/CaptainsCommand";
 import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
-import { HelloWorldCommand } from "./Commands/HelloWorldCommand";
 import { RandomSlashCommand } from "./Commands/RandomSlashCommand";
 import { RoleHelperCommand } from "./Commands/RoleHelperCommand";
-import { SearchDBDCommand } from "./Commands/SearchDBDCommand";
+import { RandomTeamCommand } from "./Commands/RandomTeamCommand";
 
 type guildCommandContainer = { guild: string; commands: ChatInputApplicationCommandData[]; };
 export class CommandCreatorService {
@@ -74,6 +73,7 @@ export class CommandCreatorService {
         this.commands.push(new RandomSlashCommand());
         this.commands.push(new CaptainsCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
+        this.commands.push(new RandomTeamCommand());
         // this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
     }
 
