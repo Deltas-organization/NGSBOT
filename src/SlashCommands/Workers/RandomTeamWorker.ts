@@ -9,7 +9,10 @@ export class RandomTeamWorker {
 
     public Run(memberNames: string[], membersWithPriority: string[]): { container: MessageContainer, unselectedPlayerNames: string[] } {
         const container = new MessageContainer();
-        const numberOfTeams = Math.floor(memberNames.length / this._teamSize);
+        let numberOfTeams = Math.floor(memberNames.length / this._teamSize);
+        if(numberOfTeams % 2 == 1)
+            numberOfTeams--;
+        
         const availableTeamMembers = [...memberNames];
         const teams: string[][] = [];
         const guaranteedTeamMembers: { memberName: string, teamNumber: number }[] = [];

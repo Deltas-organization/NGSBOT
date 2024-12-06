@@ -8,7 +8,9 @@ class RandomTeamWorker {
     }
     Run(memberNames, membersWithPriority) {
         const container = new MessageContainer_1.MessageContainer();
-        const numberOfTeams = Math.floor(memberNames.length / this._teamSize);
+        let numberOfTeams = Math.floor(memberNames.length / this._teamSize);
+        if (numberOfTeams % 2 == 1)
+            numberOfTeams--;
         const availableTeamMembers = [...memberNames];
         const teams = [];
         const guaranteedTeamMembers = [];
