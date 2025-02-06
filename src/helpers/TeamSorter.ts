@@ -18,15 +18,13 @@ export class TeamSorter {
     public static SortByDivision(divisionDisplay1: string, divisionDisplay2: string): number {
         const order = [//NGSDivisions.Storm,
         NGSDivisions.Heroic,
-        NGSDivisions.Nexus,
         NGSDivisions.A,
         // NGSDivisions.AEast,
         // NGSDivisions.AWest,
         NGSDivisions.BEast,
         NGSDivisions.BWest,
         NGSDivisions.C,
-        NGSDivisions.DEast,
-        NGSDivisions.DWest,
+        NGSDivisions.D,
         NGSDivisionConcat.E];
         //NGSDivisions.EEast,
         //NGSDivisions.EWest];
@@ -54,15 +52,15 @@ export class TeamSorter {
     public static SortByDivisionConcat(divisionDisplay1: string, divisionDisplay2: string): number {
         const order = [//NGSDivisionConcat.Storm,
         NGSDivisionConcat.Heroic,
-        NGSDivisionConcat.Nexus,
+        // NGSDivisionConcat.Nexus,
         NGSDivisionConcat.A,
         // NGSDivisionConcat.AEast,
         // NGSDivisionConcat.AWest,
         NGSDivisionConcat.BEast,
         NGSDivisionConcat.BWest,
         NGSDivisionConcat.C,
-        NGSDivisionConcat.DEast,
-        NGSDivisionConcat.DWest,
+        NGSDivisionConcat.D,
+        // NGSDivisionConcat.DWest,
         // NGSDivisionConcat.EEast,
         // NGSDivisionConcat.EWest
         NGSDivisionConcat.E];

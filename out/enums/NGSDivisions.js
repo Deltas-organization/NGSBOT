@@ -5,7 +5,7 @@ var NGSDivisions;
 (function (NGSDivisions) {
     //Storm = "Storm",
     NGSDivisions["Heroic"] = "Heroic";
-    NGSDivisions["Nexus"] = "Nexus";
+    //Nexus = "Nexus",
     NGSDivisions["A"] = "A";
     // AEast = "A East",
     // AWest = "A West",
@@ -15,8 +15,9 @@ var NGSDivisions;
     NGSDivisions["C"] = "C";
     //CEast = "C East",
     //CWest = "C West",
-    NGSDivisions["DEast"] = "D East";
-    NGSDivisions["DWest"] = "D West";
+    // DEast = "D East",
+    // DWest = "D West",
+    NGSDivisions["D"] = "D";
     // EEast = "E East",
     // EWest = "E West",
     NGSDivisions["E"] = "E";

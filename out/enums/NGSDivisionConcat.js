@@ -5,7 +5,7 @@ var NGSDivisionConcat;
 (function (NGSDivisionConcat) {
     // Storm = "storm",
     NGSDivisionConcat["Heroic"] = "heroic";
-    NGSDivisionConcat["Nexus"] = "nexus";
+    // Nexus = "nexus",
     NGSDivisionConcat["A"] = "a";
     //AEast = "a-east",
     // AWest = "a-west",
@@ -15,8 +15,9 @@ var NGSDivisionConcat;
     NGSDivisionConcat["C"] = "c";
     // CEast = "c-east",
     // CWest = "c-west",
-    NGSDivisionConcat["DEast"] = "d-east";
-    NGSDivisionConcat["DWest"] = "d-west";
+    NGSDivisionConcat["D"] = "d";
+    // DEast = "d-east",
+    // DWest = "d-west",
     // EEast = "e-east",
     // EWest = "e-west"
     NGSDivisionConcat["E"] = "e";

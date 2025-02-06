@@ -8,8 +8,8 @@ class ChannelHelper {
         switch (division) {
             case NGSDivisions_1.NGSDivisions.Heroic:
                 return DiscordChannels_1.DiscordChannels.DivisionHeroic;
-            case NGSDivisions_1.NGSDivisions.Nexus:
-                return DiscordChannels_1.DiscordChannels.DivisionNexus;
+            // case NGSDivisions.Nexus:
+            //     return DiscordChannels.DivisionNexus;
             case NGSDivisions_1.NGSDivisions.A:
                 return DiscordChannels_1.DiscordChannels.DivisionA;
             case NGSDivisions_1.NGSDivisions.BEast:
@@ -17,8 +17,7 @@ class ChannelHelper {
                 return DiscordChannels_1.DiscordChannels.DivisionB;
             case NGSDivisions_1.NGSDivisions.C:
                 return DiscordChannels_1.DiscordChannels.DivisionC;
-            case NGSDivisions_1.NGSDivisions.DEast:
-            case NGSDivisions_1.NGSDivisions.DWest:
+            case NGSDivisions_1.NGSDivisions.D:
                 return DiscordChannels_1.DiscordChannels.DivisionD;
             case NGSDivisions_1.NGSDivisions.E:
                 return DiscordChannels_1.DiscordChannels.DivisionE;
