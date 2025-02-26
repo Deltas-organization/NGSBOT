@@ -1,0 +1,90 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SchedulePoster = void 0;
+const inversify_1 = require("inversify");
+const DataStoreWrapper_1 = require("../helpers/DataStoreWrapper");
+const discord_js_1 = require("discord.js");
+const types_1 = require("../inversify/types");
+const LiveDataStore_1 = require("../LiveDataStore");
+const NGSMongoHelper_1 = require("../helpers/NGSMongoHelper");
+const ScheduleHelper_1 = require("../helpers/ScheduleHelper");
+const DiscordChannels_1 = require("../enums/DiscordChannels");
+const ChannelMessageSender_1 = require("../helpers/messageSenders/ChannelMessageSender");
+let SchedulePoster = class SchedulePoster {
+    constructor(_client, _token, apiToken, mongoConnection) {
+        this._client = _client;
+        this._token = _token;
+        this.dataStore = new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken));
+        this.mongoHelper = new NGSMongoHelper_1.NGSMongoHelper(mongoConnection);
+    }
+    SendSchedule() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._client.login(this._token);
+            const alreadySentMessageInformation = yield this.mongoHelper.GetTodaysScheduleMessageInformation();
+            const messageSender = new ChannelMessageSender_1.ChannelMessageSender(this._client);
+            const games = yield ScheduleHelper_1.ScheduleHelper.GetTodaysGamesSorted(this.dataStore);
+            if (games.length > 0) {
+                const messages = yield ScheduleHelper_1.ScheduleHelper.GetMessages(games);
+                if (messages.length == 0)
+                    return;
+                let messagesToSendTotalcount = 0;
+                for (var index = 0; index < messages.length; index++) {
+                    messagesToSendTotalcount += (yield messageSender.GetMessagesWithSafeLength(messages[index])).length;
+                }
+                if (alreadySentMessageInformation.length == 0) {
+                    let messageIndex = 0;
+                    for (var index = 0; index < messages.length; index++) {
+                        const newMessageIds = yield messageSender.SendToDiscordChannel(messages[index], DiscordChannels_1.DiscordChannels.NGSHype, true);
+                        const messageInformation = [];
+                        for (let messageId of newMessageIds) {
+                            messageInformation.push({ messageId: messageId, index: messageIndex });
+                            messageIndex++;
+                        }
+                        yield this.mongoHelper.AddScheduleMessageIds(messageInformation);
+                    }
+                }
+                else if (alreadySentMessageInformation.length == messagesToSendTotalcount) {
+                    let messageIndex = 0;
+                    for (var index = 0; index < messages.length; index++) {
+                        var existingMessageInformation = alreadySentMessageInformation.find(message => message.messageIndex == messageIndex);
+                        if (existingMessageInformation != null) {
+                            yield messageSender.OverwriteMessage(messages[index], existingMessageInformation.messageId, DiscordChannels_1.DiscordChannels.NGSHype, true);
+                        }
+                        messageIndex++;
+                    }
+                }
+            }
+        });
+    }
+};
+SchedulePoster = __decorate([
+    (0, inversify_1.injectable)(),
+    __param(0, (0, inversify_1.inject)(types_1.TYPES.Client)),
+    __param(1, (0, inversify_1.inject)(types_1.TYPES.Token)),
+    __param(2, (0, inversify_1.inject)(types_1.TYPES.ApiToken)),
+    __param(3, (0, inversify_1.inject)(types_1.TYPES.MongConection)),
+    __metadata("design:paramtypes", [discord_js_1.Client, String, String, String])
+], SchedulePoster);
+exports.SchedulePoster = SchedulePoster;
+//# sourceMappingURL=schedule-poster-cron.js.map
