@@ -15,6 +15,7 @@ const MessageHelper_1 = require("../helpers/MessageHelper");
 class HistoryDisplay {
     constructor(dataStore) {
         this.dataStore = dataStore;
+        this._historyStartDate = "02-02-2025";
     }
     GetRecentHistory(days) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -79,7 +80,7 @@ class HistoryDisplay {
             if (indexedHistory.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
                 addsSoFar++;
             }
-            if (indexedHistory.action == NGSHistoryActions_1.HistoryActions.AddedDivision) {
+            if (this.IsHistoryNewSeasonRecord(indexedHistory)) {
                 if (currentHistoryIndex > addsSoFar)
                     return 0;
                 else
@@ -87,6 +88,16 @@ class HistoryDisplay {
             }
         }
         return addsSoFar - currentHistoryIndex;
+    }
+    IsHistoryNewSeasonRecord(historyRecord) {
+        if (historyRecord.action == NGSHistoryActions_1.HistoryActions.AddedDivision)
+            return true;
+        var historyDate = new Date(historyRecord.timestamp);
+        var seasonStartDate = new Date(this._historyStartDate);
+        if (historyDate < seasonStartDate) {
+            return true;
+        }
+        return false;
     }
     FormatMessages(histories) {
         let result = [];

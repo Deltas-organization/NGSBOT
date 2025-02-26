@@ -12,6 +12,8 @@ import { INGSHistory } from "../interfaces/INGSHistory";
 import { LiveDataStore } from "../LiveDataStore";
 
 export class HistoryDisplay {
+
+    private _historyStartDate = "02-02-2025";
     constructor(private dataStore: DataStoreWrapper) {
     }
 
@@ -70,14 +72,14 @@ export class HistoryDisplay {
         return messages;
     }
 
-    GetRosterAddNumber(history: INGSHistory, sortedHistory: INGSHistory[]) {
+    private GetRosterAddNumber(history: INGSHistory, sortedHistory: INGSHistory[]) {
         var addsSoFar = 0;
         var currentHistoryIndex = sortedHistory.indexOf(history);
         for (var indexedHistory of sortedHistory) {
             if (indexedHistory.action == HistoryActions.JoinedTeam) {
                 addsSoFar++;
             }
-            if (indexedHistory.action == HistoryActions.AddedDivision) {
+            if (this.IsHistoryNewSeasonRecord(indexedHistory)) {
                 if (currentHistoryIndex > addsSoFar)
                     return 0;
                 else
@@ -85,6 +87,19 @@ export class HistoryDisplay {
             }
         }
         return addsSoFar - currentHistoryIndex;
+    }
+
+    private IsHistoryNewSeasonRecord(historyRecord: INGSHistory)
+    {
+        if(historyRecord.action == HistoryActions.AddedDivision)
+            return true;
+        var historyDate = new Date(historyRecord.timestamp);
+        var seasonStartDate = new Date(this._historyStartDate);
+        if(historyDate < seasonStartDate)
+        {
+            return true;
+        }
+        return false;
     }
 
     private FormatMessages(histories: HistoryContainer[]): string[] {
