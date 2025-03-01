@@ -95,7 +95,7 @@ export class HistoryDisplay {
             return true;
         var historyDate = new Date(historyRecord.timestamp);
         var seasonStartDate = new Date(this._historyStartDate);
-        if(historyDate < seasonStartDate)
+        if(historyDate <= seasonStartDate)
         {
             return true;
         }
