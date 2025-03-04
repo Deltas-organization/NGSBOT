@@ -76,27 +76,25 @@ export class HistoryDisplay {
         var addsSoFar = 0;
         var currentHistoryIndex = sortedHistory.indexOf(history);
         for (var indexedHistory of sortedHistory) {
-            if (indexedHistory.action == HistoryActions.JoinedTeam) {
-                addsSoFar++;
-            }
             if (this.IsHistoryNewSeasonRecord(indexedHistory)) {
                 if (currentHistoryIndex > addsSoFar)
                     return 0;
                 else
                     break;
             }
+            if (indexedHistory.action == HistoryActions.JoinedTeam) {
+                addsSoFar++;
+            }
         }
         return addsSoFar - currentHistoryIndex;
     }
 
-    private IsHistoryNewSeasonRecord(historyRecord: INGSHistory)
-    {
-        if(historyRecord.action == HistoryActions.AddedDivision)
+    private IsHistoryNewSeasonRecord(historyRecord: INGSHistory) {
+        if (historyRecord.action == HistoryActions.AddedDivision)
             return true;
         var historyDate = new Date(historyRecord.timestamp);
         var seasonStartDate = new Date(this._historyStartDate);
-        if(historyDate <= seasonStartDate)
-        {
+        if (historyDate <= seasonStartDate) {
             return true;
         }
         return false;
