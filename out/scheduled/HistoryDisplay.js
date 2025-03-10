@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryDisplay = void 0;
 const NGSHistoryActions_1 = require("../enums/NGSHistoryActions");
 const MessageHelper_1 = require("../helpers/MessageHelper");
+const LiveDataStore_1 = require("../LiveDataStore");
 class HistoryDisplay {
     constructor(dataStore) {
         this.dataStore = dataStore;
@@ -77,14 +78,14 @@ class HistoryDisplay {
         var addsSoFar = 0;
         var currentHistoryIndex = sortedHistory.indexOf(history);
         for (var indexedHistory of sortedHistory) {
-            if (indexedHistory.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
-                addsSoFar++;
-            }
             if (this.IsHistoryNewSeasonRecord(indexedHistory)) {
                 if (currentHistoryIndex > addsSoFar)
                     return 0;
                 else
                     break;
+            }
+            if (indexedHistory.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
+                addsSoFar++;
             }
         }
         return addsSoFar - currentHistoryIndex;
@@ -92,9 +93,11 @@ class HistoryDisplay {
     IsHistoryNewSeasonRecord(historyRecord) {
         if (historyRecord.action == NGSHistoryActions_1.HistoryActions.AddedDivision)
             return true;
+        if (historyRecord.season && historyRecord.season != +LiveDataStore_1.LiveDataStore.season)
+            return true;
         var historyDate = new Date(historyRecord.timestamp);
         var seasonStartDate = new Date(this._historyStartDate);
-        if (historyDate < seasonStartDate) {
+        if (historyDate <= seasonStartDate) {
             return true;
         }
         return false;

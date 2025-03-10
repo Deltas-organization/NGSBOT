@@ -92,6 +92,10 @@ export class HistoryDisplay {
     private IsHistoryNewSeasonRecord(historyRecord: INGSHistory) {
         if (historyRecord.action == HistoryActions.AddedDivision)
             return true;
+        
+        if(historyRecord.season && historyRecord.season != +LiveDataStore.season)
+            return true;
+
         var historyDate = new Date(historyRecord.timestamp);
         var seasonStartDate = new Date(this._historyStartDate);
         if (historyDate <= seasonStartDate) {
