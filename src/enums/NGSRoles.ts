@@ -12,5 +12,12 @@ export enum NGSRoles {
     FreeAgents = 'Free Agents',
     NGSBot = 'NGSBOT',
     Muted = 'Muted',
-    UnPurgeable = "UnPurgeable"
+    UnPurgeable = "UnPurgeable",
+    OffRosterSub = "Off Roster Sub",
+    DivisionE = "ORS Div E",
+    DivisionD = "ORS Div D",
+    DivisionC = "ORS Div C",
+    DivisionB = "ORS Div B",
+    DivisionA = "ORS Div A",
+    DivisionHeroic = "ORS Heroic",
 }

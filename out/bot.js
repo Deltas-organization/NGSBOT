@@ -39,10 +39,19 @@ const TranslatorService_1 = require("./translators/core/TranslatorService");
 const Globals_1 = require("./Globals");
 const CommandCreatorService_1 = require("./SlashCommands/CommandCreatorService");
 const messageChecker_1 = require("./messageChecker");
+const DiscordGuilds_1 = require("./enums/DiscordGuilds");
 let Bot = class Bot {
     constructor(client, token, apiToken, mongoConnection, botCommand) {
         this.client = client;
         this.token = token;
+        this.EmojiDictionary = [
+            { EmojiValue: "705186343440875560", RoleName: NGSRoles_1.NGSRoles.DivisionE },
+            { EmojiValue: "603561788688039937", RoleName: NGSRoles_1.NGSRoles.DivisionD },
+            { EmojiValue: "598558183530823694", RoleName: NGSRoles_1.NGSRoles.DivisionC },
+            { EmojiValue: "617155504120266796", RoleName: NGSRoles_1.NGSRoles.DivisionB },
+            { EmojiValue: "591636712338489349", RoleName: NGSRoles_1.NGSRoles.DivisionA },
+            { EmojiValue: "600663992406507520", RoleName: NGSRoles_1.NGSRoles.DivisionHeroic }
+        ];
         this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
         this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client);
         this.pmMessageInteraction = new PmMessageInteraction_1.PmMessageInteraction(client, this.dependencies);
@@ -60,6 +69,7 @@ let Bot = class Bot {
     OnInitialize() {
         this.WatchForUserJoin();
         this.WatchForUserFreeAgent();
+        this.WatchForUserORS();
     }
     WatchForUserJoin() {
         this.client.on('guildMemberAdd', (member) => __awaiter(this, void 0, void 0, function* () {
@@ -90,6 +100,54 @@ let Bot = class Bot {
                     message.member.roles.add(freeAgentRole);
             }
         }));
+    }
+    WatchForUserORS() {
+        const loadedRoles = new Map();
+        const specificMessageId = "1353405256981282889";
+        const channelId = "1351384908186124299";
+        this.client.channels.fetch(channelId).then(channel => {
+            channel.messages.fetch(specificMessageId);
+        });
+        this.client.on('messageReactionAdd', (reaction, user) => __awaiter(this, void 0, void 0, function* () {
+            yield this.AdjustRole(specificMessageId, loadedRoles, reaction, user, "add");
+        }));
+        this.client.on('messageReactionRemove', (reaction, user) => __awaiter(this, void 0, void 0, function* () {
+            yield this.AdjustRole(specificMessageId, loadedRoles, reaction, user, "remove");
+        }));
+    }
+    AdjustRole(specificMessageId, loadedRoles, reaction, user, addOrRemove) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = reaction.message;
+            if (((_a = message.guild) === null || _a === void 0 ? void 0 : _a.id) != DiscordGuilds_1.DiscordGuilds.NGS || message.id != specificMessageId)
+                return;
+            const reactedEmojiId = reaction.emoji.id;
+            if (reactedEmojiId == null)
+                return;
+            const guild = message.guild;
+            if (!guild)
+                return;
+            const member = guild.members.cache.get(user.id);
+            if (!member)
+                return;
+            const relatedEmojiIndex = this.EmojiDictionary.findIndex(item => item.EmojiValue == reactedEmojiId);
+            if (relatedEmojiIndex == -1)
+                return;
+            const relatedEmoji = this.EmojiDictionary[relatedEmojiIndex];
+            let foundRole = loadedRoles.get(reactedEmojiId);
+            if (!foundRole) {
+                const roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(guild);
+                const serverRole = roleHelper.lookForRole(relatedEmoji.RoleName);
+                if (!serverRole)
+                    return;
+                foundRole = serverRole;
+                loadedRoles.set(reactedEmojiId, foundRole);
+            }
+            if (addOrRemove == "add")
+                yield member.roles.add(foundRole);
+            else if (addOrRemove == "remove")
+                yield member.roles.remove(foundRole);
+        });
     }
     OnMessageReceived(message) {
         return __awaiter(this, void 0, void 0, function* () {

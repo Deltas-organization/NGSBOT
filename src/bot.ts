@@ -1,4 +1,4 @@
-import { ChannelType, Client, Message, MessageType } from "discord.js";
+import { ChannelType, Client, Message, MessageReaction, MessageType, PartialMessageReaction, PartialUser, ReactionEmoji, Role, TextChannel, User } from "discord.js";
 import { inject, injectable } from "inversify";
 import { TYPES } from "./inversify/types";
 import { LiveDataStore } from "./LiveDataStore";
@@ -17,6 +17,7 @@ import { Globals } from "./Globals";
 import { CommandCreatorService } from "./SlashCommands/CommandCreatorService";
 import { TypeFlags } from "typescript";
 import { MessageChecker } from "./messageChecker";
+import { DiscordGuilds } from "./enums/DiscordGuilds";
 
 @injectable()
 export class Bot {
@@ -54,6 +55,7 @@ export class Bot {
     public OnInitialize() {
         this.WatchForUserJoin();
         this.WatchForUserFreeAgent();
+        this.WatchForUserORS();
     }
 
     public WatchForUserJoin() {
@@ -88,13 +90,76 @@ export class Bot {
         });
     }
 
+    private EmojiDictionary: { EmojiValue: string, RoleName: NGSRoles }[] = [
+        { EmojiValue: "705186343440875560", RoleName: NGSRoles.DivisionE },
+        { EmojiValue: "603561788688039937", RoleName: NGSRoles.DivisionD },
+        { EmojiValue: "598558183530823694", RoleName: NGSRoles.DivisionC },
+        { EmojiValue: "617155504120266796", RoleName: NGSRoles.DivisionB },
+        { EmojiValue: "591636712338489349", RoleName: NGSRoles.DivisionA },
+        { EmojiValue: "600663992406507520", RoleName: NGSRoles.DivisionHeroic }]
+
+    public WatchForUserORS() {
+        const loadedRoles: Map<string, Role> = new Map<string, Role>();
+        const specificMessageId = "1353405256981282889";
+        const channelId = "1351384908186124299";
+        this.client.channels.fetch(channelId).then(channel => {
+            (<TextChannel>channel).messages.fetch(specificMessageId);
+        });
+        this.client.on('messageReactionAdd', async (reaction, user) => {
+            await this.AdjustRole(specificMessageId, loadedRoles, reaction, user, "add");
+        });
+
+        this.client.on('messageReactionRemove', async (reaction, user) => {
+            await this.AdjustRole(specificMessageId, loadedRoles, reaction, user, "remove");
+        });
+    }
+
+    private async AdjustRole(specificMessageId: string, loadedRoles: Map<string, Role>, reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser, addOrRemove: "add" | "remove") {
+        const message = reaction.message;
+        if (message.guild?.id != DiscordGuilds.NGS || message.id != specificMessageId)
+            return;
+        const reactedEmojiId = reaction.emoji.id;
+        if (reactedEmojiId == null)
+            return;
+
+        const guild = message.guild;
+        if (!guild)
+            return;
+
+        const member = guild.members.cache.get(user.id);
+        if (!member)
+            return;
+
+
+        const relatedEmojiIndex = this.EmojiDictionary.findIndex(item => item.EmojiValue == reactedEmojiId);
+        if (relatedEmojiIndex == -1)
+            return;
+
+        const relatedEmoji = this.EmojiDictionary[relatedEmojiIndex];
+
+        let foundRole = loadedRoles.get(reactedEmojiId);
+        if (!foundRole) {
+            const roleHelper = await RoleHelper.CreateFrom(guild);
+            const serverRole = roleHelper.lookForRole(relatedEmoji.RoleName);
+            if (!serverRole)
+                return;
+
+            foundRole = serverRole
+            loadedRoles.set(reactedEmojiId, foundRole);
+        }
+        if (addOrRemove == "add")
+            await member.roles.add(foundRole);
+        else if (addOrRemove == "remove")
+            await member.roles.remove(foundRole);
+    }
+
     private async OnMessageReceived(message: Message) {
         this.translatorService.runTranslators(message);
 
         if (message.channel.type == ChannelType.DM && message.author.bot == false) {
             await this.pmMessageInteraction.ReceivePM(message);
         }
-        
+
         this.messageChecker.Check(message);
     }
 }
