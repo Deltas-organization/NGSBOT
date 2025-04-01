@@ -49,6 +49,7 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             NGSRoles_1.NGSRoles.ORSDivisionC,
             NGSRoles_1.NGSRoles.ORSDivisionB,
             NGSRoles_1.NGSRoles.ORSDivisionA,
+            NGSRoles_1.NGSRoles.ORSDivisionHeroic,
             NGSRoles_1.NGSRoles.OffRosterSub
         ];
         this.reserveredRoles = [];
