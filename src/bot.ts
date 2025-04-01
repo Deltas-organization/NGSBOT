@@ -91,12 +91,12 @@ export class Bot {
     }
 
     private EmojiDictionary: { EmojiValue: string, RoleName: NGSRoles }[] = [
-        { EmojiValue: "705186343440875560", RoleName: NGSRoles.DivisionE },
-        { EmojiValue: "603561788688039937", RoleName: NGSRoles.DivisionD },
-        { EmojiValue: "598558183530823694", RoleName: NGSRoles.DivisionC },
-        { EmojiValue: "617155504120266796", RoleName: NGSRoles.DivisionB },
-        { EmojiValue: "591636712338489349", RoleName: NGSRoles.DivisionA },
-        { EmojiValue: "600663992406507520", RoleName: NGSRoles.DivisionHeroic }]
+        { EmojiValue: "705186343440875560", RoleName: NGSRoles.ORSDivisionE },
+        { EmojiValue: "603561788688039937", RoleName: NGSRoles.ORSDivisionD },
+        { EmojiValue: "598558183530823694", RoleName: NGSRoles.ORSDivisionC },
+        { EmojiValue: "617155504120266796", RoleName: NGSRoles.ORSDivisionB },
+        { EmojiValue: "591636712338489349", RoleName: NGSRoles.ORSDivisionA },
+        { EmojiValue: "600663992406507520", RoleName: NGSRoles.ORSDivisionHeroic }]
 
     public WatchForUserORS() {
         const loadedRoles: Map<string, Role> = new Map<string, Role>();

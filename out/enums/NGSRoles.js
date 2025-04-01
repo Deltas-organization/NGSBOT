@@ -17,11 +17,11 @@ var NGSRoles;
     NGSRoles["Muted"] = "Muted";
     NGSRoles["UnPurgeable"] = "UnPurgeable";
     NGSRoles["OffRosterSub"] = "Off Roster Sub";
-    NGSRoles["DivisionE"] = "ORS Div E";
-    NGSRoles["DivisionD"] = "ORS Div D";
-    NGSRoles["DivisionC"] = "ORS Div C";
-    NGSRoles["DivisionB"] = "ORS Div B";
-    NGSRoles["DivisionA"] = "ORS Div A";
-    NGSRoles["DivisionHeroic"] = "ORS Heroic";
+    NGSRoles["ORSDivisionE"] = "ORS Div E";
+    NGSRoles["ORSDivisionD"] = "ORS Div D";
+    NGSRoles["ORSDivisionC"] = "ORS Div C";
+    NGSRoles["ORSDivisionB"] = "ORS Div B";
+    NGSRoles["ORSDivisionA"] = "ORS Div A";
+    NGSRoles["ORSDivisionHeroic"] = "ORS Heroic";
 })(NGSRoles = exports.NGSRoles || (exports.NGSRoles = {}));
 //# sourceMappingURL=NGSRoles.js.map

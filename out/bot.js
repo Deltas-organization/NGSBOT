@@ -45,12 +45,12 @@ let Bot = class Bot {
         this.client = client;
         this.token = token;
         this.EmojiDictionary = [
-            { EmojiValue: "705186343440875560", RoleName: NGSRoles_1.NGSRoles.DivisionE },
-            { EmojiValue: "603561788688039937", RoleName: NGSRoles_1.NGSRoles.DivisionD },
-            { EmojiValue: "598558183530823694", RoleName: NGSRoles_1.NGSRoles.DivisionC },
-            { EmojiValue: "617155504120266796", RoleName: NGSRoles_1.NGSRoles.DivisionB },
-            { EmojiValue: "591636712338489349", RoleName: NGSRoles_1.NGSRoles.DivisionA },
-            { EmojiValue: "600663992406507520", RoleName: NGSRoles_1.NGSRoles.DivisionHeroic }
+            { EmojiValue: "705186343440875560", RoleName: NGSRoles_1.NGSRoles.ORSDivisionE },
+            { EmojiValue: "603561788688039937", RoleName: NGSRoles_1.NGSRoles.ORSDivisionD },
+            { EmojiValue: "598558183530823694", RoleName: NGSRoles_1.NGSRoles.ORSDivisionC },
+            { EmojiValue: "617155504120266796", RoleName: NGSRoles_1.NGSRoles.ORSDivisionB },
+            { EmojiValue: "591636712338489349", RoleName: NGSRoles_1.NGSRoles.ORSDivisionA },
+            { EmojiValue: "600663992406507520", RoleName: NGSRoles_1.NGSRoles.ORSDivisionHeroic }
         ];
         this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);
         this.messageSender = new ChannelMessageSender_1.ChannelMessageSender(client);

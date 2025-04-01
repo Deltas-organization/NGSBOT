@@ -43,7 +43,13 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             'HI Caster',
             'HI Captain',
             '@everyone',
-            'Ticket Tool'
+            'Ticket Tool',
+            NGSRoles_1.NGSRoles.ORSDivisionE,
+            NGSRoles_1.NGSRoles.ORSDivisionD,
+            NGSRoles_1.NGSRoles.ORSDivisionC,
+            NGSRoles_1.NGSRoles.ORSDivisionB,
+            NGSRoles_1.NGSRoles.ORSDivisionA,
+            NGSRoles_1.NGSRoles.OffRosterSub
         ];
         this.reserveredRoles = [];
     }

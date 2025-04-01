@@ -34,7 +34,13 @@ export abstract class RoleWorkerBase extends WorkerBase {
         'HI Caster',
         'HI Captain',
         '@everyone',
-        'Ticket Tool'];
+        'Ticket Tool',
+        NGSRoles.ORSDivisionE,
+        NGSRoles.ORSDivisionD,
+        NGSRoles.ORSDivisionC,
+        NGSRoles.ORSDivisionB,
+        NGSRoles.ORSDivisionA,
+        NGSRoles.OffRosterSub];
 
     protected reserveredRoles: Role[] = [];
     protected myBotRole: Role;
