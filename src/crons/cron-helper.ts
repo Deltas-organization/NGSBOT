@@ -18,6 +18,7 @@ import { HistoryDisplay } from "../scheduled/HistoryDisplay";
 import moment = require("moment");
 import { CheckPendingMembers } from "../commands/CheckPendingMembers";
 import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
+import { CleanupLFGChannel } from "../commands/CleanupLFGChannel";
 
 @injectable()
 export class CronHelper {
@@ -30,6 +31,7 @@ export class CronHelper {
     private checkUnscheduledGamesForWeek: CheckUnscheduledGamesForWeek;
     private checkFlexMatches: CheckFlexMatches;
     private checkPendingMembers: CheckPendingMembers;
+    private cleanupLFGChannel: CleanupLFGChannel;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -47,6 +49,7 @@ export class CronHelper {
         this.checkUnscheduledGamesForWeek = new CheckUnscheduledGamesForWeek(this.mongoHelper, this.dataStore);
         this.checkFlexMatches = new CheckFlexMatches(this.dataStore);
         this.checkPendingMembers = new CheckPendingMembers(apiToken, this.dataStore, this.mongoHelper);
+        this.cleanupLFGChannel = new CleanupLFGChannel(this.client);
     }
 
     public async sendSchedule() {
@@ -175,6 +178,16 @@ export class CronHelper {
         }
         catch (e) {
             console.log(e);
+        }
+    }
+
+    public async DeleteLFGMessages() {        
+        await this.client.login(this.token);
+        try {
+            await this.cleanupLFGChannel.DeleteOldMessages(4);
+        }
+        catch (e) {
+            Globals.log(e);
         }
     }
 }

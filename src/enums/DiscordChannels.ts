@@ -7,6 +7,7 @@ export enum DiscordChannels {
     NGSCaptainList = "431452468933820418",
     NGSOffRosterSubs = "1351384908186124299",
     NGSCaptains = "329900204214059008",
+    NGSLFG = "1400973318370361494",
     DadSchedule = "674530041694257192",
     MomSchedule = "861743079019249714",
     SisSchedule = "793559101975429151",

@@ -11,6 +11,7 @@ var DiscordChannels;
     DiscordChannels["NGSCaptainList"] = "431452468933820418";
     DiscordChannels["NGSOffRosterSubs"] = "1351384908186124299";
     DiscordChannels["NGSCaptains"] = "329900204214059008";
+    DiscordChannels["NGSLFG"] = "1400973318370361494";
     DiscordChannels["DadSchedule"] = "674530041694257192";
     DiscordChannels["MomSchedule"] = "861743079019249714";
     DiscordChannels["SisSchedule"] = "793559101975429151";

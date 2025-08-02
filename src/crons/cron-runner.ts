@@ -32,6 +32,9 @@ export class CronRunner {
                 break;
             case "pendingmembers":
                 await cronHelper.MessageAboutPendingMembers();
+                break;
+            case "checklfg":
+                await cronHelper.DeleteLFGMessages();
                 break
         }
 

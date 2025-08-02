@@ -41,6 +41,9 @@ class CronRunner {
                 case "pendingmembers":
                     yield cronHelper.MessageAboutPendingMembers();
                     break;
+                case "checklfg":
+                    yield cronHelper.DeleteLFGMessages();
+                    break;
             }
             process.exit();
         });
