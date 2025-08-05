@@ -5,7 +5,7 @@ var NGSDivisionConcat;
 (function (NGSDivisionConcat) {
     // Storm = "storm",
     NGSDivisionConcat["Heroic"] = "heroic";
-    // Nexus = "nexus",
+    NGSDivisionConcat["Nexus"] = "nexus";
     NGSDivisionConcat["A"] = "a";
     //AEast = "a-east",
     // AWest = "a-west",
@@ -15,11 +15,11 @@ var NGSDivisionConcat;
     NGSDivisionConcat["C"] = "c";
     // CEast = "c-east",
     // CWest = "c-west",
-    NGSDivisionConcat["D"] = "d";
-    // DEast = "d-east",
-    // DWest = "d-west",
+    // D = "d",
+    NGSDivisionConcat["DEast"] = "d-east";
+    NGSDivisionConcat["DWest"] = "d-west";
     // EEast = "e-east",
     // EWest = "e-west"
-    NGSDivisionConcat["E"] = "e";
+    //E = "e"
 })(NGSDivisionConcat = exports.NGSDivisionConcat || (exports.NGSDivisionConcat = {}));
 //# sourceMappingURL=NGSDivisionConcat.js.map

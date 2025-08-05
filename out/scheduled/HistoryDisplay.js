@@ -16,7 +16,7 @@ const LiveDataStore_1 = require("../LiveDataStore");
 class HistoryDisplay {
     constructor(dataStore) {
         this.dataStore = dataStore;
-        this._historyStartDate = "02-02-2025";
+        this._historyStartDate = "08-03-2025";
     }
     GetRecentHistory(days) {
         return __awaiter(this, void 0, void 0, function* () {
