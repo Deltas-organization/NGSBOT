@@ -19,5 +19,6 @@ export enum NGSRoles {
     ORSDivisionC = "ORS Div C",
     ORSDivisionB = "ORS Div B",
     ORSDivisionA = "ORS Div A",
+    ORSDivisionNexus = "ORS Nexus",
     ORSDivisionHeroic = "ORS Heroic",
 }

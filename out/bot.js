@@ -50,6 +50,7 @@ let Bot = class Bot {
             { EmojiValue: "598558183530823694", RoleName: NGSRoles_1.NGSRoles.ORSDivisionC },
             { EmojiValue: "617155504120266796", RoleName: NGSRoles_1.NGSRoles.ORSDivisionB },
             { EmojiValue: "591636712338489349", RoleName: NGSRoles_1.NGSRoles.ORSDivisionA },
+            { EmojiValue: "864233991522484235", RoleName: NGSRoles_1.NGSRoles.ORSDivisionNexus },
             { EmojiValue: "600663992406507520", RoleName: NGSRoles_1.NGSRoles.ORSDivisionHeroic }
         ];
         this.dependencies = new TranslatorDependencies_1.CommandDependencies(client, new DataStoreWrapper_1.DataStoreWrapper(new LiveDataStore_1.LiveDataStore(apiToken)), apiToken, mongoConnection);

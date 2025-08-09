@@ -22,6 +22,7 @@ var NGSRoles;
     NGSRoles["ORSDivisionC"] = "ORS Div C";
     NGSRoles["ORSDivisionB"] = "ORS Div B";
     NGSRoles["ORSDivisionA"] = "ORS Div A";
+    NGSRoles["ORSDivisionNexus"] = "ORS Nexus";
     NGSRoles["ORSDivisionHeroic"] = "ORS Heroic";
 })(NGSRoles = exports.NGSRoles || (exports.NGSRoles = {}));
 //# sourceMappingURL=NGSRoles.js.map

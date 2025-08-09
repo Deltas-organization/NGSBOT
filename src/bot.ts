@@ -96,6 +96,7 @@ export class Bot {
         { EmojiValue: "598558183530823694", RoleName: NGSRoles.ORSDivisionC },
         { EmojiValue: "617155504120266796", RoleName: NGSRoles.ORSDivisionB },
         { EmojiValue: "591636712338489349", RoleName: NGSRoles.ORSDivisionA },
+        { EmojiValue: "864233991522484235", RoleName: NGSRoles.ORSDivisionNexus},
         { EmojiValue: "600663992406507520", RoleName: NGSRoles.ORSDivisionHeroic }]
 
     public WatchForUserORS() {
