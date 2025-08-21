@@ -10,10 +10,11 @@ import { INGSTeam } from "../interfaces";
 import { IHistoryMessages } from "../interfaces/IHistoryMessage";
 import { INGSHistory } from "../interfaces/INGSHistory";
 import { LiveDataStore } from "../LiveDataStore";
+import { TeamHelper } from "../helpers/TeamHelper";
 
 export class HistoryDisplay {
 
-    private _historyStartDate = "08-03-2025";
+    private static _historyStartDate = "08-03-2025";
     constructor(private dataStore: DataStoreWrapper) {
     }
 
@@ -33,7 +34,7 @@ export class HistoryDisplay {
                 if (dayDifference < days) {
                     const historyInformation = new HistoryInformation(history);
                     if (history.action == HistoryActions.JoinedTeam) {
-                        var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
+                        var numberOfRosterAdd = HistoryDisplay.GetRosterAddNumber(history, reversedHistory);
                         if (numberOfRosterAdd > 0) {
                             historyInformation.RosterAddNumber = numberOfRosterAdd;
                         }
@@ -47,6 +48,20 @@ export class HistoryDisplay {
         }
 
         return this.FormatMessages(validHistories);
+    }
+
+    public static async GetRosterAddNumberThisSeason(team: INGSTeam): Promise<number> {
+        const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp)
+        const reversedHistory = sortedHistory.slice().reverse();
+        for (let history of sortedHistory) {
+            if (history.action == HistoryActions.JoinedTeam) {
+                var numberOfRosterAdd = HistoryDisplay.GetRosterAddNumber(history, reversedHistory);
+                if (numberOfRosterAdd > 0) {
+                    return numberOfRosterAdd;
+                }
+            }
+        }
+        return 0;
     }
 
     public async GetTeamsCreatedThisSeason(season: number): Promise<string[]> {
@@ -72,7 +87,7 @@ export class HistoryDisplay {
         return messages;
     }
 
-    private GetRosterAddNumber(history: INGSHistory, sortedHistory: INGSHistory[]) {
+    private static GetRosterAddNumber(history: INGSHistory, sortedHistory: INGSHistory[]) {
         var addsSoFar = 0;
         var currentHistoryIndex = sortedHistory.indexOf(history);
         for (var indexedHistory of sortedHistory) {
@@ -89,11 +104,11 @@ export class HistoryDisplay {
         return addsSoFar - currentHistoryIndex;
     }
 
-    private IsHistoryNewSeasonRecord(historyRecord: INGSHistory) {
+    private static IsHistoryNewSeasonRecord(historyRecord: INGSHistory) {
         if (historyRecord.action == HistoryActions.AddedDivision)
             return true;
-        
-        if(historyRecord.season && historyRecord.season != +LiveDataStore.season)
+
+        if (historyRecord.season && historyRecord.season != +LiveDataStore.season)
             return true;
 
         var historyDate = new Date(historyRecord.timestamp);

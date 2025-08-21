@@ -16,7 +16,6 @@ const LiveDataStore_1 = require("../LiveDataStore");
 class HistoryDisplay {
     constructor(dataStore) {
         this.dataStore = dataStore;
-        this._historyStartDate = "08-03-2025";
     }
     GetRecentHistory(days) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35,7 +34,7 @@ class HistoryDisplay {
                     if (dayDifference < days) {
                         const historyInformation = new HistoryInformation(history);
                         if (history.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
-                            var numberOfRosterAdd = this.GetRosterAddNumber(history, reversedHistory);
+                            var numberOfRosterAdd = HistoryDisplay.GetRosterAddNumber(history, reversedHistory);
                             if (numberOfRosterAdd > 0) {
                                 historyInformation.RosterAddNumber = numberOfRosterAdd;
                             }
@@ -48,6 +47,21 @@ class HistoryDisplay {
                 }
             }
             return this.FormatMessages(validHistories);
+        });
+    }
+    static GetRosterAddNumberThisSeason(team) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sortedHistory = team.history.sort((h1, h2) => h1.timestamp - h2.timestamp);
+            const reversedHistory = sortedHistory.slice().reverse();
+            for (let history of sortedHistory) {
+                if (history.action == NGSHistoryActions_1.HistoryActions.JoinedTeam) {
+                    var numberOfRosterAdd = HistoryDisplay.GetRosterAddNumber(history, reversedHistory);
+                    if (numberOfRosterAdd > 0) {
+                        return numberOfRosterAdd;
+                    }
+                }
+            }
+            return 0;
         });
     }
     GetTeamsCreatedThisSeason(season) {
@@ -74,7 +88,7 @@ class HistoryDisplay {
             return messages;
         });
     }
-    GetRosterAddNumber(history, sortedHistory) {
+    static GetRosterAddNumber(history, sortedHistory) {
         var addsSoFar = 0;
         var currentHistoryIndex = sortedHistory.indexOf(history);
         for (var indexedHistory of sortedHistory) {
@@ -90,7 +104,7 @@ class HistoryDisplay {
         }
         return addsSoFar - currentHistoryIndex;
     }
-    IsHistoryNewSeasonRecord(historyRecord) {
+    static IsHistoryNewSeasonRecord(historyRecord) {
         if (historyRecord.action == NGSHistoryActions_1.HistoryActions.AddedDivision)
             return true;
         if (historyRecord.season && historyRecord.season != +LiveDataStore_1.LiveDataStore.season)
@@ -121,6 +135,7 @@ class HistoryDisplay {
     }
 }
 exports.HistoryDisplay = HistoryDisplay;
+HistoryDisplay._historyStartDate = "08-03-2025";
 class HistoryContainer {
     get HasHistories() {
         return this.Information.size > 0;

@@ -14,6 +14,7 @@ const NGSQueryBuilder_1 = require("../helpers/NGSQueryBuilder");
 const TeamSorter_1 = require("../helpers/TeamSorter");
 const MessageContainer_1 = require("../message-helpers/MessageContainer");
 const MongoCollections_1 = require("../mongo/models/MongoCollections");
+const HistoryDisplay_1 = require("../scheduled/HistoryDisplay");
 class CheckPendingMembers {
     constructor(apiKey, dataStore, mongoHelper) {
         this.apiKey = apiKey;
@@ -101,11 +102,12 @@ class CheckPendingMembers {
                 for (var team of teams.Teams) {
                     if (pending.teamName.toLowerCase() == team.teamName.toLowerCase()) {
                         found = true;
-                        result.push({ pendingMember: pending, division: team.divisionDisplayName });
+                        var rosterAddsThisSeason = yield HistoryDisplay_1.HistoryDisplay.GetRosterAddNumberThisSeason(team);
+                        result.push({ pendingMember: pending, division: team.divisionDisplayName, rosterAddCountSoFar: rosterAddsThisSeason });
                     }
                 }
                 if (!found)
-                    result.push({ pendingMember: pending, division: "UNPLACED" });
+                    result.push({ pendingMember: pending, division: "UNPLACED", rosterAddCountSoFar: 0 });
             }
             return result;
         });
@@ -115,15 +117,15 @@ class CheckPendingMembers {
         const sortedPendings = pendingsWithDivision.sort((item1, item2) => TeamSorter_1.TeamSorter.SortByDivision(item1.division, item2.division));
         const groupedbyDivisionPendings = sortedPendings.reduce(function (r, a) {
             r[a.division] = r[a.division] || [];
-            r[a.division].push(a.pendingMember);
+            r[a.division].push({ member: a.pendingMember, addNumber: a.rosterAddCountSoFar });
             return r;
         }, Object.create(null));
         for (const pendingGroupKey in groupedbyDivisionPendings) {
             const divisionName = pendingGroupKey;
             let pendingMembers = groupedbyDivisionPendings[pendingGroupKey];
             const groupedByTeamName = pendingMembers.reduce(function (r, a) {
-                r[a.teamName] = r[a.teamName] || [];
-                r[a.teamName].push(a);
+                r[a.member.teamName] = r[a.member.teamName] || [];
+                r[a.member.teamName].push(a);
                 return r;
             }, Object.create(null));
             const newMessageGroup = new MessageContainer_1.MessageGroup();
@@ -133,9 +135,10 @@ class CheckPendingMembers {
                 var groupedMembers = groupedByTeamName[groupedByTeamKey];
                 newMessageGroup.AddOnNewLine(`Team`, 2);
                 newMessageGroup.AddOnNewLine(`**${teamName}**`, 2);
+                newMessageGroup.AddOnNewLine(`Roster adds so far this season: ${groupedMembers[0].addNumber}`, 2);
                 newMessageGroup.AddOnNewLine(`Users`, 4);
                 for (var member of groupedMembers) {
-                    newMessageGroup.AddOnNewLine(`**${member.userName}**`, 4);
+                    newMessageGroup.AddOnNewLine(`**${member.member.userName}**`, 4);
                 }
                 newMessageGroup.AddEmptyLine();
             }
