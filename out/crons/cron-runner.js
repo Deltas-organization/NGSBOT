@@ -33,7 +33,7 @@ class CronRunner {
                     yield cronHelper.CheckReportedGames();
                     break;
                 case "nextweek":
-                    yield cronHelper.CheckSundaysUnScheduledGames();
+                    yield cronHelper.CheckWeekendUnScheduledGames();
                     break;
                 case "flex":
                     yield cronHelper.CheckFlexMatches();

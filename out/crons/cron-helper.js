@@ -148,9 +148,9 @@ let CronHelper = class CronHelper {
             }
         });
     }
-    CheckSundaysUnScheduledGames() {
+    CheckWeekendUnScheduledGames() {
         return __awaiter(this, void 0, void 0, function* () {
-            var IsSunday = moment().isoWeekday() == 7;
+            var IsSunday = moment().isoWeekday() >= 5;
             if (!IsSunday)
                 return;
             yield this.client.login(this.token);
