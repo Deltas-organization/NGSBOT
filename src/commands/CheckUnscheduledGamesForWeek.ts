@@ -21,7 +21,7 @@ export class CheckUnscheduledGamesForWeek {
 
     }
 
-    public async Check(): Promise<MessageHelper<void>[] | undefined> {
+    public async Check(updateRound: boolean): Promise<MessageHelper<void>[] | undefined> {
         var season: number = +LiveDataStore.season;
         try {
             var information = await this.mongoHelper.GetNgsInformation(season);
@@ -38,7 +38,8 @@ export class CheckUnscheduledGamesForWeek {
                     Globals.log(`problem reporting matches by round for division: ${division}`, e);
                 }
             }
-            await this.mongoHelper.UpdateSeasonRound(season);
+            if (updateRound)
+                await this.mongoHelper.UpdateSeasonRound(season);
             var successfulDivisions = new MessageHelper<void>();
             successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`))
             successfulDivisions.AddNewLine(this._divisionsWithAllGamesScheduled.join(", "))
