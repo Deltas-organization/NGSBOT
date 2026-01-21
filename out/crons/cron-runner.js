@@ -44,6 +44,9 @@ class CronRunner {
                 case "checklfg":
                     yield cronHelper.DeleteLFGMessages();
                     break;
+                case "checktracking":
+                    yield cronHelper.SendMessageAboutTrackedChannels();
+                    break;
             }
             process.exit();
         });

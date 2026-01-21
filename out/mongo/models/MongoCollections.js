@@ -9,5 +9,6 @@ var MongoCollections;
     MongoCollections["ScheduleRequest"] = "ScheduleRequest";
     MongoCollections["SeasonInformation"] = "SeasonInformation";
     MongoCollections["RolesToIgnore"] = "RolesToIgnore";
+    MongoCollections["TrackedChannelInformation"] = "TrackedChannelInformation";
 })(MongoCollections = exports.MongoCollections || (exports.MongoCollections = {}));
 //# sourceMappingURL=MongoCollections.js.map

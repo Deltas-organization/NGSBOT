@@ -5,7 +5,8 @@ export enum MongoCollections {
     PendingMembers = "PendingMembers",
     ScheduleRequest = "ScheduleRequest",
     SeasonInformation = "SeasonInformation",
-    RolesToIgnore = "RolesToIgnore"
+    RolesToIgnore = "RolesToIgnore",
+    TrackedChannelInformation = "TrackedChannelInformation",
 }
 
 export interface IMongoPendingMemberCollection extends INGSPendingMember {

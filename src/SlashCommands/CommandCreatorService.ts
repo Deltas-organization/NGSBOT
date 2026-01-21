@@ -7,6 +7,7 @@ import { GamesSlashCommand } from "./Commands/GamesSlashCommand";
 import { RandomSlashCommand } from "./Commands/RandomSlashCommand";
 import { RoleHelperCommand } from "./Commands/RoleHelperCommand";
 import { RandomTeamCommand } from "./Commands/RandomTeamCommand";
+import { TrackedChannelCommand } from "./Commands/TrackChannelCommand";
 
 type guildCommandContainer = { guild: string; commands: ChatInputApplicationCommandData[]; };
 export class CommandCreatorService {
@@ -74,7 +75,7 @@ export class CommandCreatorService {
         this.commands.push(new CaptainsCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RandomTeamCommand());
-        // this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
+        this.commands.push(new TrackedChannelCommand(this.mongoConnectionUri));
     }
 
     private async RunCommand(client: Client, interaction: CommandInteraction | ButtonInteraction): Promise<void> {

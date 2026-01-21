@@ -18,7 +18,7 @@ import { CaptainList } from "../../mongo/models/captain-list";
 import { NGSMongoHelper } from "../../helpers/NGSMongoHelper";
 
 export class CaptainsListWorker {
-
+    
     private _season: number;
     private _mongoHelper: NGSMongoHelper;
     private _guild: Guild;

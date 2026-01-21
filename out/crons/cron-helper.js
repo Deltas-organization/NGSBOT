@@ -40,6 +40,7 @@ const moment = require("moment");
 const CheckPendingMembers_1 = require("../commands/CheckPendingMembers");
 const NGSMongoHelper_1 = require("../helpers/NGSMongoHelper");
 const CleanupLFGChannel_1 = require("../commands/CleanupLFGChannel");
+const TrackedChannelWorker_1 = require("../commands/TrackedChannelWorker");
 let CronHelper = class CronHelper {
     constructor(client, token, apiToken, mongoConnection) {
         this.client = client;
@@ -54,6 +55,7 @@ let CronHelper = class CronHelper {
         this.checkFlexMatches = new CheckFlexMatches_1.CheckFlexMatches(this.dataStore);
         this.checkPendingMembers = new CheckPendingMembers_1.CheckPendingMembers(apiToken, this.dataStore, this.mongoHelper);
         this.cleanupLFGChannel = new CleanupLFGChannel_1.CleanupLFGChannel(this.client);
+        this.notifyOfTrackedChannels = new TrackedChannelWorker_1.TrackedChannelWorker(this.mongoHelper, this.client);
     }
     sendSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -200,6 +202,22 @@ let CronHelper = class CronHelper {
             yield this.client.login(this.token);
             try {
                 yield this.cleanupLFGChannel.DeleteOldMessages(4);
+            }
+            catch (e) {
+                Globals_1.Globals.log(e);
+            }
+        });
+    }
+    SendMessageAboutTrackedChannels() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.client.login(this.token);
+            try {
+                var reminders = yield this.notifyOfTrackedChannels.SendReminders();
+                if (reminders) {
+                    for (var reminder of reminders) {
+                        yield this.messageSender.SendToDiscordChannelAsBasic(reminder.messagehelper.CreateStringMessage(), reminder.channelId);
+                    }
+                }
             }
             catch (e) {
                 Globals_1.Globals.log(e);

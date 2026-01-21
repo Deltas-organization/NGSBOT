@@ -19,6 +19,7 @@ import moment = require("moment");
 import { CheckPendingMembers } from "../commands/CheckPendingMembers";
 import { NGSMongoHelper } from "../helpers/NGSMongoHelper";
 import { CleanupLFGChannel } from "../commands/CleanupLFGChannel";
+import { TrackedChannelWorker } from "../commands/TrackedChannelWorker";
 
 @injectable()
 export class CronHelper {
@@ -32,6 +33,7 @@ export class CronHelper {
     private checkFlexMatches: CheckFlexMatches;
     private checkPendingMembers: CheckPendingMembers;
     private cleanupLFGChannel: CleanupLFGChannel;
+    private notifyOfTrackedChannels: TrackedChannelWorker;
 
     constructor(
         @inject(TYPES.Client) private client: Client,
@@ -50,6 +52,7 @@ export class CronHelper {
         this.checkFlexMatches = new CheckFlexMatches(this.dataStore);
         this.checkPendingMembers = new CheckPendingMembers(apiToken, this.dataStore, this.mongoHelper);
         this.cleanupLFGChannel = new CleanupLFGChannel(this.client);
+        this.notifyOfTrackedChannels = new TrackedChannelWorker(this.mongoHelper, this.client);
     }
 
     public async sendSchedule() {
@@ -183,10 +186,25 @@ export class CronHelper {
         }
     }
 
-    public async DeleteLFGMessages() {        
+    public async DeleteLFGMessages() {
         await this.client.login(this.token);
         try {
             await this.cleanupLFGChannel.DeleteOldMessages(4);
+        }
+        catch (e) {
+            Globals.log(e);
+        }
+    }
+
+    public async SendMessageAboutTrackedChannels() {
+        await this.client.login(this.token);
+        try {
+            var reminders = await this.notifyOfTrackedChannels.SendReminders();
+            if (reminders) {
+                for (var reminder of reminders) {
+                    await this.messageSender.SendToDiscordChannelAsBasic(reminder.messagehelper.CreateStringMessage(), reminder.channelId);
+                }
+            }
         }
         catch (e) {
             Globals.log(e);

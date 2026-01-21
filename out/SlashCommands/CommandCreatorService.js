@@ -16,6 +16,7 @@ const GamesSlashCommand_1 = require("./Commands/GamesSlashCommand");
 const RandomSlashCommand_1 = require("./Commands/RandomSlashCommand");
 const RoleHelperCommand_1 = require("./Commands/RoleHelperCommand");
 const RandomTeamCommand_1 = require("./Commands/RandomTeamCommand");
+const TrackChannelCommand_1 = require("./Commands/TrackChannelCommand");
 class CommandCreatorService {
     constructor(client, dataStore, mongoConnectionUri) {
         this.client = client;
@@ -81,7 +82,7 @@ class CommandCreatorService {
         this.commands.push(new CaptainsCommand_1.CaptainsCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RoleHelperCommand_1.RoleHelperCommand(this.dataStore, this.mongoConnectionUri));
         this.commands.push(new RandomTeamCommand_1.RandomTeamCommand());
-        // this.commands.push(new SearchDBDCommand(this.mongoConnectionUri));
+        this.commands.push(new TrackChannelCommand_1.TrackedChannelCommand(this.mongoConnectionUri));
     }
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {

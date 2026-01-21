@@ -36,6 +36,9 @@ export class CronRunner {
             case "checklfg":
                 await cronHelper.DeleteLFGMessages();
                 break
+            case "checktracking":
+                await cronHelper.SendMessageAboutTrackedChannels();
+                break
         }
 
         process.exit();

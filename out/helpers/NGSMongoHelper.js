@@ -53,8 +53,8 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     AddOrUpdateAssignRoleRequest(request) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection("AssignRoleRequest");
-            var selectOneFilter = { guildId: { $eq: request.guildId } };
+            const collection = this.connectedDatabase.collection("AssignRoleRequest");
+            const selectOneFilter = { guildId: { $eq: request.guildId } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             if (existingRecord) {
                 existingRecord.assignablesRoles = [...new Set([...existingRecord.assignablesRoles, ...request.assignablesRoles])];
@@ -70,11 +70,11 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     RemoveAssignedRoles(request) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection("AssignRoleRequest");
-            var selectOneFilter = { guildId: { $eq: request.guildId } };
+            const collection = this.connectedDatabase.collection("AssignRoleRequest");
+            const selectOneFilter = { guildId: { $eq: request.guildId } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             if (existingRecord) {
-                var rolesToAssign = existingRecord.assignablesRoles;
+                const rolesToAssign = existingRecord.assignablesRoles;
                 for (const roleToRemove of request.assignablesRoles) {
                     const currentIndex = rolesToAssign.indexOf(roleToRemove);
                     if (currentIndex > -1) {
@@ -93,8 +93,8 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     GetAssignedRoleRequests(guildId) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.AssignRoleRequest);
-            var selectOneFilter = { guildId: { $eq: guildId } };
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.AssignRoleRequest);
+            const selectOneFilter = { guildId: { $eq: guildId } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             if (existingRecord)
                 return existingRecord.assignablesRoles;
@@ -105,8 +105,8 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     AddRoleToIgnore(guildId, roleId) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
-            var newRecord = {
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
+            const newRecord = {
                 guildId: guildId,
                 roleId: roleId
             };
@@ -115,10 +115,10 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     }
     GetRolesToIgnore(guildToSearch) {
         return __awaiter(this, void 0, void 0, function* () {
-            var result = [];
+            const result = [];
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
-            var selectFilter = { guildId: { $eq: guildToSearch } };
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.RolesToIgnore);
+            const selectFilter = { guildId: { $eq: guildToSearch } };
             yield collection.find(selectFilter).forEach(item => {
                 result.push(item.roleId);
             });
@@ -128,17 +128,17 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     GetCaptainListMessage(season, division) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
-            var selectOneFilter = { season: { $eq: season }, division: { $eq: division } };
-            var existingMessage = yield collection.findOne(selectOneFilter);
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
+            const selectOneFilter = { season: { $eq: season }, division: { $eq: division } };
+            const existingMessage = yield collection.findOne(selectOneFilter);
             return existingMessage;
         });
     }
     CreateCaptainListRecord(messageId, season, division) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
-            var newRecord = {
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
+            const newRecord = {
                 season: season,
                 messageId: messageId,
                 division: division
@@ -150,8 +150,8 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     UpdateCaptainListRecord(record) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
-            var selectOneFilter = { season: { $eq: record.season }, division: { $eq: record.division } };
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.CaptainList);
+            const selectOneFilter = { season: { $eq: record.season }, division: { $eq: record.division } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             yield collection.updateOne(selectOneFilter, { $set: record }, { upsert: true });
             return existingRecord;
@@ -160,9 +160,9 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     GetNgsInformation(season) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.SeasonInformation);
-            var selectOneFilter = { season: { $eq: season } };
-            var result = yield collection.findOne(selectOneFilter);
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.SeasonInformation);
+            const selectOneFilter = { season: { $eq: season } };
+            let result = yield collection.findOne(selectOneFilter);
             if (!result) {
                 result = {
                     season: season,
@@ -176,8 +176,8 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     UpdateSeasonRound(season) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.SeasonInformation);
-            var selectOneFilter = { season: { $eq: season } };
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.SeasonInformation);
+            const selectOneFilter = { season: { $eq: season } };
             const existingRecord = yield collection.findOne(selectOneFilter);
             existingRecord.round += 1;
             yield collection.updateOne(selectOneFilter, { $set: existingRecord }, { upsert: true });
@@ -187,9 +187,39 @@ class NGSMongoHelper extends Mongohelper_1.Mongohelper {
     RemovePendingMember(pendingMember) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectedPromise;
-            var collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.PendingMembers);
-            var selectOneQuery = { $and: [{ teamName: { $eq: pendingMember.teamName } }, { userName: { $eq: pendingMember.userName } }] };
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.PendingMembers);
+            const selectOneQuery = { $and: [{ teamName: { $eq: pendingMember.teamName } }, { userName: { $eq: pendingMember.userName } }] };
             yield collection.deleteOne(selectOneQuery);
+        });
+    }
+    GetTrackedChannelsInformation() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.TrackedChannelInformation);
+            const findAllTracking = { tracking: { $eq: true } };
+            const result = [];
+            yield collection.find(findAllTracking).forEach(item => {
+                result.push(item);
+            });
+            return result;
+        });
+    }
+    AddorStopTrackedChannelsInformation(channelId, reminderDays) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectedPromise;
+            const collection = this.connectedDatabase.collection(MongoCollections_1.MongoCollections.TrackedChannelInformation);
+            const selectOneFilter = { channelId: { $eq: channelId }, tracking: { $eq: true } };
+            const existingRecord = yield collection.findOne(selectOneFilter);
+            if (existingRecord) {
+                const deletedRecord = Object.assign(Object.assign({}, existingRecord), { tracking: false });
+                yield collection.updateOne(selectOneFilter, { $set: deletedRecord }, { upsert: true });
+                return 'Deleted';
+            }
+            else {
+                const newRecord = { channelId, tracking: true, reminderDays };
+                yield collection.insertOne(newRecord);
+                return 'Added';
+            }
         });
     }
 }
