@@ -12,11 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrackedChannelCommand = void 0;
 const discord_js_1 = require("discord.js");
 const DiscordGuilds_1 = require("../../enums/DiscordGuilds");
-const RandomOptions_1 = require("../../helpers/RandomOptions");
+const OptionsCommandBase_1 = require("../Base/OptionsCommandBase");
 const TrackChannelWorker_1 = require("../Workers/TrackChannelWorker");
-const SlashCommandBase_1 = require("../Base/SlashCommandBase");
 const DiscordMembers_1 = require("../../enums/DiscordMembers");
-class TrackedChannelCommand extends SlashCommandBase_1.SlashCommandBase {
+class TrackedChannelCommand extends OptionsCommandBase_1.OptionsCommandBase {
     constructor(mongoConnectionUri) {
         super();
         this.mongoConnectionUri = mongoConnectionUri;
@@ -28,7 +27,6 @@ class TrackedChannelCommand extends SlashCommandBase_1.SlashCommandBase {
     RunCommand(client, interaction) {
         return __awaiter(this, void 0, void 0, function* () {
             const member = interaction.member;
-            console.log(member.id);
             //NGS REC RoleId
             if (member.id != DiscordMembers_1.DiscordMembers.Delta && (member === null || member === void 0 ? void 0 : member.roles.cache.has("522579713554776064")) !== true) {
                 yield interaction.followUp({
@@ -36,8 +34,8 @@ class TrackedChannelCommand extends SlashCommandBase_1.SlashCommandBase {
                 });
                 return;
             }
-            const worker = new TrackChannelWorker_1.TrackChannelWorker(client, this.mongoConnectionUri);
-            const message = yield worker.Run(interaction.channelId);
+            const worker = new TrackChannelWorker_1.TrackChannelWorker(this.mongoConnectionUri);
+            const message = yield worker.Run(interaction.channelId, interaction.options.data);
             if (message === "Added") {
                 yield interaction.followUp({
                     content: 'This channel is now being tracked.'
@@ -52,13 +50,11 @@ class TrackedChannelCommand extends SlashCommandBase_1.SlashCommandBase {
     }
     CreateOptions() {
         const options = [];
-        for (var option of RandomOptions_1.Random.options) {
-            options.push({
-                name: option.name,
-                description: option.description,
-                type: discord_js_1.ApplicationCommandOptionType.Integer
-            });
-        }
+        options.push({
+            name: "day_reminder",
+            description: "Sets the Days Required of Interactions before posting",
+            type: discord_js_1.ApplicationCommandOptionType.Integer
+        });
         return options;
     }
 }

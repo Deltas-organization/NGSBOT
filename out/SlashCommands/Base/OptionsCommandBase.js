@@ -7,7 +7,8 @@ class OptionsCommandBase extends SlashCommandBase_1.SlashCommandBase {
         this.command = {
             description: this.Description,
             name: this.Name,
-            options: this.CreateOptions()
+            options: this.CreateOptions(),
+            defaultMemberPermissions: this.Permissions
         };
         return this.command;
     }

@@ -11,25 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrackChannelWorker = void 0;
 const NGSMongoHelper_1 = require("../../helpers/NGSMongoHelper");
-const ChannelMessageSender_1 = require("../../helpers/messageSenders/ChannelMessageSender");
-const DiscordChannels_1 = require("../../enums/DiscordChannels");
 class TrackChannelWorker {
-    constructor(client, mongoConnectionUri) {
-        this.client = client;
+    constructor(mongoConnectionUri) {
         this.mongoConnectionUri = mongoConnectionUri;
         this._mongoHelper = new NGSMongoHelper_1.NGSMongoHelper(this.mongoConnectionUri);
-        this._messageSender = new ChannelMessageSender_1.ChannelMessageSender(this.client);
     }
-    Run(channelId) {
+    Run(channelId, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._guild = yield this.GetGuild(DiscordChannels_1.DiscordChannels.NGSDiscord);
-            return yield this._mongoHelper.AddorStopTrackedChannelsInformation(channelId, 5);
-        });
-    }
-    GetGuild(channelId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const channel = (yield this.client.channels.fetch(channelId));
-            return channel.guild;
+            if (options.length > 0) {
+                var optionValue = options[0];
+                return yield this._mongoHelper.AddorStopTrackedChannelsInformation(channelId, +optionValue.value);
+            }
+            else {
+                return yield this._mongoHelper.AddorStopTrackedChannelsInformation(channelId, 1);
+            }
         });
     }
 }

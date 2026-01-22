@@ -8,7 +8,7 @@ import { SlashCommandBase } from "../Base/SlashCommandBase";
 import { DataStoreWrapper } from "../../helpers/DataStoreWrapper";
 import { DiscordMembers } from "../../enums/DiscordMembers";
 
-export class TrackedChannelCommand extends SlashCommandBase {
+export class TrackedChannelCommand extends OptionsCommandBase {
 
     protected Description: string = "Will Track this channel";
     public Name: string = "track";
@@ -21,7 +21,6 @@ export class TrackedChannelCommand extends SlashCommandBase {
 
     public async RunCommand(client: Client<boolean>, interaction: CommandInteraction<CacheType>): Promise<void> {
         const member = interaction.member as GuildMember;
-        console.log(member.id);
         //NGS REC RoleId
         if (member.id != DiscordMembers.Delta && member?.roles.cache.has("522579713554776064") !== true) {
             await interaction.followUp(
@@ -30,8 +29,8 @@ export class TrackedChannelCommand extends SlashCommandBase {
                 });
             return;
         }
-        const worker = new TrackChannelWorker(client, this.mongoConnectionUri);
-        const message = await worker.Run(interaction.channelId);
+        const worker = new TrackChannelWorker(this.mongoConnectionUri);
+        const message = await worker.Run(interaction.channelId, interaction.options.data);
         if (message === "Added") {
             await interaction.followUp(
                 {
@@ -48,13 +47,11 @@ export class TrackedChannelCommand extends SlashCommandBase {
 
     public CreateOptions(): ApplicationCommandOptionData[] {
         const options: ApplicationCommandOptionData[] = [];
-        for (var option of Random.options) {
-            options.push({
-                name: option.name,
-                description: option.description,
-                type: ApplicationCommandOptionType.Integer
-            })
-        }
+        options.push({
+            name: "day_reminder",
+            description: "Sets the Days Required of Interactions before posting",
+            type: ApplicationCommandOptionType.Integer
+        })
         return options;
     }
 
