@@ -20,7 +20,8 @@ class Globals {
         }
     }
     static InformDelta(message) {
-        this.ChannelSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
+        if (this.ChannelSender)
+            this.ChannelSender.SendToDiscordChannel(message, DiscordChannels_1.DiscordChannels.DeltaPmChannel);
     }
 }
 exports.Globals = Globals;

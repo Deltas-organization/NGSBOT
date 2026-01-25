@@ -26,6 +26,7 @@ export class Globals {
     }
 
     public static InformDelta(message: string) {
-        this.ChannelSender.SendToDiscordChannel(message, DiscordChannels.DeltaPmChannel);
+        if (this.ChannelSender)
+            this.ChannelSender.SendToDiscordChannel(message, DiscordChannels.DeltaPmChannel);
     }
 }

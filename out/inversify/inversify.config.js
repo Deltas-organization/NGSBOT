@@ -11,7 +11,8 @@ let container = new inversify_1.Container();
 container.bind(types_1.TYPES.Bot).to(bot_1.Bot).inSingletonScope();
 container.bind(types_1.TYPES.CreateCasterEvents).to(create_caster_event_1.CreateCasterEvents).inSingletonScope();
 container.bind(types_1.TYPES.CronHelper).to(cron_helper_1.CronHelper).inSingletonScope();
-container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({ intents: [
+container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({
+    intents: [
         discord_js_1.GatewayIntentBits.DirectMessages,
         discord_js_1.GatewayIntentBits.Guilds,
         discord_js_1.GatewayIntentBits.GuildMembers,
@@ -20,7 +21,11 @@ container.bind(types_1.TYPES.Client).toConstantValue(new discord_js_1.Client({ i
         discord_js_1.GatewayIntentBits.MessageContent,
         discord_js_1.GatewayIntentBits.GuildScheduledEvents,
         discord_js_1.GatewayIntentBits.GuildVoiceStates
-    ] }));
+    ],
+    partials: [
+        discord_js_1.Partials.Channel
+    ]
+}));
 if (process.env.TOKEN)
     container.bind(types_1.TYPES.Token).toConstantValue(process.env.TOKEN);
 if (process.env.NGSToken)

@@ -202,7 +202,12 @@ export class CronHelper {
             var reminders = await this.notifyOfTrackedChannels.SendReminders();
             if (reminders) {
                 for (var reminder of reminders) {
-                    await this.messageSender.SendToDiscordChannelAsBasic(reminder.messagehelper.CreateStringMessage(), reminder.channelId);
+                    try {
+                        await this.messageSender.SendToDiscordChannelAsBasic(reminder.messagehelper.CreateStringMessage(), reminder.channelId);
+                    }
+                    catch (e) {
+                        Globals.log("Unable to send Reminder", reminder, e);
+                    }
                 }
             }
         }

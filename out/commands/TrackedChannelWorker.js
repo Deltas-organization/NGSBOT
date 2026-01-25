@@ -25,14 +25,18 @@ class TrackedChannelWorker {
             try {
                 var information = yield this.mongoHelper.GetTrackedChannelsInformation();
                 for (var value of information) {
-                    console.log("value", value);
-                    const guildChannel = yield this.GetChannel(value.channelId);
-                    const messages = yield guildChannel.messages.fetch({ limit: 1 });
-                    const lastMessage = messages.first();
-                    if (lastMessage && this.IsMessageOlderThen(lastMessage, value.reminderDays)) {
-                        const messageToSend = new MessageHelper_1.MessageHelper();
-                        messageToSend.AddNew(`This channel hasn't been interacted with in a while. Please either stop tracking the channel or continue discussion.`);
-                        result.push({ channelId: value.channelId, messagehelper: messageToSend });
+                    try {
+                        const guildChannel = yield this.GetChannel(value.channelId);
+                        const messages = yield guildChannel.messages.fetch({ limit: 1 });
+                        const lastMessage = messages.first();
+                        if (lastMessage && this.IsMessageOlderThen(lastMessage, value.reminderDays)) {
+                            const messageToSend = new MessageHelper_1.MessageHelper();
+                            messageToSend.AddNew(`This channel hasn't been interacted with in a while. Please either stop tracking the channel or continue discussion.`);
+                            result.push({ channelId: value.channelId, messagehelper: messageToSend });
+                        }
+                    }
+                    catch (e) {
+                        Globals_1.Globals.log("Problem with channel retrieval.", e);
                     }
                 }
             }
