@@ -20,7 +20,7 @@ export class TrackedChannelWorker {
     private _currentDate: moment.Moment;
 
     constructor(private mongoHelper: NGSMongoHelper, private client: Client) {
-        this._currentDate = moment();
+        this._currentDate = moment().utc();
     }
 
     public async SendReminders(): Promise<{ channelId: string, messagehelper: MessageHelper<void> }[] | undefined> {
@@ -30,12 +30,17 @@ export class TrackedChannelWorker {
             for (var value of information) {
                 try {
                     const guildChannel = await this.GetChannel(value.channelId);
-                    const messages = await guildChannel.messages.fetch({ limit: 1 });
-                    const lastMessage = messages.first();
-                    if (lastMessage && this.IsMessageOlderThen(lastMessage, value.reminderDays)) {
-                        const messageToSend = new MessageHelper<void>();
-                        messageToSend.AddNew(`This channel hasn't been interacted with in a while. Please either stop tracking the channel or continue discussion.`);
-                        result.push({ channelId: value.channelId, messagehelper: messageToSend })
+                    if (guildChannel) {
+                        const messages = await guildChannel.messages.fetch({ limit: 1 });
+                        const lastMessage = messages.first();
+                        if (lastMessage && this.IsMessageOlderThen(lastMessage, value.reminderDays)) {
+                            const messageToSend = new MessageHelper<void>();
+                            messageToSend.AddNew(`This channel hasn't been interacted with in a while. Please either stop tracking the channel or continue discussion.`);
+                            result.push({ channelId: value.channelId, messagehelper: messageToSend })
+                        }
+                    }
+                    else {
+                        Globals.log("Unable to find channel");
                     }
                 }
                 catch (e) {
@@ -56,8 +61,13 @@ export class TrackedChannelWorker {
 
     private IsMessageOlderThen(message: Message, days: number): boolean {
         let momentDate = moment(message.createdTimestamp);
+        const hoursDifference = this._currentDate.diff(momentDate, 'hours');
         const dateDifference = this._currentDate.diff(momentDate, 'days');
-        if (dateDifference > days) {
+        console.log("momentDate", momentDate.utc());
+        console.log("createdTimestamp", message.createdTimestamp);
+        console.log("hours", hoursDifference);
+        console.log("date", dateDifference);
+        if (hoursDifference > days * 24) {
             return true;
         }
         return false;
