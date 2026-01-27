@@ -54,7 +54,7 @@ class TrackedChannelWorker {
     }
     GetChannel(channelId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.client.channels.fetch(channelId));
+            return (yield this.client.channels.fetch(channelId).catch(() => null));
         });
     }
     IsMessageOlderThen(message, days) {

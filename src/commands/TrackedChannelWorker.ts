@@ -56,7 +56,7 @@ export class TrackedChannelWorker {
     }
 
     private async GetChannel(channelId: string) {
-        return (await this.client.channels.fetch(channelId)) as TextChannel;
+        return (await this.client.channels.fetch(channelId).catch(() => null)) as TextChannel;
     }
 
     private IsMessageOlderThen(message: Message, days: number): boolean {
