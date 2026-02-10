@@ -152,5 +152,5 @@ class LiveDataStore {
     }
 }
 exports.LiveDataStore = LiveDataStore;
-LiveDataStore.season = '20';
+LiveDataStore.season = '21';
 //# sourceMappingURL=LiveDataStore.js.map

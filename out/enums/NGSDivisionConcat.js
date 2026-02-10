@@ -15,9 +15,9 @@ var NGSDivisionConcat;
     NGSDivisionConcat["C"] = "c";
     // CEast = "c-east",
     // CWest = "c-west",
-    // D = "d",
-    NGSDivisionConcat["DEast"] = "d-east";
-    NGSDivisionConcat["DWest"] = "d-west";
+    NGSDivisionConcat["D"] = "d";
+    //DEast = "d-east",
+    //DWest = "d-west",
     // EEast = "e-east",
     // EWest = "e-west"
     //E = "e"

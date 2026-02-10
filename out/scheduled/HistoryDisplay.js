@@ -135,7 +135,7 @@ class HistoryDisplay {
     }
 }
 exports.HistoryDisplay = HistoryDisplay;
-HistoryDisplay._historyStartDate = "08-03-2025";
+HistoryDisplay._historyStartDate = "02-15-2025";
 class HistoryContainer {
     get HasHistories() {
         return this.Information.size > 0;

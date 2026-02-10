@@ -14,7 +14,7 @@ import { TeamHelper } from "../helpers/TeamHelper";
 
 export class HistoryDisplay {
 
-    private static _historyStartDate = "08-03-2025";
+    private static _historyStartDate = "02-15-2025";
     constructor(private dataStore: DataStoreWrapper) {
     }
 

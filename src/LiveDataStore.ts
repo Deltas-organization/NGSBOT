@@ -9,7 +9,7 @@ import { AugmentedNGSUser } from './models/AugmentedNGSUser';
 
 export class LiveDataStore {
 
-    public static season: string = '20';
+    public static season: string = '21';
 
     constructor(private _apiKey: string) {
 

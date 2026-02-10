@@ -11,9 +11,9 @@ export enum NGSDivisions {
     C = "C",
     //CEast = "C East",
     //CWest = "C West",
-    DEast = "D East",
-    DWest = "D West",
-    // D = "D",
+    //DEast = "D East",
+    //DWest = "D West",
+    D = "D",
     // EEast = "E East",
     // EWest = "E West",
     // E = "E"

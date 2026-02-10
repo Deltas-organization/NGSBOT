@@ -23,11 +23,11 @@ class TeamSorter {
             NGSDivisions_1.NGSDivisions.BEast,
             NGSDivisions_1.NGSDivisions.BWest,
             NGSDivisions_1.NGSDivisions.C,
-            NGSDivisions_1.NGSDivisions.DEast,
-            NGSDivisions_1.NGSDivisions.DWest
+            NGSDivisions_1.NGSDivisions.D,
+            //NGSDivisions.DWest];
+            //NGSDivisions.EEast,
+            //NGSDivisions.EWest];
         ];
-        //NGSDivisions.EEast,
-        //NGSDivisions.EWest];
         for (var current of order) {
             var division1Index = divisionDisplay1 === null || divisionDisplay1 === void 0 ? void 0 : divisionDisplay1.indexOf(current);
             if (!division1Index)
@@ -46,6 +46,7 @@ class TeamSorter {
     }
     static SortByDivisionConcat(divisionDisplay1, divisionDisplay2) {
         const order = [
+            //NGSDivisionConcat.Storm,
             NGSDivisionConcat_1.NGSDivisionConcat.Heroic,
             NGSDivisionConcat_1.NGSDivisionConcat.Nexus,
             NGSDivisionConcat_1.NGSDivisionConcat.A,
@@ -54,12 +55,12 @@ class TeamSorter {
             NGSDivisionConcat_1.NGSDivisionConcat.BEast,
             NGSDivisionConcat_1.NGSDivisionConcat.BWest,
             NGSDivisionConcat_1.NGSDivisionConcat.C,
-            NGSDivisionConcat_1.NGSDivisionConcat.DEast,
-            NGSDivisionConcat_1.NGSDivisionConcat.DWest
+            NGSDivisionConcat_1.NGSDivisionConcat.D,
+            //NGSDivisionConcat.DWest
+            // NGSDivisionConcat.EEast,
+            // NGSDivisionConcat.EWest
+            //NGSDivisionConcat.E
         ];
-        // NGSDivisionConcat.EEast,
-        // NGSDivisionConcat.EWest
-        //NGSDivisionConcat.E];
         for (var current of order) {
             var division1Index = divisionDisplay1 === null || divisionDisplay1 === void 0 ? void 0 : divisionDisplay1.indexOf(current);
             if (!division1Index)

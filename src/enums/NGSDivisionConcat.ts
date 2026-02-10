@@ -11,9 +11,9 @@ export enum NGSDivisionConcat {
     C = 'c',
     // CEast = "c-east",
     // CWest = "c-west",
-    // D = "d",
-    DEast = "d-east",
-    DWest = "d-west",
+    D = "d",
+    //DEast = "d-east",
+    //DWest = "d-west",
     // EEast = "e-east",
     // EWest = "e-west"
     //E = "e"

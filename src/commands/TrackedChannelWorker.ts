@@ -44,7 +44,7 @@ export class TrackedChannelWorker {
                     }
                 }
                 catch (e) {
-                    Globals.log("Problem with channel retrieval.", e)
+                    Globals.log("Problem with channel retrieval.", e);
                 }
             }
         }

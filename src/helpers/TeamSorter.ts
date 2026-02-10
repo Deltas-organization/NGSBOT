@@ -17,30 +17,31 @@ export class TeamSorter {
 
     public static SortByDivision(divisionDisplay1: string, divisionDisplay2: string): number {
         const order = [//NGSDivisions.Storm,
-        NGSDivisions.Heroic,
-        NGSDivisions.Nexus,
-        NGSDivisions.A,
-        // NGSDivisions.AEast,
-        // NGSDivisions.AWest,
-        NGSDivisions.BEast,
-        NGSDivisions.BWest,
-        NGSDivisions.C,
-        NGSDivisions.DEast,
-        NGSDivisions.DWest];
-        //NGSDivisions.EEast,
-        //NGSDivisions.EWest];
+            NGSDivisions.Heroic,
+            NGSDivisions.Nexus,
+            NGSDivisions.A,
+            // NGSDivisions.AEast,
+            // NGSDivisions.AWest,
+            NGSDivisions.BEast,
+            NGSDivisions.BWest,
+            NGSDivisions.C,
+            NGSDivisions.D,
+            //NGSDivisions.DWest];
+            //NGSDivisions.EEast,
+            //NGSDivisions.EWest];
+        ];
 
         for (var current of order) {
             var division1Index = divisionDisplay1?.indexOf(current);
-            if(!division1Index)
+            if (!division1Index)
                 return -1;
 
             if (division1Index > -1) {
                 return -1;
             }
-            
+
             var division2Index = divisionDisplay2?.indexOf(current);
-            if(!division2Index)
+            if (!division2Index)
                 return 1;
 
             if (division2Index > -1) {
@@ -51,32 +52,34 @@ export class TeamSorter {
     }
 
     public static SortByDivisionConcat(divisionDisplay1: string, divisionDisplay2: string): number {
-        const order = [//NGSDivisionConcat.Storm,
-        NGSDivisionConcat.Heroic,
-        NGSDivisionConcat.Nexus,
-        NGSDivisionConcat.A,
-        // NGSDivisionConcat.AEast,
-        // NGSDivisionConcat.AWest,
-        NGSDivisionConcat.BEast,
-        NGSDivisionConcat.BWest,
-        NGSDivisionConcat.C,
-        NGSDivisionConcat.DEast,
-        NGSDivisionConcat.DWest];
-        // NGSDivisionConcat.EEast,
-        // NGSDivisionConcat.EWest
-        //NGSDivisionConcat.E];
+        const order = [
+            //NGSDivisionConcat.Storm,
+            NGSDivisionConcat.Heroic,
+            NGSDivisionConcat.Nexus,
+            NGSDivisionConcat.A,
+            // NGSDivisionConcat.AEast,
+            // NGSDivisionConcat.AWest,
+            NGSDivisionConcat.BEast,
+            NGSDivisionConcat.BWest,
+            NGSDivisionConcat.C,
+            NGSDivisionConcat.D,
+            //NGSDivisionConcat.DWest
+            // NGSDivisionConcat.EEast,
+            // NGSDivisionConcat.EWest
+            //NGSDivisionConcat.E
+        ];
 
         for (var current of order) {
             var division1Index = divisionDisplay1?.indexOf(current);
-            if(!division1Index)
+            if (!division1Index)
                 return -1;
 
             if (division1Index > -1) {
                 return -1;
             }
-            
+
             var division2Index = divisionDisplay2?.indexOf(current);
-            if(!division2Index)
+            if (!division2Index)
                 return 1;
 
             if (division2Index > -1) {
