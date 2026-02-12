@@ -33,6 +33,12 @@ class CaptainsListWorker {
         return __awaiter(this, void 0, void 0, function* () {
             this._guild = yield this.GetGuild(DiscordChannels_1.DiscordChannels.NGSDiscord);
             this._roleHelper = yield RoleHelper_1.RoleHelper.CreateFrom(this._guild);
+            try {
+                this._guildMembers = (yield this._guild.members.fetch()).map((mem, _, __) => mem);
+            }
+            catch (e) {
+                Globals_1.Globals.log("there was a problem getting guild members", e);
+            }
             for (var value in NGSDivisions_1.NGSDivisions) {
                 const division = NGSDivisions_1.NGSDivisions[value];
                 try {
@@ -108,9 +114,8 @@ class CaptainsListWorker {
                 const divisionInformation = divisions.find(d => d.displayName == division);
                 if (!divisionInformation)
                     return `Unable to find division: ${division}`;
-                const guildMembers = (yield this._guild.members.fetch()).map((mem, _, __) => mem);
                 const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
-                const divMods = guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
+                const divMods = this._guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
                 const messageHelper = new MessageHelper_1.MessageHelper('captainList');
                 messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
                 for (let team of teams) {
@@ -120,14 +125,14 @@ class CaptainsListWorker {
                     let hasAssistant = false;
                     for (let user of users.sort((user1, user2) => this.userSort(user1, user2))) {
                         if (user.IsCaptain) {
-                            let guildMember = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                            let guildMember = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, this._guildMembers);
                             if (guildMember)
                                 messageHelper.AddNew(` - captain ${guildMember.member}`);
                             else
                                 messageHelper.AddNew(` - captain ${user.displayName}`);
                         }
                         if (user.IsAssistantCaptain) {
-                            let guildMember = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                            let guildMember = yield DiscordFuzzySearch_1.DiscordFuzzySearch.FindGuildMember(user, this._guildMembers);
                             if (hasAssistant) {
                                 if (guildMember)
                                     messageHelper.AddNew(` and ${guildMember.member}`);

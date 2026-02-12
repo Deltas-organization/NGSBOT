@@ -1,4 +1,4 @@
-import { Client, Guild, GuildChannel, Message, User } from "discord.js";
+import { Client, Guild, GuildChannel, GuildMember, Message, User } from "discord.js";
 import { DiscordChannels } from "../../enums/DiscordChannels";
 import { NGSDivisions } from "../../enums/NGSDivisions";
 import { Globals } from "../../Globals";
@@ -24,6 +24,7 @@ export class CaptainsListWorker {
     private _guild: Guild;
     private _roleHelper: RoleHelper;
     private _messageSender: ChannelMessageSender;
+    private _guildMembers: GuildMember[];
 
     public constructor(private client: Client<boolean>, private dataStore: DataStoreWrapper, private mongoConnectionUri: string) {
         this._season = +LiveDataStore.season;
@@ -34,6 +35,12 @@ export class CaptainsListWorker {
     public async Run(): Promise<void> {
         this._guild = await this.GetGuild(DiscordChannels.NGSDiscord);
         this._roleHelper = await RoleHelper.CreateFrom(this._guild);
+        try {
+            this._guildMembers = (await this._guild.members.fetch()).map((mem, _, __) => mem);
+        }
+        catch (e) {
+            Globals.log("there was a problem getting guild members", e);
+        }
 
         for (var value in NGSDivisions) {
             const division = NGSDivisions[value];
@@ -100,17 +107,14 @@ export class CaptainsListWorker {
 
     private async CreateDivisionList(division: NGSDivisions, channelToUserForGuildRetrieval: string): Promise<string | undefined> {
         try {
-
             const teams = await this.GetTeamsInDivision(division);
             const divisions = await this.dataStore.GetDivisions();
             const divisionInformation = divisions.find(d => d.displayName == division);
             if (!divisionInformation)
                 return `Unable to find division: ${division}`;
 
-            const guildMembers = (await this._guild.members.fetch()).map((mem, _, __) => mem);
-
             const modsToLookFor = divisionInformation.moderator.split('&').map(item => item.replace(' ', '').toLowerCase());
-            const divMods = guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
+            const divMods = this._guildMembers.filter(member => modsToLookFor.indexOf(member.user.username) != -1);
             const messageHelper = new MessageHelper<unknown>('captainList');
             messageHelper.AddNewLine(`**${division}** Moderator: ${divMods.join("&")}`);
             for (let team of teams) {
@@ -120,20 +124,19 @@ export class CaptainsListWorker {
                 let hasAssistant = false;
                 for (let user of users.sort((user1, user2) => this.userSort(user1, user2))) {
                     if (user.IsCaptain) {
-                        let guildMember = await DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                        let guildMember = await DiscordFuzzySearch.FindGuildMember(user, this._guildMembers);
                         if (guildMember)
                             messageHelper.AddNew(` - captain ${guildMember.member}`)
                         else
                             messageHelper.AddNew(` - captain ${user.displayName}`)
                     }
                     if (user.IsAssistantCaptain) {
-                        let guildMember = await DiscordFuzzySearch.FindGuildMember(user, guildMembers);
+                        let guildMember = await DiscordFuzzySearch.FindGuildMember(user, this._guildMembers);
                         if (hasAssistant) {
                             if (guildMember)
-                                messageHelper.AddNew(` and ${guildMember.member}`)
+                                messageHelper.AddNew(` and ${guildMember.member}`);
                             else
-                                messageHelper.AddNew(` and ${user.displayName}`)
-
+                                messageHelper.AddNew(` and ${user.displayName}`);
                         }
                         else {
                             if (guildMember)
