@@ -22,12 +22,12 @@ export class CheckUnscheduledGamesForWeek {
     }
 
     public async Check(updateRound: boolean): Promise<MessageHelper<void>[] | undefined> {
-        var season: number = +LiveDataStore.season;
+        const season: number = +LiveDataStore.season;
         try {
-            var information = await this.mongoHelper.GetNgsInformation(season);
-            var result: MessageHelper<void>[] = [];
+            const information = await this.mongoHelper.GetNgsInformation(season);
+            const result: MessageHelper<void>[] = [];
             for (var value in NGSDivisions) {
-                var division = NGSDivisions[value];
+                const division = NGSDivisions[value];
                 try {
                     //We do +1 since the round hasn't been incremented yet and we are looking at next weeks scheduled games.
                     var message = await this.SendMessageForDivision(division, information.round + 1);
@@ -40,10 +40,12 @@ export class CheckUnscheduledGamesForWeek {
             }
             if (updateRound)
                 await this.mongoHelper.UpdateSeasonRound(season);
-            var successfulDivisions = new MessageHelper<void>();
-            successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`))
-            successfulDivisions.AddNewLine(this._divisionsWithAllGamesScheduled.join(", "))
-            result.push(successfulDivisions);
+            if (this._divisionsWithAllGamesScheduled.length > 0) {
+                const successfulDivisions = new MessageHelper<void>();
+                successfulDivisions.AddNewLine((`These Divisions have all their games scheduled.`))
+                successfulDivisions.AddNewLine(this._divisionsWithAllGamesScheduled.join(", "))
+                result.push(successfulDivisions);
+            }
             return result;
         }
         catch (e) {
