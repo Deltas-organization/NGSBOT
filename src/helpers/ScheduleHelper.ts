@@ -38,6 +38,7 @@ export class ScheduleHelper {
 
         for (var schedule of scheduledGames) {
             let scheduledDate = new Date(+schedule.scheduledTime.startTime);
+            scheduledDate.setHours(scheduledDate.getHours() + 3);
             let scheduledUTC = DateHelper.ConvertDateToUTC(scheduledDate);
             var dayDifference = this.GetDayDifference(scheduledUTC, todaysUTC);
             var dayCount = dayDifference.dayCount;
