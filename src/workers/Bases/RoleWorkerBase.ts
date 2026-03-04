@@ -40,7 +40,7 @@ export abstract class RoleWorkerBase extends WorkerBase {
         NGSRoles.ORSDivisionC,
         NGSRoles.ORSDivisionB,
         NGSRoles.ORSDivisionA,
-        NGSRoles.Nexus,
+        NGSRoles.ORSDivisionNexus,
         NGSRoles.ORSDivisionHeroic,
         NGSRoles.OffRosterSub];
 
