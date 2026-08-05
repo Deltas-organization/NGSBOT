@@ -1,20 +1,13 @@
-import { tagged } from "inversify";
-import { stringify } from "querystring";
-import { NGSDivisions } from "../enums/NGSDivisions";
 import { HistoryActions } from "../enums/NGSHistoryActions";
 import { DataStoreWrapper } from "../helpers/DataStoreWrapper";
 import { MessageHelper } from "../helpers/MessageHelper";
-import { TeamSorter } from "../helpers/TeamSorter";
-import { CommandDependencies } from "../helpers/TranslatorDependencies";
 import { INGSTeam } from "../interfaces";
-import { IHistoryMessages } from "../interfaces/IHistoryMessage";
 import { INGSHistory } from "../interfaces/INGSHistory";
 import { LiveDataStore } from "../LiveDataStore";
-import { TeamHelper } from "../helpers/TeamHelper";
 
 export class HistoryDisplay {
 
-    private static _historyStartDate = "02-15-2025";
+    private static _historyStartDate = "08-10-2026";
     constructor(private dataStore: DataStoreWrapper) {
     }
 

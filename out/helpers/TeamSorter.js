@@ -22,8 +22,9 @@ class TeamSorter {
             // NGSDivisions.AWest,
             NGSDivisions_1.NGSDivisions.BEast,
             NGSDivisions_1.NGSDivisions.BWest,
-            NGSDivisions_1.NGSDivisions.C,
-            NGSDivisions_1.NGSDivisions.D,
+            NGSDivisions_1.NGSDivisions.CEast,
+            NGSDivisions_1.NGSDivisions.CWest,
+            // NGSDivisions.D,
             //NGSDivisions.DWest];
             //NGSDivisions.EEast,
             //NGSDivisions.EWest];
@@ -54,8 +55,8 @@ class TeamSorter {
             // NGSDivisionConcat.AWest,
             NGSDivisionConcat_1.NGSDivisionConcat.BEast,
             NGSDivisionConcat_1.NGSDivisionConcat.BWest,
-            NGSDivisionConcat_1.NGSDivisionConcat.C,
-            NGSDivisionConcat_1.NGSDivisionConcat.D,
+            NGSDivisionConcat_1.NGSDivisionConcat.CEast,
+            NGSDivisionConcat_1.NGSDivisionConcat.CWest,
             //NGSDivisionConcat.DWest
             // NGSDivisionConcat.EEast,
             // NGSDivisionConcat.EWest

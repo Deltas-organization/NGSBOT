@@ -12,10 +12,10 @@ var NGSDivisionConcat;
     // B = 'c',
     NGSDivisionConcat["BEast"] = "b-east";
     NGSDivisionConcat["BWest"] = "b-west";
-    NGSDivisionConcat["C"] = "c";
-    // CEast = "c-east",
-    // CWest = "c-west",
-    NGSDivisionConcat["D"] = "d";
+    // C = 'c',
+    NGSDivisionConcat["CEast"] = "c-east";
+    NGSDivisionConcat["CWest"] = "c-west";
+    // D = "d",
     //DEast = "d-east",
     //DWest = "d-west",
     // EEast = "e-east",
