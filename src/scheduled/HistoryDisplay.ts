@@ -7,7 +7,7 @@ import { LiveDataStore } from "../LiveDataStore";
 
 export class HistoryDisplay {
 
-    private static _historyStartDate = "08-10-2026";
+    private static _historyStartDate = "08-05-2026";
     constructor(private dataStore: DataStoreWrapper) {
     }
 
