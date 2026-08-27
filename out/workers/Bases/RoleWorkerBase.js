@@ -44,6 +44,7 @@ class RoleWorkerBase extends WorkerBase_1.WorkerBase {
             'HI Captain',
             '@everyone',
             'Ticket Tool',
+            'Welcoming Committee',
             NGSRoles_1.NGSRoles.ORSDivisionE,
             NGSRoles_1.NGSRoles.ORSDivisionD,
             NGSRoles_1.NGSRoles.ORSDivisionC,

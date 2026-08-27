@@ -35,6 +35,7 @@ export abstract class RoleWorkerBase extends WorkerBase {
         'HI Captain',
         '@everyone',
         'Ticket Tool',
+        'Welcoming Committee',
         NGSRoles.ORSDivisionE,
         NGSRoles.ORSDivisionD,
         NGSRoles.ORSDivisionC,
